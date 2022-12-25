@@ -12,6 +12,7 @@ public static class Game {
 
     // Managers
     public static Renderer     Renderer     = new ();
+    public static Registry     Registry     = new();
     public static AssetManager AssetManager = new ();
     public static SaveManager  SaveManager  = new ();
     public static SceneManager SceneManager = new ();

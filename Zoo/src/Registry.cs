@@ -4,56 +4,56 @@ using Raylib_cs;
 
 namespace Zoo;
 
-public enum ObjectType {
-    [Description("foliage")] Foliage,
-    [Description("building")] Building,
-    [Description("consumable")] Consumable,
-    [Description("misc")] Misc
+public static class ObjectType {
+    public static readonly string Foliage = "foliage";
+    public static readonly string Building = "building";
+    public static readonly string Consumable = "consumables";
+    public static readonly string Misc = "misc"; 
 }
 
 public struct ObjectData {
-    public string     assetPath;
-    public string     name;
-    public string     spritePath;
-    public string     spriteSheetPath;
-    public ObjectType type;
-    public Vector2    pivot;
-    public Vector2    size;
-    public bool       solid;
-    public bool       canPlaceOnSlopes;
-    public bool       canPlaceInWater;
+    public string          AssetPath;
+    public string          Name;
+    public string          SpritePath;
+    public SpriteSheetData SpriteSheet;
+    public string          Type;
+    public Vector2         Pivot;
+    public Vector2         Size;
+    public bool            Solid;
+    public bool            CanPlaceOnSlopes;
+    public bool            CanPlaceInWater;
 }
 
 public struct WallData {
-    public string assetPath;
-    public string name;
-    public string type;
-    public bool   solid;
-    public string spriteSheetPath;
+    public string          AssetPath;
+    public string          Name;
+    public string          Type;
+    public bool            Solid;
+    public SpriteSheetData SpriteSheet;
 }
 
 public struct PathData {
-    public string assetPath;
-    public string name;
-    public string spriteSheetPath;
+    public string          AssetPath;
+    public string          Name;
+    public SpriteSheetData SpriteSheet;
 }
 
 public class Registry {
-    private Dictionary<string, ObjectData> objectRegistry = new ();
-    private Dictionary<string, WallData>   wallRegistry   = new ();
-    private Dictionary<string, PathData>   pathRegistry   = new();
+    private readonly Dictionary<string, ObjectData> objectRegistry = new ();
+    private readonly Dictionary<string, WallData>   wallRegistry   = new ();
+    private readonly Dictionary<string, PathData>   pathRegistry   = new();
 
     public void RegisterObject(string assetPath, ObjectData data) {
         objectRegistry.Add(assetPath, data);
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered object {data.name}");
+        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered object {data.Name}");
     }
     public void RegisterWall(string assetPath, WallData data) {
         wallRegistry.Add(assetPath, data);
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered wall {data.name}");
+        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered wall {data.Name}");
     }
     public void RegisterPath(string assetPath, PathData data) {
         pathRegistry.Add(assetPath, data);
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered path {data.name}");
+        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered path {data.Name}");
     }
     
     public ObjectData GetObject(string assetPath) {

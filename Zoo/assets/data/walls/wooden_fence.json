@@ -1,0 +1,11 @@
+{
+    "assetPath": "assets/walls/wooden_fence.json",
+    "name": "Wooden Fence",
+    "type": "fence",
+    "spriteSheet": {
+        "spritePath": "assets/paths/wooden_fence.png",
+        "cellHeight": 32,
+        "cellWidth": 16
+    },
+    "solid": true
+}
