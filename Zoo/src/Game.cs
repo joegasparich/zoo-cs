@@ -118,6 +118,11 @@ public static class Game {
         framesSinceGameStart++;
     }
 
+    public static void OnInput(InputEvent evt) {
+        // if (!event->consumed) ui.onInput(event);
+        if (!evt.consumed) SceneManager.GetCurrentScene().OnInput(evt);
+    }
+
     public static int RegisterEntity(Entity entity) {
         return RegisterEntity(entity, nextEntityId++);
     }
