@@ -11,8 +11,10 @@ public static class Game {
     public const  int ScreenHeight = 720;
 
     // Managers
-    public static Renderer     Renderer = new ();
+    public static Renderer     Renderer     = new ();
     public static AssetManager AssetManager = new ();
+    public static SaveManager  SaveManager  = new ();
+    public static SceneManager SceneManager = new ();
     
     // Collections
     private static Dictionary<int, Entity> entities = new ();
@@ -40,12 +42,8 @@ public static class Game {
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Hello World");
 
         AssetManager.LoadAssets();
-
-        // Test
-        var testEntity = new Entity(new Vector2(0, 0));
-        var renderer = testEntity.AddComponent<RenderComponent>();
-        renderer.SetSprite(Assets.Keeper);
-        RegisterEntity(testEntity);
+        
+        SaveManager.NewGame();
     }
 
     private static void Cleanup() {
