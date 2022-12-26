@@ -1,9 +1,9 @@
 {
-    "assetPath": "assets/walls/iron_bar_fence.json",
+    "assetPath": "assets/data/walls/iron_bar_fence.json",
     "name": "Iron Bar Fence",
     "type": "fence",
     "spriteSheet": {
-        "spritePath": "assets/paths/iron_bar_fence.png",
+        "texturePath": "assets/data/walls/iron_bar_fence.png",
         "cellHeight": 32,
         "cellWidth": 16
     },

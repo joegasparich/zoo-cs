@@ -12,10 +12,10 @@ public class RenderComponent : Component {
     public RenderComponent(Entity entity) : base(entity) {}
 
     public override void Render() {
-        Game.Renderer.Blit(
+        Find.Renderer.Blit(
             sprite,
             entity.Pos,
-            Game.Renderer.GetDepth(entity.Pos.Y),
+            Find.Renderer.GetDepth(entity.Pos.Y),
             new Vector2(sprite.width * source.width, sprite.height * source.height) * Renderer.PixelScale,
             origin,
             source
@@ -23,7 +23,7 @@ public class RenderComponent : Component {
     }
 
     public void SetSprite(string path) {
-        sprite = Game.AssetManager.GetTexture(path);
+        sprite = Find.AssetManager.GetTexture(path);
         spritePath = path;
     }
 

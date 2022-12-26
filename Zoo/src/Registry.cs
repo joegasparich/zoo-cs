@@ -12,30 +12,30 @@ public static class ObjectType {
 }
 
 public struct ObjectData {
-    public string          AssetPath;
-    public string          Name;
-    public string          SpritePath;
-    public SpriteSheetData SpriteSheet;
-    public string          Type;
-    public Vector2         Pivot;
-    public Vector2         Size;
-    public bool            Solid;
-    public bool            CanPlaceOnSlopes;
-    public bool            CanPlaceInWater;
+    public string       AssetPath;
+    public string       Name;
+    public string?      SpritePath;
+    public SpriteSheet? SpriteSheet;
+    public string       Type;
+    public Vector2      Pivot;
+    public Vector2      Size;
+    public bool         Solid;
+    public bool         CanPlaceOnSlopes;
+    public bool         CanPlaceInWater;
 }
 
 public struct WallData {
-    public string          AssetPath;
-    public string          Name;
-    public string          Type;
-    public bool            Solid;
-    public SpriteSheetData SpriteSheet;
+    public string      AssetPath;
+    public string      Name;
+    public string      Type;
+    public bool        Solid;
+    public SpriteSheet SpriteSheet;
 }
 
 public struct PathData {
-    public string          AssetPath;
-    public string          Name;
-    public SpriteSheetData SpriteSheet;
+    public string      AssetPath;
+    public string      Name;
+    public SpriteSheet SpriteSheet;
 }
 
 public class Registry {

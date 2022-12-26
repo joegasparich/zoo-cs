@@ -1,18 +1,14 @@
 using System.Text.Json;
 using Raylib_cs;
+using Zoo.util;
 
 namespace Zoo;
-
-public struct SpriteSheetData {
-    public string SpritePath;
-    public int    CellWidth;
-    public int    CellHeight;
-}
 
 public class AssetManager {
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
         
     private readonly Dictionary<string, Texture2D> textureMap = new ();
+    private readonly Dictionary<string, SpriteSheet> spriteSheetMap = new ();
 
     public void LoadAssets() {
         // Textures
@@ -32,8 +28,14 @@ public class AssetManager {
 
             var        json = File.ReadAllText(path);
             ObjectData data = JsonSerializer.Deserialize<ObjectData>(json, JsonOpts)!;
+
+            if (data.SpritePath != null)
+                GetTexture(data.SpritePath);
             
-            Game.Registry.RegisterObject(path, data);
+            if (data.SpriteSheet?.TexturePath != null)
+                LoadSpriteSheet(data.SpriteSheet.Value);
+            
+            Find.Registry.RegisterObject(path, data);
         }
         
         // Paths
@@ -45,7 +47,9 @@ public class AssetManager {
             var      json = File.ReadAllText(path);
             PathData data = JsonSerializer.Deserialize<PathData>(json, JsonOpts)!;
             
-            Game.Registry.RegisterPath(path, data);
+            LoadSpriteSheet(data.SpriteSheet);
+            
+            Find.Registry.RegisterPath(path, data);
         }
         
         // Walls
@@ -57,7 +61,9 @@ public class AssetManager {
             var      json = File.ReadAllText(path);
             WallData data = JsonSerializer.Deserialize<WallData>(json, JsonOpts)!;
             
-            Game.Registry.RegisterWall(path, data);
+            LoadSpriteSheet(data.SpriteSheet);
+            
+            Find.Registry.RegisterWall(path, data);
         }
     }
 
@@ -69,5 +75,23 @@ public class AssetManager {
         }
 
         return textureMap[path];
+    }
+
+    public SpriteSheet? LoadSpriteSheet(SpriteSheet spritesheet) {
+        if (spritesheet.TexturePath.NullOrEmpty()) return null;
+
+        if (!spriteSheetMap.ContainsKey(spritesheet.TexturePath)) {
+            spritesheet.Texture = GetTexture(spritesheet.TexturePath);
+            spriteSheetMap.Add(spritesheet.TexturePath, spritesheet);
+        }
+
+        return spriteSheetMap[spritesheet.TexturePath];
+    }
+    
+    public SpriteSheet? GetSpriteSheet(string texturePath) {
+        if (texturePath.NullOrEmpty()) return null;
+        if (!spriteSheetMap.ContainsKey(texturePath)) return null;
+        
+        return spriteSheetMap[texturePath];
     }
 }

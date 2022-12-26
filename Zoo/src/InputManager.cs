@@ -51,7 +51,7 @@ public class InputManager {
             evt.keyUp         = Raylib.IsKeyReleased(key) ? key : null;
             evt.keyHeld       = Raylib.IsKeyDown(key) ? key : null;
             evt.mousePos      = Raylib.GetMousePosition();
-            evt.mouseWorldPos = Game.Renderer.ScreenToWorldPos(evt.mousePos);
+            evt.mouseWorldPos = Find.Renderer.ScreenToWorldPos(evt.mousePos);
 
             FireInputEvent(evt);
         }
@@ -67,7 +67,7 @@ public class InputManager {
             evt.mouseUp       = Raylib.IsMouseButtonReleased(mouseButton) ? mouseButton : null;
             evt.mouseHeld     = Raylib.IsMouseButtonDown(mouseButton) ? mouseButton : null;
             evt.mousePos      = Raylib.GetMousePosition();
-            evt.mouseWorldPos = Game.Renderer.ScreenToWorldPos(evt.mousePos);
+            evt.mouseWorldPos = Find.Renderer.ScreenToWorldPos(evt.mousePos);
 
             FireInputEvent(evt);
         }
@@ -76,7 +76,7 @@ public class InputManager {
             var evt = new InputEvent(InputEventType.MouseScroll);
             evt.mouseScroll   = Raylib.GetMouseWheelMove();
             evt.mousePos      = Raylib.GetMousePosition();
-            evt.mouseWorldPos = Game.Renderer.ScreenToWorldPos(evt.mousePos);
+            evt.mouseWorldPos = Find.Renderer.ScreenToWorldPos(evt.mousePos);
 
             FireInputEvent(evt);
         }
@@ -94,7 +94,7 @@ public class InputManager {
     }
     
     public Vector2 GetMouseWorldPosition() {
-        return Game.Renderer.ScreenToWorldPos(GetMousePosition());
+        return Find.Renderer.ScreenToWorldPos(GetMousePosition());
     }
     
     public InputEvent GetCurrentEvent() {

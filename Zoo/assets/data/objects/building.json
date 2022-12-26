@@ -10,7 +10,7 @@
         "y": 2
     },
     "spriteSheet": {
-        "spritePath": "assets/img/building.png",
+        "texturePath": "assets/data/objects/building.png",
         "cellHeight": 32,
         "cellWidth": 32
     },

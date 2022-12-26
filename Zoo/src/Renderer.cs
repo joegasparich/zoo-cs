@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using Zoo.util;
+using Zoo.world;
 
 namespace Zoo;
 
@@ -96,8 +97,7 @@ public class Renderer {
     }
 
     public float GetDepth(float yPos) {
-        var largerThanWorld = 10000; // TODO move
-        return Math.Clamp(yPos / largerThanWorld, 0, 1) * -1 + Depth.YSorting.ToInt();
+        return Math.Clamp(yPos / World.LargerThanWorld, 0, 1) * -1 + Depth.YSorting.ToInt();
     }
 
     public void Blit(

@@ -11,6 +11,7 @@ public static class Game {
     public const  int ScreenHeight = 720;
 
     // Managers
+    public static InputManager Input        = new();
     public static Renderer     Renderer     = new ();
     public static Registry     Registry     = new();
     public static AssetManager AssetManager = new ();
@@ -110,9 +111,11 @@ public static class Game {
     private static void Render() {
         Renderer.BeginDrawing();
         {
-            foreach (var entity in entities.Values) {
-                entity.Render();
-            }
+            SceneManager.GetCurrentScene().Render();
+            
+            // foreach (var entity in entities.Values) {
+            //     entity.Render();
+            // }
         }
         Renderer.EndDrawing();
 
@@ -141,4 +144,7 @@ public static class Game {
         entitiesToRemove.Add(entity);
     }
     
+    public static Entity GetEntityById(int id) {
+        return entities[id];
+    }
 }

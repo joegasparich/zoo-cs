@@ -25,4 +25,9 @@ public static class ExtensionMethods {
         }
         return null;
     }
+    
+    public static bool NullOrEmpty( this string str )
+    {
+        return string.IsNullOrEmpty(str);
+    }
 }
