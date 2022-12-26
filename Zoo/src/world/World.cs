@@ -63,6 +63,21 @@ public class World {
         }
     }
 
+    public IEnumerable<IntVec2> GetAdjacentTiles(IntVec2 tile, bool diagonals = false) {
+        for (int i = 0; i < 4; i++) {
+            var adj = GetTileInDirection(tile, (Side) i);
+            if (IsPositionInMap(adj)) yield return adj;
+        }
+
+        if (diagonals) {
+            for (int i = 0; i < 4; i++) {
+                var adj = GetTileInDirection(tile, (Side) i);
+                var adj2 = GetTileInDirection(adj, (Side) ((i + 1) % 4));
+                if (IsPositionInMap(adj2)) yield return adj2;
+            }
+        }
+    }
+
     public Side GetQuadrantAtPos(Vector2 pos) {
         var xRel = (pos.X + LargerThanWorld) % 1f - 0.5f;
         var yRel = (pos.Y + LargerThanWorld) % 1f - 0.5f;

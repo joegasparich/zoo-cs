@@ -1,3 +1,5 @@
+using Zoo.world;
+
 namespace Zoo; 
 
 public static class Find {
@@ -10,6 +12,8 @@ public static class Find {
             return null!;
         }
     }
+
+    public static World World => Zoo.World;
 
     public static Registry Registry => Game.Registry;
     public static InputManager Input => Game.Input;

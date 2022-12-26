@@ -32,38 +32,28 @@ public class BiomeGrid {
     private int            rows;
     private int            cols;
     private bool           isSetup = false;
-    private BiomeChunk[][] chunkGrid;
-
-    private IEnumerable<BiomeChunk> AllChunks {
-        get {
-            foreach (var col in chunkGrid) {
-                foreach (var chunk in col) {
-                    yield return chunk;
-                }
-            }
-        }
-    }
+    private BiomeChunk[,] chunkGrid;
 
     public BiomeGrid(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
+        
+        var chunkCols = cols / ChunkSize + Convert.ToInt32(cols % ChunkSize != 0);
+        var chunkRows = rows / ChunkSize + Convert.ToInt32(rows % ChunkSize != 0);
+        
+        chunkGrid = new BiomeChunk[chunkCols, chunkRows];
     }
 
     public void Setup() {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
         
-        var chunkCols = cols / ChunkSize + Convert.ToInt32(cols % ChunkSize != 0);
-        var chunkRows = rows / ChunkSize + Convert.ToInt32(rows % ChunkSize != 0);
-        
-        chunkGrid = new BiomeChunk[chunkCols][];
-        for (int i = 0; i < chunkCols; i++) {
-            chunkGrid[i] = new BiomeChunk[chunkRows];
-            for (int j = 0; j < chunkRows; j++) {
-                chunkGrid[i][j] = new BiomeChunk(
+        for (var i = 0; i < chunkGrid.GetLength(0); i++) {
+            for (var j = 0; j < chunkGrid.GetLength(1); j++) {
+                chunkGrid[i, j] = new BiomeChunk(
                     i, 
                     j,
-                    i == chunkCols - 1 && cols % ChunkSize != 0 ? cols & ChunkSize : ChunkSize,
-                    j == chunkRows - 1 && rows % ChunkSize != 0 ? rows & ChunkSize : ChunkSize
+                    i == chunkGrid.GetLength(0) - 1 && cols % ChunkSize != 0 ? cols & ChunkSize : ChunkSize,
+                    j == chunkGrid.GetLength(1) - 1 && rows % ChunkSize != 0 ? rows & ChunkSize : ChunkSize
                 );
             }
         }
@@ -89,13 +79,13 @@ public class BiomeGrid {
     }
 
     public void PostUpdate() {
-        foreach (var chunk in AllChunks) {
+        foreach (var chunk in chunkGrid) {
             chunk.PostUpdate();
         }
     }
 
     public void Render() {
-        foreach (var chunk in AllChunks) {
+        foreach (var chunk in chunkGrid) {
             chunk.Render();
         }
     }
@@ -106,7 +96,7 @@ public class BiomeGrid {
     
     private BiomeChunk GetChunk(int col, int row) {
         if (!IsChunkInGrid(col, row)) return null;
-        return chunkGrid[col][row];
+        return chunkGrid[col, row];
     }
 
     private IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
@@ -124,7 +114,7 @@ public class BiomeGrid {
                         radius
                     )
                 ) {
-                    yield return chunkGrid[floorX + i][floorY + j];
+                    yield return chunkGrid[floorX + i, floorY + j];
                 }
             }
         }
@@ -143,7 +133,7 @@ public class BiomeGrid {
     }
 
     public void RegenerateAllChunks() {
-        foreach (var chunk in AllChunks) {
+        foreach (var chunk in chunkGrid) {
             chunk.ShouldRegenerate = true;
         }
     }

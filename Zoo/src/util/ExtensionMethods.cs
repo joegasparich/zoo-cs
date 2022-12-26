@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Numerics;
 using System.Reflection;
 
 namespace Zoo.util; 
@@ -29,5 +30,9 @@ public static class ExtensionMethods {
     public static bool NullOrEmpty( this string str )
     {
         return string.IsNullOrEmpty(str);
+    }
+    
+    public static IntVec2 Floor(this Vector2 vec) {
+        return new IntVec2(JMath.FloorToInt(vec.X), JMath.FloorToInt(vec.Y));
     }
 }

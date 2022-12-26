@@ -7,9 +7,11 @@ public static class JMath {
     public static int FloorToInt(float f) => (int)MathF.Floor(f);
     public static int CeilToInt(float f) => (int)MathF.Ceiling(f);
     
-    public static float Lerp(float from, float to, float pct) =>  from + (to - from) * pct;
-    public static float Normalise(float val, float min, float max) =>  (val - min) / (max - min);
-    public static float Clamp(float val, float min, float max) =>  Math.Max(min, Math.Min(max, val));
+    public static float Lerp(float         from, float to,  float pct) =>  from + (to - from) * pct;
+    public static float Normalise(float    val,  float min, float max) =>  (val - min) / (max - min);
+    public static float Clamp(float        val,  float min, float max) =>  Math.Max(min, Math.Min(max, val));
+    public static float Min(params float[] vals) => vals.Min();
+    public static float Max(params float[] vals) => vals.Max();
     
     // Vectors
     public static Vector2 XY(this Vector3 v) => new Vector2(v.X, v.Y);

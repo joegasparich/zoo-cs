@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Zoo.util; 
 
 public struct IntVec2 : IEquatable<IntVec2> {
@@ -41,6 +43,8 @@ public struct IntVec2 : IEquatable<IntVec2> {
     public static bool operator !=(IntVec2 a, IntVec2 b) {
         return !a.Equals(b);
     }
+    
+    public static implicit operator Vector2(IntVec2 v) => new (v.X, v.Y);
 
     public bool Equals(IntVec2 other) {
         return X == other.X && Y == other.Y;
