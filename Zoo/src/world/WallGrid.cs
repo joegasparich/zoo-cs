@@ -103,7 +103,7 @@ public class WallGrid {
                     pos: pos * World.WorldScale,
                     depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
                     scale: new Vector2(1, 2) * World.WorldScale,
-                    source: spriteSheet.GetCellBounds(spriteIndex),
+                    source: spriteSheet.GetCellBounds(spriteIndex.ToInt()),
                     color: wall.OverrideColour
                 );
                 

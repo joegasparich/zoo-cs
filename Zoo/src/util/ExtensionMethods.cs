@@ -5,6 +5,10 @@ using System.Reflection;
 namespace Zoo.util; 
 
 public static class ExtensionMethods {
+    public static bool FEquals(this float a, float b) {
+        return Math.Abs(a - b) < 0.0001f;
+    }
+    
     public static int ToInt(this Enum e) {
         return Convert.ToInt32(e);
     }

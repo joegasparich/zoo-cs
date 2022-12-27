@@ -8,7 +8,8 @@ namespace Zoo;
 public enum Depth
 {
     Ground = -1,
-    Water = -2,
+    GroundCover = -2,
+    Water = -3,
     Overlay = -4,
     YSorting = - 5,
     Debug = -8,
