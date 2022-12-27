@@ -17,7 +17,7 @@ public class AssetManager {
                 continue;
             }
 
-            GetTexture(path);
+            GetTexture(path.Replace("\\", "/"));
         }
         
         // Objects
@@ -25,8 +25,9 @@ public class AssetManager {
             if (!path.EndsWith(".json")) {
                 continue;
             }
+            var finalPath = path.Replace("\\", "/");
 
-            var        json = File.ReadAllText(path);
+            var        json = File.ReadAllText(finalPath);
             ObjectData data = JsonSerializer.Deserialize<ObjectData>(json, JsonOpts)!;
 
             if (data.SpritePath != null)
@@ -35,7 +36,7 @@ public class AssetManager {
             if (data.SpriteSheet?.TexturePath != null)
                 LoadSpriteSheet(data.SpriteSheet.Value);
             
-            Find.Registry.RegisterObject(path, data);
+            Find.Registry.RegisterObject(finalPath, data);
         }
         
         // Paths
@@ -43,13 +44,14 @@ public class AssetManager {
             if (!path.EndsWith(".json")) {
                 continue;
             }
+            var finalPath = path.Replace("\\", "/");
 
-            var      json = File.ReadAllText(path);
+            var      json = File.ReadAllText(finalPath);
             PathData data = JsonSerializer.Deserialize<PathData>(json, JsonOpts)!;
             
-            LoadSpriteSheet(data.SpriteSheet);
+            data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;
             
-            Find.Registry.RegisterPath(path, data);
+            Find.Registry.RegisterPath(finalPath, data);
         }
         
         // Walls
@@ -57,13 +59,14 @@ public class AssetManager {
             if (!path.EndsWith(".json")) {
                 continue;
             }
-
-            var      json = File.ReadAllText(path);
+            var finalPath = path.Replace("\\", "/");
+            
+            var      json = File.ReadAllText(finalPath);
             WallData data = JsonSerializer.Deserialize<WallData>(json, JsonOpts)!;
             
-            LoadSpriteSheet(data.SpriteSheet);
+            data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;
             
-            Find.Registry.RegisterWall(path, data);
+            Find.Registry.RegisterWall(finalPath, data);
         }
     }
 

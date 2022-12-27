@@ -17,7 +17,7 @@ public class ZooScene : Scene {
         // Test
         var testEntity = new Entity(new Vector2(0, 0));
         var renderer   = testEntity.AddComponent<RenderComponent>();
-        renderer.SetSprite(Assets.Keeper);
+        renderer.SetSprite(TEXTURES.KEEPER);
         Game.RegisterEntity(testEntity);
     }
 

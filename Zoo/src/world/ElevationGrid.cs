@@ -207,7 +207,7 @@ public class ElevationGrid {
         }
     }
 
-    public Elevation GetElevationAtGridPos(IntVec2 gridPos) {
+    private Elevation GetElevationAtGridPos(IntVec2 gridPos) {
         if (!isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
             return Elevation.Flat;

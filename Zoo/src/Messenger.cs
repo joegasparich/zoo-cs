@@ -1,7 +1,8 @@
 ﻿namespace Zoo;
 
 public enum EventType {
-    ElevationUpdated
+    ElevationUpdated,
+    PlaceSolid
 }
 
 public static class Messenger {

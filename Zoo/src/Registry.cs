@@ -56,6 +56,7 @@ public class Registry {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered path {data.Name}");
     }
     
+    // TODO: Automate loading assets similar to DefOf?
     public ObjectData GetObject(string assetPath) {
         return objectRegistry[assetPath];
     }

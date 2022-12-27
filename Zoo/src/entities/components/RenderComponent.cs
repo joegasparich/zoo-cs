@@ -13,12 +13,12 @@ public class RenderComponent : Component {
 
     public override void Render() {
         Find.Renderer.Blit(
-            sprite,
-            entity.Pos,
-            Find.Renderer.GetDepth(entity.Pos.Y),
-            new Vector2(sprite.width * source.width, sprite.height * source.height) * Renderer.PixelScale,
-            origin,
-            source
+            texture: sprite,
+            pos: entity.Pos,
+            depth: Find.Renderer.GetDepth(entity.Pos.Y),
+            scale: new Vector2(sprite.width * source.width, sprite.height * source.height) * Renderer.PixelScale,
+            origin: origin,
+            source: source
         );
     }
 

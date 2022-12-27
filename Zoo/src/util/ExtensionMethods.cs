@@ -35,4 +35,9 @@ public static class ExtensionMethods {
     public static IntVec2 Floor(this Vector2 vec) {
         return new IntVec2(JMath.FloorToInt(vec.X), JMath.FloorToInt(vec.Y));
     }
+    
+    public static void Deconstruct(this Vector2 v, out float x, out float y) {
+        x = v.X;
+        y = v.Y;
+    }
 }

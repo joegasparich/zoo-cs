@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Zoo.entities;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -20,7 +21,11 @@ public class World {
     
     public ElevationGrid Elevation { get; }
     public BiomeGrid Biomes { get; }
-        
+    public WallGrid Walls { get; }
+
+    private Dictionary<int, Entity> TileObjects = new ();
+    private Dictionary<string, Entity> TileObjectMap = new ();
+
     private bool isSetup = false;
     
     public World(int width, int height) {
@@ -29,6 +34,7 @@ public class World {
         
         Elevation = new ElevationGrid(Width, Height);
         Biomes = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
+        Walls = new WallGrid(Width, Height);
     }
     
     public void Setup() {
@@ -36,6 +42,7 @@ public class World {
         
         Elevation.Setup();
         Biomes.Setup();
+        Walls.Setup();
         
         isSetup = true;
         
@@ -52,8 +59,31 @@ public class World {
     public void Render() {
         Biomes.Render();
         Elevation.Render();
+        Walls.Render();
     }
     public void RenderDebug() { }
+
+    public void RegisterTileObject(Entity tileObject) {
+        var component = tileObject.GetComponent<TileObjectComponent>();
+        
+        TileObjects.Add(tileObject.Id, tileObject);
+        foreach(var tile in component.GetOccupiedTiles()) {
+            TileObjectMap.Add(tile.ToString(), tileObject);
+        }
+
+        if (component.Data.Solid) {
+            Messenger.Fire(EventType.PlaceSolid, component.GetOccupiedTiles().ToArray());
+        }
+    }
+    
+    public void UnregisterTileObject(Entity tileObject) {
+        var component = tileObject.GetComponent<TileObjectComponent>();
+        
+        TileObjects.Remove(tileObject.Id);
+        foreach(var tile in component.GetOccupiedTiles()) {
+            TileObjectMap.Remove(tile.ToString());
+        }
+    }
 
     public bool IsPositionInMap(Vector2 pos) {
         return pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
@@ -94,5 +124,10 @@ public class World {
         if (xRel <= 0 && Math.Abs(xRel) >= Math.Abs(yRel)) return Side.West;
 
         return Side.North;
+    }
+    
+    public Entity? GetTileObjectAtTile(IntVec2 tile) {
+        return TileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
+
     }
 }

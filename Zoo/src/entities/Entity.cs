@@ -57,8 +57,8 @@ public class Entity {
         components.Add(component.GetType(), component);
         return component;
     }
-    public Component GetComponent(Type type) {
-        return components[type];
+    public T GetComponent<T>() where T : Component {
+        return (T)components[typeof(T)];
     }
     public bool HasComponent(Type type) {
         return components.ContainsKey(type);
