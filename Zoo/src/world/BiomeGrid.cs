@@ -268,7 +268,7 @@ internal class BiomeChunk : IDisposable {
         var matDefault = Raylib.LoadMaterialDefault();
         Raylib.DrawMesh(chunkMesh, matDefault, Matrix4x4.Transpose(
             Matrix4x4.CreateTranslation(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize, Depth.Ground.ToInt()) *
-            Matrix4x4.CreateScale(Renderer.WorldScale / (float)BiomeGrid.BiomeScale, Renderer.WorldScale / (float)BiomeGrid.BiomeScale, 1)
+            Matrix4x4.CreateScale(World.WorldScale / (float)BiomeGrid.BiomeScale, World.WorldScale / (float)BiomeGrid.BiomeScale, 1)
         ));
     }
 

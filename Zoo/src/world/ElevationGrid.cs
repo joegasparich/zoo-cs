@@ -19,10 +19,13 @@ public enum SlopeVariant {
 };
 
 public class ElevationGrid {
-    private int          rows;
-    private int          cols;
-    private Elevation[,] grid;
-    private bool         isSetup = false;
+    private static readonly Color WaterColour = new Color(0, 76, 255, 204);
+    
+    private int             rows;
+    private int             cols;
+    private Elevation[,]    grid;
+    private List<Vector2[]> waterPolygons = new ();
+    private bool            isSetup       = false;
     
     public ElevationGrid(int rows, int cols) {
         this.rows = rows;
@@ -44,10 +47,11 @@ public class ElevationGrid {
             }
         }
 
-        grid[0, 0] = Elevation.Hill;
-        grid[3, 3] = Elevation.Hill;
+        grid[3, 3] = Elevation.Water;
         
         isSetup = true;
+
+        GenerateWaterMesh();
     }
 
     public void Reset() {
@@ -60,6 +64,12 @@ public class ElevationGrid {
         rows = 0;
         grid = null;
         isSetup = false;
+    }
+
+    public void Render() {
+        foreach (var polygon in waterPolygons) {
+            Draw.DrawTriangleFan3D(polygon, polygon.Length, WaterColour, Depth.Water.ToInt());
+        }
     }
 
     public bool CanElevate(IntVec2 gridPos, Elevation elevation) {
@@ -82,7 +92,7 @@ public class ElevationGrid {
         return true;
     }
 
-    public bool SetElevation(IntVec2 gridPos, Elevation elevation) {
+    private bool SetElevation(IntVec2 gridPos, Elevation elevation) {
         if (!isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
             return false;
@@ -165,7 +175,36 @@ public class ElevationGrid {
             }
         }
 
+        GenerateWaterMesh();
+
         Messenger.Fire(EventType.ElevationUpdated, (pos, radius));
+    }
+
+    private void GenerateWaterMesh() {
+        waterPolygons.Clear();
+
+
+        for (var i = 0; i < cols; i++) {
+            for (var j = 0; j < rows; j++) {
+                var tile = new IntVec2(i, j);
+                if (GetTileBaseElevation(tile) >= 0) continue;
+
+                var vertices = ElevationUtility.GetWaterVertices(GetTileSlopeVariant(tile));
+                var average  = Vector2.Zero;
+                var polygon = vertices.Select(v => {
+                    var pos = new Vector2((i + v.X) * World.WorldScale, (j + v.Y) * World.WorldScale);
+                    average += pos;
+                    return pos;
+                });
+                
+                // Join start and end
+                polygon.Append(polygon.First());
+                // Centre
+                polygon.Prepend(average / vertices.Length);
+                
+                waterPolygons.Add(polygon.ToArray());
+            }
+        }
     }
 
     public Elevation GetElevationAtGridPos(IntVec2 gridPos) {

@@ -4,6 +4,7 @@ namespace Zoo.world;
 
 public static class ElevationUtility {
     public const float ElevationHeight = 0.5f;
+    public const float WaterLevel      = 0.1f;
     
     public static float GetSlopeElevation(SlopeVariant slope, Vector2 pos) {
         var relX = pos.X % 1f;
@@ -125,5 +126,32 @@ public static class ElevationUtility {
             default:
                 return F;
         }
+    }
+
+    public static Vector2[] GetWaterVertices(SlopeVariant slope) {
+        var vertices = slope switch {
+            SlopeVariant.N => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f - WaterLevel), new Vector2(1.0f, 1.0f - WaterLevel), new Vector2(1.0f, 0.0f), },
+            SlopeVariant.S => new[] { new Vector2(0.0f, WaterLevel), new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, WaterLevel), },
+            SlopeVariant.W => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f), new Vector2(1.0f - WaterLevel, 1.0f), new Vector2(1.0f - WaterLevel, 0.0f), },
+            SlopeVariant.E => new[] { new Vector2(WaterLevel, 0.0f), new Vector2(WaterLevel, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, 0.0f), },
+            SlopeVariant.NW => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f), new Vector2(1.0f - WaterLevel, 1.0f), new Vector2(1.0f, 1.0f - WaterLevel), new Vector2(1.0f, 0.0f), },
+            SlopeVariant.NE => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f - WaterLevel), new Vector2(WaterLevel, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, 0.0f), },
+            SlopeVariant.SW => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, WaterLevel), new Vector2(1.0f - WaterLevel, 0.0f), },
+            SlopeVariant.SE => new[] { new Vector2(0.0f, WaterLevel), new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, 0.0f), new Vector2(WaterLevel, 0.0f), },
+            SlopeVariant.INW => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f - WaterLevel), new Vector2(1.0f - WaterLevel, 0.0f), },
+            SlopeVariant.INE => new[] { new Vector2(WaterLevel, 0.0f), new Vector2(1.0f, 1.0f - WaterLevel), new Vector2(1.0f, 0.0f), },
+            SlopeVariant.ISW => new[] { new Vector2(0.0f, WaterLevel), new Vector2(0.0f, 1.0f), new Vector2(1.0f - WaterLevel, 1.0f), },
+            SlopeVariant.ISE => new[] { new Vector2(WaterLevel, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, WaterLevel), },
+            SlopeVariant.I1 => new[] { new Vector2(0.0f, WaterLevel), new Vector2(0.0f, 1.0f), new Vector2(1.0f - WaterLevel, 1.0f), new Vector2(1.0f, 1.0f - WaterLevel), new Vector2(1.0f, 0.0f), new Vector2(WaterLevel, 0.0f), },
+            SlopeVariant.I2 => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f - WaterLevel), new Vector2(WaterLevel, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, WaterLevel), new Vector2(1.0f - WaterLevel, 0.0f), },
+            SlopeVariant.Flat => new[] { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, 0.0f), },
+            _ => Array.Empty<Vector2>()
+        };
+
+        for (var index = 0; index < vertices.Length; index++) {
+            vertices[index].Y += WaterLevel * ElevationHeight;
+        }
+
+        return vertices;
     }
 }

@@ -12,6 +12,7 @@ public enum Side {
 }
 
 public class World {
+    public const int WorldScale      = 32;
     public const int LargerThanWorld = 10000;
     
     public  int  Width  { get; }
@@ -50,6 +51,7 @@ public class World {
 
     public void Render() {
         Biomes.Render();
+        Elevation.Render();
     }
     public void RenderDebug() { }
 

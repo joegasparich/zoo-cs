@@ -18,7 +18,6 @@ public enum Depth
 
 public class Renderer {
     // Constants
-    public const  int   WorldScale     = 32;
     public const  int   PixelScale     = 2;
     private const float CameraSpeed    = 2f;
     private const float CameraZoomRate = 0.005f;
@@ -135,12 +134,12 @@ public class Renderer {
     
     public Vector2 ScreenToWorldPos(Vector2 screenPos) {
         var cameraCenter = (camera.position * zoom).XY() - new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
-        return (screenPos + cameraCenter) / (WorldScale * zoom);
+        return (screenPos + cameraCenter) / (World.WorldScale * zoom);
     }
     
     // TODO: make sure this is correct since this is literally AI generated
     public Vector2 WorldToScreenPos(Vector2 worldPos) {
-        return worldPos * (WorldScale * zoom) - (camera.position * zoom).XY() + new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
+        return worldPos * (World.WorldScale * zoom) - (camera.position * zoom).XY() + new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
     }
 
     public bool IsPositionOnScreen(Vector2 worldPos, float margin) {

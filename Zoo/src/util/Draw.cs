@@ -4,6 +4,27 @@ using Raylib_cs;
 namespace Zoo.util; 
 
 public static class Draw {
+    // Draw a triangle fan defined by points
+    // NOTE: First vertex provided is the center, shared by all triangles
+    // By default, following vertex should be provided in counter-clockwise order
+    public static void DrawTriangleFan3D(Vector2[] points, int pointCount, Color color, float zPos)
+    {
+        if (pointCount >= 3)
+        {
+            Rlgl.rlBegin(DrawMode.QUADS);
+            Rlgl.rlColor4ub(color.r, color.g, color.b, color.a);
+
+            for (int i = 1; i < pointCount - 1; i++)
+            {
+                Rlgl.rlVertex3f(points[0].X, points[0].Y, zPos);
+                Rlgl.rlVertex3f(points[i].X, points[i].Y, zPos);
+                Rlgl.rlVertex3f(points[i + 1].X, points[i + 1].Y, zPos);
+                Rlgl.rlVertex3f(points[i + 1].X, points[i + 1].Y, zPos);
+            }
+            Rlgl.rlEnd();
+        }
+    }
+    
     public static void DrawTexturePro3D(
         Texture2D texture,
         Rectangle sourceRect,
