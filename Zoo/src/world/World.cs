@@ -17,6 +17,7 @@ public class World {
     public  int  Width  { get; }
     public  int  Height { get; }
     
+    public ElevationGrid Elevation { get; }
     public BiomeGrid Biomes { get; }
         
     private bool isSetup = false;
@@ -25,13 +26,16 @@ public class World {
         Width = width;
         Height = height;
         
+        Elevation = new ElevationGrid(Width, Height);
         Biomes = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
     }
     
     public void Setup() {
         if (isSetup) return;
         
+        Elevation.Setup();
         Biomes.Setup();
+        
         isSetup = true;
         
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "World setup complete");
@@ -78,7 +82,7 @@ public class World {
         }
     }
 
-    public Side GetQuadrantAtPos(Vector2 pos) {
+    public static Side GetQuadrantAtPos(Vector2 pos) {
         var xRel = (pos.X + LargerThanWorld) % 1f - 0.5f;
         var yRel = (pos.Y + LargerThanWorld) % 1f - 0.5f;
         

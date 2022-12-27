@@ -27,12 +27,13 @@ public struct BiomeInfo {
 public class BiomeGrid {
     public const   int   BiomeScale          = 2;
     internal const int   ChunkSize           = 5;
-    private const  float SlopeColourStrength = 0.3f;
+    internal const float SlopeColourStrength = 0.3f;
 
-    private int            rows;
-    private int            cols;
-    private bool           isSetup = false;
+    private int           rows;
+    private int           cols;
+    private bool          isSetup = false;
     private BiomeChunk[,] chunkGrid;
+    private string        elevationListenerHandle;
 
     public BiomeGrid(int rows, int cols) {
         this.rows = rows;
@@ -45,6 +46,11 @@ public class BiomeGrid {
     }
 
     public void Setup() {
+        if (isSetup) {
+            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup BiomeGrid which was already setup");
+            return;
+        }
+        
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
         
         for (var i = 0; i < chunkGrid.GetLength(0); i++) {
@@ -58,22 +64,23 @@ public class BiomeGrid {
             }
         }
         
-        // elevationListenerHandle = Messenger::on(EventType::ElevationUpdated, [this](Event * _e) {
-        //     auto e = static_cast<ElevationUpdatedEvent*>(_e);
-        //
-        //     regenerateChunksInRadius(e->pos * 2.0f, e->radius + 6.0f);
-        // });
+        elevationListenerHandle = Messenger.On(EventType.ElevationUpdated, OnElevationUpdated);
 
         isSetup = true;
     }
 
     public void Reset() {
+        if (!isSetup) {
+            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to reset when BiomeGrid wasn't setup");
+            return;
+        }
+        
         cols      = 0;
         rows      = 0;
         chunkGrid = null;
         
-        // Messenger::unsubscribe(EventType::ElevationUpdated, elevationListenerHandle);
-        // elevationListenerHandle = "";
+        Messenger.Off(EventType.ElevationUpdated, elevationListenerHandle);
+        elevationListenerHandle = "";
 
         isSetup = false;
     }
@@ -125,6 +132,11 @@ public class BiomeGrid {
             chunk.SetBiomeInRadius(pos - new Vector2(chunk.X * ChunkSize, chunk.Y * ChunkSize), radius, biome);
         }
     }
+    
+    private void OnElevationUpdated(object data) {
+        var (pos, radius) = (Tuple<Vector2, float>)data;
+        RegenerateChunksInRadius(pos, radius);
+    }
 
     public void RegenerateChunksInRadius(Vector2 pos, float radius) {
         foreach (var chunk in GetChunksInRadius(pos, radius)) {
@@ -149,6 +161,8 @@ internal class BiomeChunk : IDisposable {
     public int  Y                { get; }
     public int  Rows             { get; }
     public int  Cols             { get; }
+
+    public Vector2 ChunkPos => new Vector2(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize);
     
     public BiomeChunk(int x, int y, int rows, int cols) {
         X    = x;
@@ -205,15 +219,18 @@ internal class BiomeChunk : IDisposable {
             for (int j = 0; j < Rows; ++j) {
                 var cell = grid[i][j];
                 for (int q = 0; q < 4; q++) {
-                    var colour = BiomeInfo.Get(cell.Quadrants[q]).Color;
-                    // TODO: Slope colour
+                    var colour          = BiomeInfo.Get(cell.Quadrants[q]).Color;
+                    var pos             = ChunkPos + new Vector2(i, j);
+                    var tile            = (pos / BiomeGrid.BiomeScale).Floor();
+                    var slopeBrightness = ElevationUtility.GetSlopeVariantColourOffset(Find.World.Elevation.GetTileSlopeVariant(tile), pos, (Side)q);
+                    colour = colour.Brighten(slopeBrightness * BiomeGrid.SlopeColourStrength);
                     
                     var quadrantVertices = BiomeCell.GetQuadrantVertices(new Vector2(i, j), (Side)q);
                     for (int v = 0; v < 3; v++) {
-                        // TODO: Elevation
+                        var elevation = Find.World.Elevation.GetElevationAtPos((quadrantVertices[v] + ChunkPos) / BiomeGrid.BiomeScale);
                         
                         vertices[vertexIndex * 3]     = quadrantVertices[v].X;
-                        vertices[vertexIndex * 3 + 1] = quadrantVertices[v].Y;
+                        vertices[vertexIndex * 3 + 1] = quadrantVertices[v].Y - elevation * BiomeGrid.BiomeScale;
                         vertices[vertexIndex * 3 + 2] = 0;
                         
                         colours[vertexIndex * 4]     = colour.r;

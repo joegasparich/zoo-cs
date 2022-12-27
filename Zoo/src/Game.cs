@@ -113,9 +113,9 @@ public static class Game {
         {
             SceneManager.GetCurrentScene().Render();
             
-            // foreach (var entity in entities.Values) {
-            //     entity.Render();
-            // }
+            foreach (var entity in entities.Values) {
+                entity.Render();
+            }
         }
         Renderer.EndDrawing();
 

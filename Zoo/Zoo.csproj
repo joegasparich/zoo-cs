@@ -9,14 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="Raylib-cs">
-        <HintPath>..\..\libs\Raylib-cs-master\Raylib-cs\bin\Debug\net6.0\Raylib-cs.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="assets\**\*.*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Raylib-cs">
+        <HintPath>bin\Debug\net6.0\Raylib-cs.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

@@ -1,14 +1,13 @@
 ﻿using Raylib_cs;
 
-namespace Zoo
+namespace Zoo;
+
+static class Root
 {
-    static class Root
+    public static void Main()
     {
-        public static void Main()
-        {
-            Raylib.SetTraceLogLevel(TraceLogLevel.LOG_ALL);
+        Raylib.SetTraceLogLevel(TraceLogLevel.LOG_ALL);
             
-            Game.Run();
-        }
+        Game.Run();
     }
 }

@@ -19,8 +19,6 @@ public enum SlopeVariant {
 };
 
 public class ElevationGrid {
-    private const float ElevationHeight = 0.5f;
-
     private int          rows;
     private int          cols;
     private Elevation[,] grid;
@@ -33,6 +31,11 @@ public class ElevationGrid {
     }
 
     public void Setup() {
+        if (isSetup) {
+            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup ElevationGrid which was already setup");
+            return;
+        }
+        
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
 
         for (var i = 0; i < cols; i++) {
@@ -40,11 +43,19 @@ public class ElevationGrid {
                 grid[i, j] = Elevation.Flat;
             }
         }
+
+        grid[0, 0] = Elevation.Hill;
+        grid[3, 3] = Elevation.Hill;
         
         isSetup = true;
     }
 
     public void Reset() {
+        if (!isSetup) {
+            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to reset when ElevationGrid wasn't setup");
+            return;
+        }
+        
         cols = 0;
         rows = 0;
         grid = null;
@@ -153,8 +164,8 @@ public class ElevationGrid {
                 affectedCells.Add(tile);
             }
         }
-        
-        
+
+        Messenger.Fire(EventType.ElevationUpdated, (pos, radius));
     }
 
     public Elevation GetElevationAtGridPos(IntVec2 gridPos) {
@@ -173,79 +184,27 @@ public class ElevationGrid {
             GetElevationAtGridPos(tile + new IntVec2(0, 1)).ToInt(),
             GetElevationAtGridPos(tile + new IntVec2(1, 0)).ToInt(),
             GetElevationAtGridPos(tile + new IntVec2(1, 1)).ToInt()
-        ) * ElevationHeight;
+        ) * ElevationUtility.ElevationHeight;
     }
     
-    private SlopeVariant GetTileSlopeVariant(IntVec2 tile) {
-        var nw = GetElevationAtGridPos(tile);
-        var ne = GetElevationAtGridPos(tile + new IntVec2(1, 0));
-        var sw = GetElevationAtGridPos(tile + new IntVec2(0, 1));
-        var se = GetElevationAtGridPos(tile + new IntVec2(1, 1));
-
-        if (nw == ne && nw == sw && nw == se) return SlopeVariant.Flat;
-        if (nw == ne && sw == se && nw < sw) return SlopeVariant.N;
-        if (nw == sw && ne == se && nw > ne) return SlopeVariant.E;
-        if (nw == ne && sw == se && nw > sw) return SlopeVariant.S;
-        if (nw == sw && ne == se && nw < ne) return SlopeVariant.W;
-        if (se == sw && se == ne && nw > se) return SlopeVariant.SE;
-        if (sw == nw && sw == se && ne > sw) return SlopeVariant.SW;
-        if (ne == nw && ne == se && sw > ne) return SlopeVariant.NE;
-        if (nw == sw && nw == ne && se > nw) return SlopeVariant.NW;
-        if (se == sw && se == ne && nw < se) return SlopeVariant.INW;
-        if (sw == nw && sw == se && ne < sw) return SlopeVariant.INE;
-        if (ne == nw && ne == se && sw < ne) return SlopeVariant.ISW;
-        if (nw == sw && nw == ne && se < nw) return SlopeVariant.ISE;
-        if (nw == se && sw == ne && nw > ne) return SlopeVariant.I1;
-        if (nw == se && sw == ne && nw < ne) return SlopeVariant.I2;
-
-        // How did you get here?
-        return SlopeVariant.Flat;
+    public SlopeVariant GetTileSlopeVariant(IntVec2 tile) {
+        return ElevationUtility.GetSlopeVariant(
+            GetElevationAtGridPos(tile),
+            GetElevationAtGridPos(tile + new IntVec2(1, 0)),
+            GetElevationAtGridPos(tile + new IntVec2(0, 1)),
+            GetElevationAtGridPos(tile + new IntVec2(1, 1))
+        );
     }
 
     public float GetElevationAtPos(Vector2 pos) {
         if (!Find.World.IsPositionInMap(pos)) return 0;
 
-        var relX = pos.X % 1f;
-        var relY = pos.Y % 1f;
         var baseElevation = GetTileBaseElevation(pos.Floor());
         var slopeVariant = GetTileSlopeVariant(pos.Floor());
         
-        // Tried to come up with a formula instead of using enums but I'm too dumb
-        switch (slopeVariant) {
-            case SlopeVariant.Flat:
-                return baseElevation;
-            case SlopeVariant.N:
-                return baseElevation + ElevationHeight * relY;
-            case SlopeVariant.S:
-                return baseElevation + ElevationHeight * (1 - relY);
-            case SlopeVariant.W:
-                return baseElevation + ElevationHeight * relX;
-            case SlopeVariant.E:
-                return baseElevation + ElevationHeight * (1 - relX);
-            case SlopeVariant.SE:
-                return baseElevation + ElevationHeight * MathF.Max(1 - relX - relY, 0.0f);
-            case SlopeVariant.SW:
-                return baseElevation + ElevationHeight * MathF.Max(1 - (1 - relX) - relY, 0.0f);
-            case SlopeVariant.NE:
-                return baseElevation + ElevationHeight * MathF.Max(1 - relX - (1 - relY), 0.0f);
-            case SlopeVariant.NW:
-                return baseElevation + ElevationHeight * MathF.Max(1 - (1 - relX) - (1 - relY), 0.0f);
-            case SlopeVariant.ISE:
-                return baseElevation + ElevationHeight * MathF.Min(1 - relX + 1 - relY, 1.0f);
-            case SlopeVariant.ISW:
-                return baseElevation + ElevationHeight * MathF.Min(relX + 1 - relY, 1.0f);
-            case SlopeVariant.INE:
-                return baseElevation + ElevationHeight * MathF.Min(1 - relX + relY, 1.0f);
-            case SlopeVariant.INW:
-                return baseElevation + ElevationHeight * MathF.Min(relX + relY, 1.0f);
-            case SlopeVariant.I1:
-                return baseElevation + ElevationHeight * MathF.Max(1 - relX - relY, 1 - (1 - relX) - (1 - relY));
-            case SlopeVariant.I2:
-                return baseElevation + ElevationHeight * MathF.Max(1 - (1 - relX) - relY, 1 - relX - (1 - relY));
-            default:
-                // You shouldn't be here
-                return 0;
-        }
+        var slopeHeight = ElevationUtility.GetSlopeElevation(slopeVariant, pos);
+
+        return baseElevation + slopeHeight;
     }
 
     private IntVec2[] GetSurroundingTiles(IntVec2 gridPos) {
