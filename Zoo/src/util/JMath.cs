@@ -1,12 +1,9 @@
 using System.Numerics;
+using Raylib_cs;
 
 namespace Zoo.util;
 
 public static class JMath {
-    public static int RoundToInt(float f) => (int)MathF.Round(f);
-    public static int FloorToInt(float f) => (int)MathF.Floor(f);
-    public static int CeilToInt(float f) => (int)MathF.Ceiling(f);
-    
     public static float Lerp(float         from, float to,  float pct) =>  from + (to - from) * pct;
     public static float Normalise(float    val,  float min, float max) =>  (val - min) / (max - min);
     public static float Clamp(float        val,  float min, float max) =>  Math.Max(min, Math.Min(max, val));
@@ -19,6 +16,11 @@ public static class JMath {
     public static Vector2 YZ(this Vector3 v) => new Vector2(v.Y, v.Z);
     
     // Collision
+    public static bool PointInRect(Rectangle rect, Vector2 point) {
+        return point.X >= rect.x && point.X <= rect.x + rect.width &&
+               point.Y >= rect.y && point.Y <= rect.y + rect.height;        
+    }
+    
     public static bool PointInCircle(Vector2 circlePos, float radius, Vector2 point) {
         var dx = circlePos.X - point.X;
         var dy = circlePos.Y - point.Y;

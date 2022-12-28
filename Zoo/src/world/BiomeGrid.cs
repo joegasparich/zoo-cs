@@ -107,8 +107,8 @@ public class BiomeGrid {
     }
 
     private IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
-        var floorX = JMath.FloorToInt(pos.X / ChunkSize);
-        var floorY = JMath.FloorToInt(pos.Y / ChunkSize);
+        var floorX = (pos.X / ChunkSize).FloorToInt();
+        var floorY = (pos.Y / ChunkSize).FloorToInt();
 
         // TODO: Only handles 3x3 around the pos. Change this to calculate required area based on radius
         for (int i = -1; i <= 1; i++) {
@@ -289,8 +289,8 @@ internal class BiomeChunk : IDisposable {
                     var side = (Side)q;
                     foreach (var point in BiomeCell.GetQuadrantVertices(cellPos, side)) {
                         if (JMath.PointInCircle(pos, radius, point)) {
-                            var xFloor = JMath.RoundToInt(cellPos.X);
-                            var yFloor = JMath.RoundToInt(cellPos.Y);
+                            var xFloor = cellPos.X.RoundToInt();
+                            var yFloor = cellPos.Y.RoundToInt();
                             if (grid[xFloor][yFloor].Quadrants[(int)side] != biome) {
                                 grid[xFloor][yFloor].SetQuadrant(side, biome);
                                 changed = true;

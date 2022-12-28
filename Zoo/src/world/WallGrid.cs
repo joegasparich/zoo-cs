@@ -305,6 +305,6 @@ public class WallGrid {
 
     public bool IsWallSloped(Wall wall) {
         var (v1, v2) = wall.GetVertices();
-        return JMath.RoundToInt(Find.World.Elevation.GetElevationAtPos(v1)) != JMath.RoundToInt(Find.World.Elevation.GetElevationAtPos(v2));     
+        return Find.World.Elevation.GetElevationAtPos(v1).RoundToInt() != Find.World.Elevation.GetElevationAtPos(v2).RoundToInt();     
     }
 }

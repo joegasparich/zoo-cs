@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using Zoo.entities;
+using Zoo.ui;
 
 namespace Zoo;
 
@@ -12,16 +13,17 @@ public static class Game {
 
     // Managers
     public static InputManager Input        = new();
-    public static Renderer     Renderer     = new ();
+    public static Renderer     Renderer     = new();
     public static Registry     Registry     = new();
-    public static AssetManager AssetManager = new ();
-    public static SaveManager  SaveManager  = new ();
-    public static SceneManager SceneManager = new ();
+    public static AssetManager AssetManager = new();
+    public static SaveManager  SaveManager  = new();
+    public static SceneManager SceneManager = new();
+    public static UIManager    UI           = new();
     
     // Collections
-    private static Dictionary<int, Entity> entities = new ();
-    private static List<Entity>            entitiesToAdd = new ();
-    private static List<Entity>            entitiesToRemove = new ();
+    private static Dictionary<int, Entity> entities         = new();
+    private static List<Entity>            entitiesToAdd    = new();
+    private static List<Entity>            entitiesToRemove = new();
     
     // State TODO: Save these
     private static int ticksSinceGameStart;
@@ -30,21 +32,19 @@ public static class Game {
     
     public static void Run() {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Started");
-        
         Init();
-
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Loaded");
-        
         DoLoop();
-
+        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Cleaning Up");
         Cleanup();
+        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Ended");
     }
 
     private static void Init() {
-        Raylib.InitWindow(ScreenWidth, ScreenHeight, "Hello World");
+        Raylib.InitWindow(ScreenWidth, ScreenHeight, "Zoo");
 
         AssetManager.LoadAssets();
-        
+        UI.Init();
         SaveManager.NewGame();
     }
 
@@ -72,8 +72,12 @@ public static class Game {
                 lag -= MsPerUpdate;
                 ticksSinceGameStart++;
             }
-
+            
+            // Do Render
+            UI.PreRender();
+            Input.ProcessInput();
             Render();
+            UI.PostRender();
         }
     }
     
@@ -111,11 +115,17 @@ public static class Game {
     private static void Render() {
         Renderer.BeginDrawing();
         {
-            SceneManager.GetCurrentScene().Render();
-            
-            foreach (var entity in entities.Values) {
-                entity.Render();
+            Renderer.Begin3D();
+            {
+                SceneManager.GetCurrentScene().Render();
+                
+                foreach (var entity in entities.Values) {
+                    entity.Render();
+                }
             }
+            Renderer.End3D();
+            
+            UI.Render();
         }
         Renderer.EndDrawing();
 
@@ -123,8 +133,14 @@ public static class Game {
     }
 
     public static void OnInput(InputEvent evt) {
-        // if (!event->consumed) ui.onInput(event);
+        if (!evt.consumed) UI.OnInput(evt);
         if (!evt.consumed) SceneManager.GetCurrentScene().OnInput(evt);
+    }
+
+    public static void OnGUI() {
+        Find.SceneManager.GetCurrentScene().OnGUI();
+        
+        UI.DoImmediateWindow("asdf", new Rectangle(10, 10, 100, 100), inRect => {}, true);
     }
 
     public static int RegisterEntity(Entity entity) {

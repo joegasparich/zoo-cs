@@ -84,16 +84,22 @@ public class Renderer {
 
     public void BeginDrawing() {
         Raylib.BeginDrawing();
-        Raylib.BeginMode3D(camera);
         Raylib.ClearBackground(Color.WHITE);
         
         Raylib.BeginShaderMode(discardAlphaShader);
     }
 
     public void EndDrawing() {
-        // Raylib.EndShaderMode();
-        Raylib.EndMode3D();
+        Raylib.EndShaderMode();
         Raylib.EndDrawing();
+    }
+    
+    public void Begin3D() {
+        Raylib.BeginMode3D(camera);
+    }
+    
+    public void End3D() {
+        Raylib.EndMode3D();
     }
 
     public float GetDepth(float yPos) {
