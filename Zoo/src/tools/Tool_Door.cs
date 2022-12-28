@@ -39,7 +39,7 @@ public class Tool_Door : Tool {
         if (!Ghost.Visible) return;
 
         var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall, true);
-        Ghost.SpriteSheet = wall.Data!.Value.SpriteSheet;
+        Ghost.SpriteSheet = wall.Data!.SpriteSheet;
         Ghost.SpriteIndex = spriteIndex.ToInt();
 
         Ghost.Offset = Ghost.Side switch {

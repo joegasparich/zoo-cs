@@ -11,7 +11,7 @@ public static class ObjectType {
     public static readonly string Misc = "misc"; 
 }
 
-public struct ObjectData {
+public class ObjectData {
     public string       AssetPath;
     public string       Name;
     public string?      SpritePath;
@@ -25,7 +25,7 @@ public struct ObjectData {
     public bool         CanPlaceInWater;
 }
 
-public struct WallData {
+public class WallData {
     public string      AssetPath;
     public string      Name;
     public string      Type;
@@ -33,7 +33,7 @@ public struct WallData {
     public SpriteSheet SpriteSheet;
 }
 
-public struct FootPathData {
+public class FootPathData {
     public string      AssetPath;
     public string      Name;
     public SpriteSheet SpriteSheet;

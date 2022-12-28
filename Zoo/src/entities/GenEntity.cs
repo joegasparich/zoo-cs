@@ -13,11 +13,11 @@ public static class GenEntity {
         // Renderer
         var renderer = entity.AddComponent<RenderComponent>();
         renderer.Origin = data.Origin;
-        if (data.Sprite.HasValue) {
+        if (data.SpritePath != null && data.Sprite.HasValue) {
             renderer.SetSprite(data.SpritePath);
-        } else if (data.SpriteSheet.HasValue) {
-            renderer.SetSprite(data.SpriteSheet.Value.TexturePath);
-            renderer.SetSource(data.SpriteSheet.Value.GetCellBounds(0));
+        } else if (data.SpriteSheet != null) {
+            renderer.SetSprite(data.SpriteSheet.TexturePath);
+            renderer.SetSource(data.SpriteSheet.GetCellBounds(0));
         }
         
         // Tile object

@@ -34,7 +34,7 @@ public class AssetManager {
             if (data.SpritePath != null)
                 data.Sprite = GetTexture(data.SpritePath);
             if (data.SpriteSheet?.TexturePath != null)
-                data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet.Value);
+                data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet);
             
             Find.Registry.RegisterObject(finalPath, data);
         }

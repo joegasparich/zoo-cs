@@ -95,7 +95,7 @@ public class WallGrid {
                 var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall);
                 var pos = orientation == Orientation.Horizontal ? new Vector2(i / 2.0f, j) : new Vector2(i / 2.0f, j + 1);
                 pos -= new Vector2(0.5f, 2.0f + elevation); // Offset cell size
-                var spriteSheet = wall.Data!.Value.SpriteSheet;
+                var spriteSheet = wall.Data!.SpriteSheet;
                 
                 Find.Renderer.Blit(
                     texture: spriteSheet.Texture,

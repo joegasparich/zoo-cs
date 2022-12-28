@@ -2,7 +2,7 @@ using Raylib_cs;
 
 namespace Zoo; 
 
-public struct SpriteSheet {
+public class SpriteSheet {
     public int       CellWidth;
     public int       CellHeight;
     public string    TexturePath;

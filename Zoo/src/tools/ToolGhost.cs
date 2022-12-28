@@ -157,18 +157,18 @@ public class ToolGhost {
     }
 
     private void RenderSpriteSheet() {
-        if (!SpriteSheet.HasValue) return;
+        if (SpriteSheet == null) return;
         
         var pos = (Pos + Offset) * World.WorldScale;
         if (Elevate)
             pos.Y -= Find.World.Elevation.GetElevationAtPos(Pos + Offset);
-        var source = SpriteSheet.Value.GetCellBounds(SpriteIndex);
+        var source = SpriteSheet.GetCellBounds(SpriteIndex);
         
         Find.Renderer.Blit(
-            texture: SpriteSheet.Value.Texture,
+            texture: SpriteSheet.Texture,
             pos: pos,
             depth: Depth.UI.ToInt(),
-            scale: new Vector2(SpriteSheet.Value.Texture.width * source.width, SpriteSheet.Value.Texture.height * source.height) * Renderer.PixelScale,
+            scale: new Vector2(SpriteSheet.Texture.width * source.width, SpriteSheet.Texture.height * source.height) * Renderer.PixelScale,
             origin: Origin,
             source: source,
             color: CanPlace ? GhostColour : BlockedColour

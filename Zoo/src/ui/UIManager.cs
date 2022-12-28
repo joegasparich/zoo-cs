@@ -128,7 +128,7 @@ public class UIManager {
         return openWindowMap.ContainsKey(id);
     }
 
-    public void DoImmediateWindow(string id, Rectangle initialRect, Action<Rectangle> onUI, bool doBackground) {
+    public void DoImmediateWindow(string id, Rectangle initialRect, Action<Rectangle> onUI, bool doBackground = true) {
         if (CurrentEvent == UIEvent.None) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Immediate windows must be called in OnGUI");
             return;

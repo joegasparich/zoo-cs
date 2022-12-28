@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using Zoo.ui;
 using Zoo.world;
 
 namespace Zoo.tools; 
@@ -41,5 +42,17 @@ public class Tool_Elevation : Tool {
             isDragging = false;
             evt.Consume();
         }
+    }
+
+    public override void OnGUI() {
+        Find.UI.DoImmediateWindow("immElevationPanel", new Rectangle(10, 60, 100, 100), inRect => {
+            GUI.TextAlign = AlignMode.MiddleCenter;
+
+            if (GUI.ButtonText(new Rectangle(10, 10, 80, 20), "Water")) currentElevation = Elevation.Water;
+            if (GUI.ButtonText(new Rectangle(10, 40, 80, 20), "Flat"))  currentElevation = Elevation.Flat;
+            if (GUI.ButtonText(new Rectangle(10, 70, 80, 20), "Hill")) currentElevation = Elevation.Hill;
+
+            GUI.TextAlign = AlignMode.TopLeft;
+        });
     }
 }

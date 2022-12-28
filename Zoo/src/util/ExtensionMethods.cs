@@ -66,6 +66,36 @@ public static class ExtensionMethods {
     public static float YMax(this Rectangle rect) {
         return rect.y + rect.height;
     }
+    public static Rectangle ContractedBy(this Rectangle rect, float amt) {
+        return new Rectangle(rect.x + amt, rect.y + amt, rect.width - amt * 2, rect.height - amt * 2);
+    }
+    public static Rectangle ExpandedBy(this Rectangle rect, float amt) {
+        return new Rectangle(rect.x - amt, rect.y - amt, rect.width + amt * 2, rect.height + amt * 2);
+    }
+    public static Rectangle TopPct(this Rectangle rect, float pct) {
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height * pct);
+    }
+    public static Rectangle BottomPct(this Rectangle rect, float pct) {
+        return new Rectangle(rect.x, rect.y + rect.height * (1 - pct), rect.width, rect.height * pct);
+    }
+    public static Rectangle LeftPct(this Rectangle rect, float pct) {
+        return new Rectangle(rect.x, rect.y, rect.width * pct, rect.height);
+    }
+    public static Rectangle RightPct(this Rectangle rect, float pct) {
+        return new Rectangle(rect.x + rect.width * (1 - pct), rect.y, rect.width * pct, rect.height);
+    }
+    public static Rectangle TopHalf(this Rectangle rect) {
+        return rect.TopPct(0.5f);
+    }
+    public static Rectangle BottomHalf(this Rectangle rect) {
+        return rect.BottomPct(0.5f);
+    }
+    public static Rectangle LeftHalf(this Rectangle rect) {
+        return rect.LeftPct(0.5f);
+    }
+    public static Rectangle RightHalf(this Rectangle rect) {
+        return rect.RightPct(0.5f);
+    }
     
     // List //
     public static T Pop<T>(this IList<T> source) {

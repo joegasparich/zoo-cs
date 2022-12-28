@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using Zoo.ui;
 using Zoo.world;
 
 namespace Zoo.tools; 
@@ -6,6 +7,7 @@ namespace Zoo.tools;
 public class Tool_Biome : Tool {
     private const float DefaultRadius      = 0.65f;
     private const int   PlaceIntervalTicks = 5;
+    private const int   ButtonSize         = 30;
     
     private Biome currentBiome;
     private bool  isDragging;
@@ -16,7 +18,7 @@ public class Tool_Biome : Tool {
     public Tool_Biome(ToolManager tm) : base(tm) {}
 
     public override void Set() {
-        currentBiome = Biome.Sand;
+        SetBiome(Biome.Sand);
 
         Ghost.Type    = GhostType.Circle;
         Ghost.Radius  = DefaultRadius;
@@ -41,5 +43,32 @@ public class Tool_Biome : Tool {
             isDragging = false;
             evt.Consume();
         }
+    }
+
+    public override void OnGUI() {
+        Find.UI.DoImmediateWindow("immBiomePanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
+            var i = 0;
+            foreach (Biome biome in Enum.GetValues(typeof(Biome))) {
+                var info = BiomeInfo.Get(biome);
+                
+                // TODO: Wrap
+                var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
+
+                GUI.DrawRect(buttonRect, info.Colour);
+                GUI.HighlightMouseover(buttonRect);
+                
+                if (currentBiome == biome)
+                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
+
+                if (GUI.ClickableArea(buttonRect))
+                    SetBiome(biome);
+                
+                i++;
+            }
+        });
+    }
+
+    private void SetBiome(Biome biome) {
+        currentBiome = biome;
     }
 }

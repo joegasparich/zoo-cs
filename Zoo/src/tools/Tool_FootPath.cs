@@ -1,11 +1,14 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Zoo.ui;
 using Zoo.util;
 using Zoo.world;
 
 namespace Zoo.tools; 
 
 public class Tool_FootPath : Tool {
+    private const int ButtonSize = 30;
+    
     private          FootPathData       currentFootPath;
     private          List<FootPathData> allFootPaths;
     private          bool               isDragging;
@@ -26,7 +29,7 @@ public class Tool_FootPath : Tool {
         Ghost.Offset = new Vector2(0, -1);
         
         // Temp, should handle having no path
-        SetPath(Find.Registry.GetFootPath(FOOTPATHS.DIRT_PATH));
+        SetFootPath(Find.Registry.GetFootPath(FOOTPATHS.DIRT_PATH));
     }
 
     public override void OnInput(InputEvent evt) {
@@ -102,6 +105,27 @@ public class Tool_FootPath : Tool {
         }
     }
 
+    public override void OnGUI() {
+        Find.UI.DoImmediateWindow("immPathPanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
+            var i = 0;
+            foreach (var footPath in allFootPaths) {
+                // TODO: Wrap
+                var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
+                
+                GUI.DrawSubTexture(buttonRect, footPath.SpriteSheet.Texture, footPath.SpriteSheet.GetCellBounds(0).BottomHalf());
+                GUI.HighlightMouseover(buttonRect);
+                
+                if (currentFootPath.AssetPath == footPath.AssetPath)
+                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
+                
+                if (GUI.ClickableArea(buttonRect))
+                    SetFootPath(footPath);
+                
+                i++;
+            }
+        });
+    }
+
     public override bool CanPlace(ToolGhost ghost) {
         var path = Find.World.FootPaths.GetPathAtTile(ghost.Pos.Floor());
 
@@ -125,7 +149,7 @@ public class Tool_FootPath : Tool {
         ghost.Offset      = new Vector2(0, -1 - elevation);
     }
 
-    private void SetPath(FootPathData data) {
+    private void SetFootPath(FootPathData data) {
         currentFootPath = data;
         Ghost.SpriteSheet = data.SpriteSheet;
     }

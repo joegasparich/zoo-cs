@@ -66,18 +66,18 @@ public class FootPathGrid {
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
                 var path = grid[i, j];
-                if (!path.Exists || !path.Data.HasValue) continue;
+                if (!path.Exists || path.Data == null) continue;
 
                 var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
                 Vector2 pos = path.Pos;
                 pos -= new Vector2(0, 1 + elevation);
                 
                 Find.Renderer.Blit(
-                    texture: path.Data.Value!.SpriteSheet.Texture,
+                    texture: path.Data!.SpriteSheet.Texture,
                     pos: pos * World.WorldScale,
                     depth: Depth.GroundCover.ToInt(),
                     scale: new Vector2(1, 2) * World.WorldScale,
-                    source: path.Data.Value!.SpriteSheet.GetCellBounds(spriteIndex.ToInt()),
+                    source: path.Data!.SpriteSheet.GetCellBounds(spriteIndex.ToInt()),
                     color: path.OverrideColour
                 );
                 

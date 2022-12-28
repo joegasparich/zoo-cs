@@ -23,7 +23,7 @@ public static class GUI {
     public static           AlignMode TextAlign      = AlignMode.TopLeft;
     public static           int       FontSize       = 10;
     private static readonly Color     HighlightColor = new Color(255, 255, 255, 150);
-    private static readonly Color     UIButtonColour = new Color(230, 230, 230, 255);
+    public static readonly Color     UIButtonColour = new Color(230, 230, 230, 255);
 
     private static Rectangle MaintainAspectRatio(Rectangle rect, Texture2D texture, Rectangle? source = null) {
         source ??= new Rectangle(0, 0, 1, 1);
@@ -35,7 +35,7 @@ public static class GUI {
             var width = rect.width * (texWidth / texHeight);
             return new Rectangle(rect.x + (rect.width - width) / 2, rect.y, width, rect.height);
         }
-        if (texWidth < texHeight) {
+        if (texWidth > texHeight) {
             var height = rect.height * (texHeight / texWidth);
             return new Rectangle(rect.x, rect.y + (rect.height - height) / 2, rect.width, height);
         }
@@ -58,7 +58,7 @@ public static class GUI {
         Raylib.DrawRectangleLinesEx(absRect, thickness, col);
     }
 
-    public static void DrawTexture(Rectangle rect, Texture2D texture, Color col) {
+    public static void DrawTexture(Rectangle rect, Texture2D texture, Color? col = null) {
         if (Find.UI.CurrentEvent != UIEvent.Draw) return;
 
         var absRect = Find.UI.GetAbsRect(rect);
@@ -68,11 +68,11 @@ public static class GUI {
             MaintainAspectRatio(absRect, texture), 
             new Vector2(0, 0),
             0,
-            col
+            col ?? Color.WHITE
         );
     }
     
-    public static void DrawSubTexture(Rectangle rect, Texture2D texture, Rectangle source, Color col) {
+    public static void DrawSubTexture(Rectangle rect, Texture2D texture, Rectangle source, Color? col = null) {
         if (Find.UI.CurrentEvent != UIEvent.Draw) return;
 
         var absRect = Find.UI.GetAbsRect(rect);
@@ -87,7 +87,7 @@ public static class GUI {
             MaintainAspectRatio(absRect, texture, source), 
             new Vector2(0, 0),
             0,
-            col
+            col ?? Color.WHITE
         );
     }
 

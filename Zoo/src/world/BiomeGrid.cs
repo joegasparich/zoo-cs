@@ -10,15 +10,16 @@ public enum Biome : byte {
     Snow
 }
 
-public struct BiomeInfo {
+// TODO: this is weird
+public class BiomeInfo {
     public string Name;
-    public Color Color;
+    public Color Colour;
 
     public static BiomeInfo Get(Biome biome) {
         switch (biome) {
-            case Biome.Grass: return new() { Name = "Grass", Color = new Color(182, 213, 60,  255) };
-            case Biome.Sand:  return new() { Name = "Sand", Color  = new Color(244, 204, 161, 255) };
-            case Biome.Snow:  return new() { Name = "Snow", Color  = new Color(223, 246, 246, 255) };
+            case Biome.Grass: return new() { Name = "Grass", Colour = new Color(182, 213, 60,  255) };
+            case Biome.Sand:  return new() { Name = "Sand", Colour  = new Color(244, 204, 161, 255) };
+            case Biome.Snow:  return new() { Name = "Snow", Colour  = new Color(223, 246, 246, 255) };
             default:          return new();
         }
     }
@@ -219,7 +220,7 @@ internal class BiomeChunk : IDisposable {
             for (int j = 0; j < Rows; ++j) {
                 var cell = grid[i][j];
                 for (int q = 0; q < 4; q++) {
-                    var colour          = BiomeInfo.Get(cell.Quadrants[q]).Color;
+                    var colour          = BiomeInfo.Get(cell.Quadrants[q]).Colour;
                     var pos             = ChunkPos + new Vector2(i, j);
                     var tile            = (pos / BiomeGrid.BiomeScale).Floor();
                     var slopeBrightness = ElevationUtility.GetSlopeVariantColourOffset(Find.World.Elevation.GetTileSlopeVariant(tile), pos, (Side)q);
@@ -311,7 +312,7 @@ internal class BiomeChunk : IDisposable {
     }
 }
 
-internal struct BiomeCell {
+internal class BiomeCell {
     public Biome[] Quadrants;
     
     public BiomeCell(Biome[] quadrants) {

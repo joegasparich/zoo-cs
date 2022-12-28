@@ -1,12 +1,15 @@
 ﻿using System.Numerics;
 using Raylib_cs;
 using Zoo.entities;
+using Zoo.ui;
 using Zoo.util;
 using Zoo.world;
 
 namespace Zoo.tools; 
 
 public class Tool_Wall : Tool {
+    private const int ButtonSize = 30;
+    
     private          WallData        currentWall;
     private          List<WallData>  allWalls;
     private          bool            isDragging;
@@ -111,6 +114,27 @@ public class Tool_Wall : Tool {
         foreach (var ghost in ghosts) {
             ghost.Render();
         }
+    }
+    
+    public override void OnGUI() {
+        Find.UI.DoImmediateWindow("immWallPanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
+            var i = 0;
+            foreach (var wall in allWalls) {
+                // TODO: Wrap
+                var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
+                
+                GUI.DrawSubTexture(buttonRect, wall.SpriteSheet.Texture, wall.SpriteSheet.GetCellBounds(0).BottomPct(0.25f));
+                GUI.HighlightMouseover(buttonRect);
+                
+                if (currentWall.AssetPath == wall.AssetPath)
+                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
+                
+                if (GUI.ClickableArea(buttonRect))
+                    SetWall(wall);
+                
+                i++;
+            }
+        });
     }
 
     public override bool CanPlace(ToolGhost ghost) {
