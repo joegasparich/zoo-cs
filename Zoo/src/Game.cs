@@ -29,6 +29,8 @@ public static class Game {
     private static int ticksSinceGameStart;
     private static int framesSinceGameStart;
     private static int nextEntityId;
+
+    public static int Ticks => ticksSinceGameStart;
     
     public static void Run() {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Started");
@@ -82,6 +84,7 @@ public static class Game {
     }
     
     private static void PreUpdate() {
+        SceneManager.GetCurrentScene().PreUpdate();
         foreach (var entity in entities.Values) {
             entity.PreUpdate();
         }
@@ -90,12 +93,14 @@ public static class Game {
     private static void Update() {
         Renderer.Update();
         
+        SceneManager.GetCurrentScene().Update();
         foreach (var entity in entities.Values) {
             entity.Update();
         }
     }
     
     private static void PostUpdate() {
+        SceneManager.GetCurrentScene().PostUpdate();
         foreach (var entity in entities.Values) {
             entity.PostUpdate();
         }

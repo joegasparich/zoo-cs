@@ -9,8 +9,9 @@ public class RenderComponent : Component {
     private string    spritePath = "";
     private Rectangle source = new (0, 0, 1, 1);
     
-    public Vector2 Origin { get; set; } = new (0.5f, 0.5f);
-    public Vector2 Offset { get; set; } = Vector2.Zero;
+    public Vector2 Origin         { get; set; } = new (0.5f, 0.5f);
+    public Vector2 Offset         { get; set; } = Vector2.Zero;
+    public Color   OverrideColour { get; set; } = Color.WHITE;
     
     public RenderComponent(Entity entity) : base(entity) {}
 
@@ -21,8 +22,11 @@ public class RenderComponent : Component {
             depth: Find.Renderer.GetDepth(entity.Pos.Y),
             scale: new Vector2(sprite.width * source.width, sprite.height * source.height) * Renderer.PixelScale,
             origin: Origin,
-            source: source
+            source: source,
+            color: OverrideColour
         );
+        
+        OverrideColour = Color.WHITE;
     }
 
     public void SetSprite(string path) {

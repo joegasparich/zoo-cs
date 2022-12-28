@@ -35,7 +35,7 @@ public class Window {
 
     public virtual void DoWindowContents() {
         if (isDragging) {
-            var newPos = Find.Input.GetMousePosition() - dragPos;
+            var newPos = Find.Input.GetMousePos() - dragPos;
             AbsRect = AbsRect with { x = newPos.X, y = newPos.Y };
         }
 

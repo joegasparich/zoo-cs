@@ -47,7 +47,7 @@ public class AssetManager {
             var finalPath = path.Replace("\\", "/");
 
             var      json = File.ReadAllText(finalPath);
-            PathData data = JsonSerializer.Deserialize<PathData>(json, JsonOpts)!;
+            FootPathData data = JsonSerializer.Deserialize<FootPathData>(json, JsonOpts)!;
 
             data.AssetPath = finalPath;
             data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;

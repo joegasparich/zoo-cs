@@ -48,6 +48,8 @@ public class Entity {
         foreach (var component in components.Values) {
             component.End();
         }
+        
+        Game.UnregisterEntity(this);
     }
     
     public T AddComponent<T>(params object?[]? args) where T : Component {
@@ -57,7 +59,8 @@ public class Entity {
         components.Add(component.GetType(), component);
         return component;
     }
-    public T GetComponent<T>() where T : Component {
+    public T? GetComponent<T>() where T : Component {
+        if (!HasComponent(typeof(T))) return null;
         return (T)components[typeof(T)];
     }
     public bool HasComponent(Type type) {

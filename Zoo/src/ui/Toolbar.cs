@@ -19,19 +19,30 @@ public class Toolbar : Window {
         var curX = GUI.GapSmall;
         GUI.TextAlign = AlignMode.MiddleCenter;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Biome");
+        // TODO: Do tool buttons with a loop?
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Biome")) {
+            toolManager.SetTool(ToolType.Biome);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Elevation");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Elevation")) {
+            toolManager.SetTool(ToolType.Elevation);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Wall");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Wall")) {
+            toolManager.SetTool(ToolType.Wall);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Door");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Door")) {
+            toolManager.SetTool(ToolType.Door);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Path");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Path")) {
+            toolManager.SetTool(ToolType.FootPath);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Object")) {
@@ -39,7 +50,9 @@ public class Toolbar : Window {
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Delete");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Delete")) {
+            toolManager.SetTool(ToolType.Delete);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
         GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "New");

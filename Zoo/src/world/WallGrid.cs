@@ -20,7 +20,7 @@ public enum WallSpriteIndex {
     HillSouth = 7,
 };
 
-public struct Wall {
+public class Wall {
     public WallData?   Data           = null;
     public Orientation Orientation    = Orientation.Vertical;
     public Vector2     WorldPos       = default;
@@ -29,7 +29,6 @@ public struct Wall {
     public bool        Indestructable = false;
     public bool        IsDoor         = false;
     public Color       OverrideColour = Color.WHITE;
-    public Wall() {}
 }
 
 public class WallGrid {
@@ -114,7 +113,7 @@ public class WallGrid {
 
     public Wall? PlaceWallAtTile(WallData data, IntVec2 tile, Side side) {
         if (!IsWallPosInMap(tile, side)) return null;
-        if (GetWallAtTile(tile, side)!.Value.Exists) return null;
+        if (GetWallAtTile(tile, side)!.Exists) return null;
         
         var (x, y, orientation) = WallUtility.GetGridPosition(tile, side);
 
@@ -138,11 +137,11 @@ public class WallGrid {
         return wall;
     }
 
-    public void DeleteWall(Wall wall) {
-        DeleteWallAtTile(wall.WorldPos.Floor(), wall.Orientation == Orientation.Horizontal ? Side.North : Side.West);
+    public void RemoveWall(Wall wall) {
+        RemoveWallAtTile(wall.WorldPos.Floor(), wall.Orientation == Orientation.Horizontal ? Side.North : Side.West);
     }
 
-    public void DeleteWallAtTile(IntVec2 tile, Side side) {
+    public void RemoveWallAtTile(IntVec2 tile, Side side) {
         if (!IsWallPosInMap(tile, side)) return;
         
         // Get grid pos
@@ -296,15 +295,15 @@ public class WallGrid {
         if (!Find.World.IsPositionInMap(tile)) return Array.Empty<Wall>();
 
         return new[] {
-            GetWallAtTile(tile, Side.North)!.Value,
-            GetWallAtTile(tile, Side.West)!.Value,
-            GetWallAtTile(tile, Side.South)!.Value,
-            GetWallAtTile(tile, Side.East)!.Value
+            GetWallAtTile(tile, Side.North)!,
+            GetWallAtTile(tile, Side.West)!,
+            GetWallAtTile(tile, Side.South)!,
+            GetWallAtTile(tile, Side.East)!
         };
     }
 
     public bool IsWallSloped(Wall wall) {
         var (v1, v2) = wall.GetVertices();
-        return Find.World.Elevation.GetElevationAtPos(v1).RoundToInt() != Find.World.Elevation.GetElevationAtPos(v2).RoundToInt();     
+        return !Find.World.Elevation.GetElevationAtPos(v1).FEquals(Find.World.Elevation.GetElevationAtPos(v2));     
     }
 }

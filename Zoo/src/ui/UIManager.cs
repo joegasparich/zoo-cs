@@ -79,7 +79,7 @@ public class UIManager {
         // First loop through in reverse to find the hovered window
         for (int i = windowStack.Count - 1; i >= 0; i--) {
             var window = windowStack[i];
-            if (JMath.PointInRect(window.AbsRect, Find.Input.GetMousePosition())) {
+            if (JMath.PointInRect(window.AbsRect, Find.Input.GetMousePos())) {
                 hoveredWindowId = window.Id;
                 break;
             }
@@ -157,6 +157,6 @@ public class UIManager {
         if (currentWindowId != hoveredWindowId)
             return false;
         
-        return JMath.PointInRect(GetAbsRect(rect), Find.Input.GetMousePosition());
+        return JMath.PointInRect(GetAbsRect(rect), Find.Input.GetMousePos());
     }
 }

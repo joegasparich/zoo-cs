@@ -33,7 +33,7 @@ public struct WallData {
     public SpriteSheet SpriteSheet;
 }
 
-public struct PathData {
+public struct FootPathData {
     public string      AssetPath;
     public string      Name;
     public SpriteSheet SpriteSheet;
@@ -42,7 +42,7 @@ public struct PathData {
 public class Registry {
     private readonly Dictionary<string, ObjectData> objectRegistry = new ();
     private readonly Dictionary<string, WallData>   wallRegistry   = new ();
-    private readonly Dictionary<string, PathData>   pathRegistry   = new();
+    private readonly Dictionary<string, FootPathData>   pathRegistry   = new();
 
     public void RegisterObject(string assetPath, ObjectData data) {
         objectRegistry.Add(assetPath, data);
@@ -52,7 +52,7 @@ public class Registry {
         wallRegistry.Add(assetPath, data);
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered wall {data.Name}");
     }
-    public void RegisterPath(string assetPath, PathData data) {
+    public void RegisterPath(string assetPath, FootPathData data) {
         pathRegistry.Add(assetPath, data);
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered path {data.Name}");
     }
@@ -64,7 +64,7 @@ public class Registry {
     public WallData GetWall(string assetPath) {
         return wallRegistry[assetPath];
     }
-    public PathData GetPath(string assetPath) {
+    public FootPathData GetFootPath(string assetPath) {
         return pathRegistry[assetPath];
     }
     
@@ -74,7 +74,7 @@ public class Registry {
     public List<WallData> GetAllWalls() {
         return wallRegistry.Values.ToList();
     }
-    public List<PathData> GetAllPaths() {
+    public List<FootPathData> GetAllFootPaths() {
         return pathRegistry.Values.ToList();
     }
 }

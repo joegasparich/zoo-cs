@@ -25,9 +25,9 @@ public struct BiomeInfo {
 }
 
 public class BiomeGrid {
-    public const   int   BiomeScale          = 2;
-    internal const int   ChunkSize           = 5;
-    internal const float SlopeColourStrength = 0.3f;
+    public static readonly int   BiomeScale          = 2;
+    internal const         int   ChunkSize           = 5;
+    internal const         float SlopeColourStrength = 0.3f;
 
     private int           rows;
     private int           cols;
@@ -134,8 +134,8 @@ public class BiomeGrid {
     }
     
     private void OnElevationUpdated(object data) {
-        var (pos, radius) = (Tuple<Vector2, float>)data;
-        RegenerateChunksInRadius(pos, radius);
+        var (pos, radius) = (ValueTuple<Vector2, float>)data;
+        RegenerateChunksInRadius(pos * BiomeScale, radius + 6);
     }
 
     public void RegenerateChunksInRadius(Vector2 pos, float radius) {

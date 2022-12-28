@@ -60,8 +60,20 @@ public static class ExtensionMethods {
     public static bool Contains(this Rectangle rect, Vector2 point) {
         return JMath.PointInRect(rect, point);
     }
+    public static float XMax(this Rectangle rect) {
+        return rect.x + rect.width;
+    }
+    public static float YMax(this Rectangle rect) {
+        return rect.y + rect.height;
+    }
     
     // List //
+    public static T Pop<T>(this IList<T> source) {
+        if(!source.Any()) throw new Exception();
+        var element = source[^1];
+        source.RemoveAt(source.Count - 1);
+        return element;
+    }
     public static void MoveItemAtIndexToFront<T>(this IList<T> list, int index) {
         var item = list[index];
         list.RemoveAt(index);

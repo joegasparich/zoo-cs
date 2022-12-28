@@ -89,12 +89,12 @@ public class InputManager {
         // Messenger::fire(EventType::InputEvent);
     }
     
-    public Vector2 GetMousePosition() {
+    public Vector2 GetMousePos() {
         return Raylib.GetMousePosition();
     }
     
-    public Vector2 GetMouseWorldPosition() {
-        return Find.Renderer.ScreenToWorldPos(GetMousePosition());
+    public Vector2 GetMouseWorldPos() {
+        return Find.Renderer.ScreenToWorldPos(GetMousePos());
     }
     
     public InputEvent GetCurrentEvent() {

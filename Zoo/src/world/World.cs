@@ -22,7 +22,7 @@ public class World {
     public ElevationGrid Elevation { get; }
     public BiomeGrid     Biomes    { get; }
     public WallGrid      Walls     { get; }
-    public PathGrid      Paths     { get; }
+    public FootPathGrid      FootPaths     { get; }
 
     private Dictionary<int, Entity>    TileObjects   = new();
     private Dictionary<string, Entity> TileObjectMap = new();
@@ -36,7 +36,7 @@ public class World {
         Elevation = new ElevationGrid(Width, Height);
         Biomes    = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
         Walls     = new WallGrid(Width, Height);
-        Paths     = new PathGrid(Width, Height);
+        FootPaths     = new FootPathGrid(Width, Height);
     }
 
     public void Setup() {
@@ -45,7 +45,7 @@ public class World {
         Elevation.Setup();
         Biomes.Setup();
         Walls.Setup();
-        Paths.Setup();
+        FootPaths.Setup();
 
         isSetup = true;
 
@@ -56,7 +56,7 @@ public class World {
         Elevation.Reset();
         Biomes.Reset();
         Walls.Reset();
-        Paths.Reset();
+        FootPaths.Reset();
 
         TileObjects.Clear();
         TileObjectMap.Clear();
@@ -75,7 +75,7 @@ public class World {
         Biomes.Render();
         Elevation.Render();
         Walls.Render();
-        Paths.Render();
+        FootPaths.Render();
     }
     public void RenderDebug() {}
 

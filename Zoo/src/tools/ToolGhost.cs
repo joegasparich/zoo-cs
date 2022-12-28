@@ -30,6 +30,7 @@ public class ToolGhost {
     public SpriteSheet? SpriteSheet   { get; set; }
     public int          SpriteIndex   { get; set; }
     public Vector2      Pos           { get; set; }
+    public Side         Side          { get; set; }
     public Vector2      Scale         { get; set; }
     public float        Radius        { get; set; }
     public Vector2      Offset        { get; set; }
@@ -37,7 +38,7 @@ public class ToolGhost {
     public Color        GhostColour   { get; set; } = DefaultGhostColour;
     public Color        BlockedColour { get; set; } = DefaultBlockedColour;
 
-    public bool CanPlace => toolManager.GetActiveTool().CanPlace(Pos);       
+    public bool CanPlace => toolManager.GetActiveTool().CanPlace(this);       
 
     public ToolGhost(ToolManager toolManager) {
         this.toolManager = toolManager;
@@ -58,6 +59,7 @@ public class ToolGhost {
         BlockedColour = DefaultBlockedColour;
 
         Pos    = Vector2.Zero;
+        Side   = Side.North;
         Scale  = Vector2.One;
         Radius = 1;
         Offset = Vector2.Zero;
@@ -66,7 +68,8 @@ public class ToolGhost {
     
     public void Render() {
         if (Follow) {
-            Pos = Find.Input.GetMouseWorldPosition();
+            Pos  = Find.Input.GetMouseWorldPos();
+            Side = World.GetQuadrantAtPos(Pos);
         }
         if (Snap) {
             Pos = Pos.Floor();

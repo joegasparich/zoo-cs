@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Zoo.entities;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -79,14 +80,34 @@ public class ElevationGrid {
         }
         
         if (elevation == Elevation.Water) {
-            // Check for walls
-            // Check for tile objects
-            // Check for paths
+            // Check 4 surrounding wall slots for walls
+            foreach(var wall in Find.World.Walls.GetSurroundingWalls(gridPos)) {
+                if (wall.Exists) return false;
+            }
+            // Check 4 surrounding tiles
+            foreach(var tile in GetSurroundingTiles(gridPos)) {
+                if (!Find.World.IsPositionInMap(tile)) continue;
+                
+                // Check for Tile Objects
+                var entity = Find.World.GetTileObjectAtTile(tile);
+                if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceInWater: false }) return false;
+                // Check for paths
+                if (Find.World.FootPaths.GetPathAtTile(tile) is { Exists: true }) return false;
+            }
         }
 
         if (elevation == Elevation.Hill) {
-            // Check for tile objects
-            // Check for paths
+            // Check 4 surrounding tiles
+            foreach(var tile in GetSurroundingTiles(gridPos)) {
+                if (!Find.World.IsPositionInMap(tile)) continue;
+
+                // Check for Tile Objects
+                var entity = Find.World.GetTileObjectAtTile(tile);
+                if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceOnSlopes: false }) return false;
+                // Check for paths
+                // TODO: Figure out if points are being elevated in a way where this is valid
+                if (Find.World.FootPaths.GetPathAtTile(tile) is { Exists: true }) return false;
+            }
         }
 
         return true;
@@ -119,30 +140,28 @@ public class ElevationGrid {
         return true;
     }
     
-    private List<IntVec2> pointsToElevate = new ();
-    private List<IntVec2> affectedCells   = new();
-    public void SetElevationInCircle(Vector2 pos, Elevation elevation, int radius) {
+    private readonly List<IntVec2> pointsToElevate = new ();
+    private readonly List<IntVec2> affectedCells   = new();
+    public void SetElevationInCircle(Vector2 pos, float radius, Elevation elevation) {
         if (!isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
             return;
         }
         if (!Find.World.IsPositionInMap(pos)) return;
 
-        bool changed = false;
+        var changed = false;
         
         pointsToElevate.Clear();
 
-        for (float i = pos.X - radius; i <= pos.X + radius; i++) {
-            for (float j = pos.Y - radius; j <= pos.Y + radius; j++) {
+        for (var i = pos.X - radius; i <= pos.X + radius; i++) {
+            for (var j = pos.Y - radius; j <= pos.Y + radius; j++) {
                 var gridPos = new Vector2(i, j).Floor();
                 if (!Find.World.IsPositionInMap(gridPos)) continue;
+                if (!JMath.PointInCircle(pos, radius, gridPos)) continue;
+                if (GetElevationAtGridPos(gridPos) == elevation) continue;
 
-                if (JMath.PointInCircle(pos, radius, gridPos)) {
-                    if (GetElevationAtGridPos(gridPos) != elevation) {
-                        pointsToElevate.Add(gridPos);
-                        changed = true; // TODO: Check canElevate to avoid heaps of mesh regeneration
-                    }
-                }
+                pointsToElevate.Add(gridPos);
+                changed = true; // TODO: Check canElevate to avoid heaps of mesh regeneration
             }
         }
         

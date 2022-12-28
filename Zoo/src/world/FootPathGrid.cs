@@ -4,7 +4,7 @@ using Zoo.util;
 
 namespace Zoo.world;
 
-public enum PathSpriteIndex {
+public enum FootPathSpriteIndex {
     Flat = 0,
     HillEast = 1,
     HillWest = 2,
@@ -12,25 +12,25 @@ public enum PathSpriteIndex {
     HillSouth = 4
 }
 
-public struct Path {
-    public PathData? Data           = null;
+public class FootPath {
+    public FootPathData? Data           = null;
     public IntVec2   Pos            = default;
     public bool      Exists         = false;
     public bool      Indestructable = false;
     public Color     OverrideColour = Color.WHITE;
-    public Path() {}
+    public FootPath() {}
 }
 
-public class PathGrid {
-    private bool    isSetup = false;
-    private Path[,] grid;
-    private int     cols;
-    private int     rows;
+public class FootPathGrid {
+    private bool        isSetup = false;
+    private FootPath[,] grid;
+    private int         cols;
+    private int         rows;
     
-    public PathGrid(int cols, int rows) {
+    public FootPathGrid(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
-        grid = new Path[cols, rows];
+        grid = new FootPath[cols, rows];
     }
 
     public void Setup() {
@@ -38,7 +38,7 @@ public class PathGrid {
         
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
-                grid[i, j] = new Path() {
+                grid[i, j] = new FootPath() {
                     Pos = new IntVec2(i, j)
                 };
             }
@@ -46,7 +46,7 @@ public class PathGrid {
         
         isSetup = true;
 
-        PlacePathAtTile(Find.Registry.GetPath(PATHS.DIRT_PATH), new IntVec2(5, 5));
+        PlacePathAtTile(Find.Registry.GetFootPath(FOOTPATHS.DIRT_PATH), new IntVec2(5, 5));
     }
 
     public void Reset() {
@@ -68,7 +68,7 @@ public class PathGrid {
                 var path = grid[i, j];
                 if (!path.Exists || !path.Data.HasValue) continue;
 
-                var (spriteIndex, elevation) = PathUtility.GetSpriteInfo(path);
+                var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
                 Vector2 pos = path.Pos;
                 pos -= new Vector2(0, 1 + elevation);
                 
@@ -86,11 +86,11 @@ public class PathGrid {
         }
     }
 
-    public Path? PlacePathAtTile(PathData data, IntVec2 tile) {
+    public FootPath? PlacePathAtTile(FootPathData data, IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
-        if (GetPathAtTile(tile).Value!.Exists) return null;
+        if (GetPathAtTile(tile)!.Exists) return null;
         
-        grid[tile.X, tile.Y] = new Path() {
+        grid[tile.X, tile.Y] = new FootPath() {
             Data = data,
             Pos = tile,
             Exists = true
@@ -103,16 +103,16 @@ public class PathGrid {
 
     public void RemovePathAtTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return;
-        if (!GetPathAtTile(tile).Value!.Exists) return;
+        if (!GetPathAtTile(tile)!.Exists) return;
         
-        grid[tile.X, tile.Y] = new Path() {
+        grid[tile.X, tile.Y] = new FootPath() {
             Pos = tile
         };
 
         // TODO: update pathfinding once using walkability grid
     }
 
-    public Path? GetPathAtTile(IntVec2 tile) {
+    public FootPath? GetPathAtTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
         return grid[tile.X, tile.Y];
     }

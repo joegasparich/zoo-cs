@@ -5,16 +5,16 @@ using Zoo.util;
 
 namespace Zoo.tools; 
 
-public class TileObjectTool : Tool {
+public class Tool_TileObject : Tool {
     private ObjectData       currentObject;
     private List<ObjectData> allObjects;
 
-    public TileObjectTool(ToolManager toolManager) : base(toolManager) {
+    public override string   Name => "Object Tool";
+    public override ToolType Type => ToolType.TileObject;
+
+    public Tool_TileObject(ToolManager tm) : base(tm) {
         allObjects = Find.Registry.GetAllObjects();
     }
-
-    public override string   Name { get; } = "Object Tool";
-    public override ToolType Type { get; } = ToolType.TileObject;
 
     public override void Set() {
         Ghost.Type    = GhostType.Sprite;
@@ -40,10 +40,10 @@ public class TileObjectTool : Tool {
         }
     }
 
-    public override bool CanPlace(Vector2 pos) {
+    public override bool CanPlace(ToolGhost ghost) {
         for (int i = 0; i < currentObject.Size.X; i++) {
             for (int j = 0; j < currentObject.Size.Y; j++) {
-                var tile = (pos + new Vector2(i, j)).Floor();
+                var tile = (ghost.Pos + new Vector2(i, j)).Floor();
                 
                 if (Find.World.GetTileObjectAtTile(tile) != null) return false;
                 if (Find.World.Elevation.IsTileWater(tile)) return false;
@@ -70,9 +70,5 @@ public class TileObjectTool : Tool {
 
         Ghost.Origin = data.Origin;
         Ghost.Offset = data.Size / 2f;
-    }
-    
-    public ObjectData GetObject() {
-        return currentObject;
     }
 }

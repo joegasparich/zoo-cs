@@ -11,7 +11,7 @@ public class ToolManager {
     
     public ToolManager() {
         Ghost      = new ToolGhost(this);
-        activeTool = new NoTool(this);
+        activeTool = new Tool_None(this);
     }
 
     public void Setup() {
@@ -65,30 +65,30 @@ public class ToolManager {
         
         // TODO: can we automate this
         switch(type) {
-            // case ToolType.Biome:
-            //     activeTool = new BiomeTool(this);
-            //     break;
-            // case ToolType.Elevation:
-            //     activeTool = new ElevationTool(this);
-            //     break;
-            // case ToolType.Wall:
-            //     activeTool = new WallTool(this);
-            //     break;
-            // case ToolType.Door:
-            //     activeTool = new DoorTool(this);
-            //     break;
-            // case ToolType.Path:
-            //     activeTool = new PathTool(this);
-            //     break;
-            case ToolType.TileObject:
-                activeTool = new TileObjectTool(this);
+            case ToolType.Biome:
+                activeTool = new Tool_Biome(this);
                 break;
-            // case ToolType.Delete:
-            //     activeTool = new DeleteTool(this);
-            //     break;
+            case ToolType.Elevation:
+                activeTool = new Tool_Elevation(this);
+                break;
+            case ToolType.Wall:
+                activeTool = new Tool_Wall(this);
+                break;
+            case ToolType.Door:
+                activeTool = new Tool_Door(this);
+                break;
+            case ToolType.FootPath:
+                activeTool = new Tool_FootPath(this);
+                break;
+            case ToolType.TileObject:
+                activeTool = new Tool_TileObject(this);
+                break;
+            case ToolType.Delete:
+                activeTool = new Tool_Delete(this);
+                break;
             case ToolType.None:
             default:
-                activeTool = new NoTool(this);
+                activeTool = new Tool_None(this);
                 break;
         }
 
