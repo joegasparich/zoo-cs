@@ -1,5 +1,4 @@
 {
-  "assetPath": "assets/data/paths/dirt_path.json",
   "name": "Dirt Path",
   "spriteSheet": {
     "texturePath": "assets/data/paths/dirt_path.png",

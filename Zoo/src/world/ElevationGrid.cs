@@ -68,7 +68,7 @@ public class ElevationGrid {
 
     public void Render() {
         foreach (var polygon in waterPolygons) {
-            Draw.DrawTriangleFan3D(polygon, polygon.Length, WaterColour, Depth.Water.ToInt());
+            Draw.DrawTriangleFan3D(polygon, WaterColour, Depth.Water.ToInt());
         }
     }
 

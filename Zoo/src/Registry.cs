@@ -15,9 +15,10 @@ public struct ObjectData {
     public string       AssetPath;
     public string       Name;
     public string?      SpritePath;
+    public Texture2D?   Sprite;
     public SpriteSheet? SpriteSheet;
     public string       Type;
-    public Vector2      Pivot;
+    public Vector2      Origin;
     public Vector2      Size;
     public bool         Solid;
     public bool         CanPlaceOnSlopes;

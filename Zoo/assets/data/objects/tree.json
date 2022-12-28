@@ -1,7 +1,7 @@
 {
   "name": "tree",
   "solid": true,
-  "pivot": {
+  "origin": {
     "x": 0.5,
     "y": 0.7
   },

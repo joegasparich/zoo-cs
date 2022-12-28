@@ -122,6 +122,8 @@ public static class Game {
                 foreach (var entity in entities.Values) {
                     entity.Render();
                 }
+                
+                SceneManager.GetCurrentScene().RenderLate();
             }
             Renderer.End3D();
             

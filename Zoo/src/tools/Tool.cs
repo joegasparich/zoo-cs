@@ -1,4 +1,6 @@
-﻿namespace Zoo.tools;
+﻿using System.Numerics;
+
+namespace Zoo.tools;
 
 public enum ToolType {
     None,
@@ -16,6 +18,8 @@ public abstract class Tool {
         
     public virtual string Name { get; }
     public virtual ToolType Type { get; }
+
+    protected ToolGhost Ghost => toolManager.Ghost;
     
     public Tool(ToolManager toolManager) {
         this.toolManager = toolManager;
@@ -28,5 +32,6 @@ public abstract class Tool {
     public virtual void PostUpdate() {}
     public virtual void Render() {}
     public virtual void OnGUI() {}
-    public virtual void OnInput(InputEvent evt) {}
+    public virtual void OnInput(InputEvent  evt) {}
+    public virtual bool CanPlace(Vector2 pos) => true;
 }

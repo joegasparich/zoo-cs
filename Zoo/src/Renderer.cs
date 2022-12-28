@@ -126,13 +126,13 @@ public class Renderer {
             source.Value.width * texture.width,
             source.Value.height * texture.height
         );
-        var pivot = origin.Value * scale.Value;
+        var scaledOrigin = origin.Value * scale.Value;
         
         Draw.DrawTexturePro3D(
             texture,
             src,
             new Rectangle(pos.X, pos.Y, scale.Value.X, scale.Value.Y),
-            new Vector3(pivot.X, pivot.Y, 0),
+            new Vector3(scaledOrigin.X, scaledOrigin.Y, 0),
             0,
             depth,
             color.Value

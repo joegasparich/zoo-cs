@@ -34,7 +34,9 @@ public class Toolbar : Window {
         GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Path");
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Object");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Object")) {
+            toolManager.SetTool(ToolType.TileObject);
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
         GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Delete");

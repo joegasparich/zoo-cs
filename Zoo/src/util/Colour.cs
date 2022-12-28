@@ -79,4 +79,8 @@ public static class Colour {
         var rgb = Hsv2Rgb(hsv with { Z = JMath.Clamp(hsv.Z + amount, 0.0f, 1.0f) });
         return FromVector3(rgb);
     }
+
+    public static Color WithAlpha(this Color color, float alpha) {
+        return new Color(color.r, color.g, color.b, (byte)(alpha * 255));
+    }
 }

@@ -30,11 +30,11 @@ public class AssetManager {
             var        json = File.ReadAllText(finalPath);
             ObjectData data = JsonSerializer.Deserialize<ObjectData>(json, JsonOpts)!;
 
+            data.AssetPath = finalPath;
             if (data.SpritePath != null)
-                GetTexture(data.SpritePath);
-            
+                data.Sprite = GetTexture(data.SpritePath);
             if (data.SpriteSheet?.TexturePath != null)
-                LoadSpriteSheet(data.SpriteSheet.Value);
+                data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet.Value);
             
             Find.Registry.RegisterObject(finalPath, data);
         }
@@ -48,7 +48,8 @@ public class AssetManager {
 
             var      json = File.ReadAllText(finalPath);
             PathData data = JsonSerializer.Deserialize<PathData>(json, JsonOpts)!;
-            
+
+            data.AssetPath = finalPath;
             data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;
             
             Find.Registry.RegisterPath(finalPath, data);
@@ -63,7 +64,8 @@ public class AssetManager {
             
             var      json = File.ReadAllText(finalPath);
             WallData data = JsonSerializer.Deserialize<WallData>(json, JsonOpts)!;
-            
+
+            data.AssetPath   = finalPath;
             data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;
             
             Find.Registry.RegisterWall(finalPath, data);

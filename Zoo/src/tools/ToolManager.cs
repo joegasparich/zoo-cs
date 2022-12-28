@@ -10,7 +10,8 @@ public class ToolManager {
     private string toolbarHandle;
     
     public ToolManager() {
-        Ghost = new ToolGhost();
+        Ghost      = new ToolGhost(this);
+        activeTool = new NoTool(this);
     }
 
     public void Setup() {
@@ -79,9 +80,9 @@ public class ToolManager {
             // case ToolType.Path:
             //     activeTool = new PathTool(this);
             //     break;
-            // case ToolType.TileObject:
-            //     activeTool = new TileObjectTool(this);
-            //     break;
+            case ToolType.TileObject:
+                activeTool = new TileObjectTool(this);
+                break;
             // case ToolType.Delete:
             //     activeTool = new DeleteTool(this);
             //     break;

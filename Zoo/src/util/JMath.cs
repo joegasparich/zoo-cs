@@ -4,11 +4,16 @@ using Raylib_cs;
 namespace Zoo.util;
 
 public static class JMath {
-    public static float Lerp(float         from, float to,  float pct) =>  from + (to - from) * pct;
-    public static float Normalise(float    val,  float min, float max) =>  (val - min) / (max - min);
-    public static float Clamp(float        val,  float min, float max) =>  Math.Max(min, Math.Min(max, val));
+    // Modify values
+    public static float Lerp(float from, float to,  float pct) =>  from + (to - from) * pct;
+    public static float Normalise(float val,  float min, float max) =>  (val - min) / (max - min);
+    public static float Clamp(float val,  float min, float max) =>  Math.Max(min, Math.Min(max, val));
     public static float Min(params float[] vals) => vals.Min();
     public static float Max(params float[] vals) => vals.Max();
+    
+    // Trig
+    public static float DegToRad(float deg) => deg * (float)Math.PI / 180f;
+    public static float RadToDeg(float rad) => rad * 180f / (float)Math.PI;
     
     // Vectors
     public static Vector2 XY(this Vector3 v) => new Vector2(v.X, v.Y);

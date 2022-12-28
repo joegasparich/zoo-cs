@@ -1,5 +1,4 @@
 {
-  "assetPath": "assets/data/paths/cobble_path.json",
   "name": "Cobble Path",
   "spriteSheet": {
     "texturePath": "assets/data/paths/cobble_path.png",
