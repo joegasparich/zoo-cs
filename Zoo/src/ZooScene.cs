@@ -21,6 +21,10 @@ public class ZooScene : Scene {
         Game.RegisterEntity(testEntity);
     }
 
+    public override void Stop() {
+        Zoo.Cleanup();
+    }
+
     public override void PreUpdate() {
         Zoo.PreUpdate();
     }

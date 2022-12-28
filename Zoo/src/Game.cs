@@ -139,8 +139,6 @@ public static class Game {
 
     public static void OnGUI() {
         Find.SceneManager.GetCurrentScene().OnGUI();
-        
-        UI.DoImmediateWindow("asdf", new Rectangle(10, 10, 100, 100), inRect => {}, true);
     }
 
     public static int RegisterEntity(Entity entity) {

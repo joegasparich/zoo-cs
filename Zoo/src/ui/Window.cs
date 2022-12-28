@@ -18,7 +18,7 @@ public class Window {
     protected bool              headerHovered = false;
     private   Action<Rectangle> OnUI;
     private   bool              doBackground = true;
-    private   bool              isDragging   = false;
+    protected bool              isDragging   = false;
     private   Vector2           dragPos      = Vector2.Zero;
 
     public Window(Rectangle rect) {
@@ -33,7 +33,7 @@ public class Window {
         this.doBackground = doBackground;
     }
 
-    public void DoWindowContents() {
+    public virtual void DoWindowContents() {
         if (isDragging) {
             var newPos = Find.Input.GetMousePosition() - dragPos;
             AbsRect = AbsRect with { x = newPos.X, y = newPos.Y };
@@ -62,7 +62,7 @@ public class Window {
         if (OnUI != null) OnUI(GetRect());
     }
 
-    public void OnInput(InputEvent evt) {
+    public virtual void OnInput(InputEvent evt) {
         DoWindowContents();
         
         // Dragging
@@ -78,7 +78,7 @@ public class Window {
         }
     }
 
-    public void Close() {
+    public virtual void Close() {
         Find.UI.CloseWindow(Id);
     }
     
