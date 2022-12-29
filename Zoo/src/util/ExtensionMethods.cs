@@ -7,7 +7,7 @@ namespace Zoo.util;
 
 public static class ExtensionMethods {
     // Float //
-    public static bool FEquals(this float a, float b) {
+    public static bool NearlyEquals(this float a, float b) {
         return Math.Abs(a - b) < 0.0001f;
     }
     public static int RoundToInt(this float f) => (int)MathF.Round(f);
@@ -48,6 +48,16 @@ public static class ExtensionMethods {
     public static void Deconstruct(this Vector2 v, out float x, out float y) {
         x = v.X;
         y = v.Y;
+    }
+    public static float Distance(this Vector2 a, Vector2 b) {
+        return MathF.Sqrt(MathF.Pow(a.X - b.X, 2) + MathF.Pow(a.Y - b.Y, 2));
+    }
+    public static float DistanceSquared(this Vector2 a, Vector2 b) {
+        return MathF.Pow(a.X - b.X, 2) + MathF.Pow(a.Y - b.Y, 2);
+    }
+    public static Vector2 Normalised(this Vector2 v) {
+        if (v.LengthSquared() == 0) return Vector2.Zero;
+        return v / v.Length();
     }
     
     // Rectangle //
@@ -108,5 +118,8 @@ public static class ExtensionMethods {
         var item = list[index];
         list.RemoveAt(index);
         list.Insert(0, item);
+    }
+    public static bool NullOrEmpty<T>( this List<T>? list ) {
+        return list == null || list.Count == 0;
     }
 }

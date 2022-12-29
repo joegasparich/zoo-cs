@@ -12,6 +12,10 @@ public enum Side {
     West = 3
 }
 
+public enum Direction {
+    N, NE, E, SE, S, SW, W, NW
+};
+
 public class World {
     public const int WorldScale      = 32;
     public const int LargerThanWorld = 10000;
@@ -19,10 +23,12 @@ public class World {
     public int Width  { get; }
     public int Height { get; }
 
-    public ElevationGrid Elevation { get; }
-    public BiomeGrid     Biomes    { get; }
-    public WallGrid      Walls     { get; }
-    public FootPathGrid      FootPaths     { get; }
+    public ElevationGrid Elevation  { get; }
+    public BiomeGrid     Biomes     { get; }
+    public WallGrid      Walls      { get; }
+    public FootPathGrid  FootPaths  { get; }
+    public AreaManager   Areas      { get; }
+    public Pathfinder    Pathfinder { get; }
 
     private Dictionary<int, Entity>    TileObjects   = new();
     private Dictionary<string, Entity> TileObjectMap = new();
@@ -36,7 +42,9 @@ public class World {
         Elevation = new ElevationGrid(Width, Height);
         Biomes    = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
         Walls     = new WallGrid(Width, Height);
-        FootPaths     = new FootPathGrid(Width, Height);
+        FootPaths = new FootPathGrid(Width, Height);
+        Areas     = new AreaManager();
+        Pathfinder = new Pathfinder(Width, Height);
     }
 
     public void Setup() {
@@ -46,6 +54,7 @@ public class World {
         Biomes.Setup();
         Walls.Setup();
         FootPaths.Setup();
+        Areas.Setup();
 
         isSetup = true;
 
@@ -57,6 +66,7 @@ public class World {
         Biomes.Reset();
         Walls.Reset();
         FootPaths.Reset();
+        Areas.Reset();
 
         TileObjects.Clear();
         TileObjectMap.Clear();
@@ -88,7 +98,7 @@ public class World {
         }
 
         if (component.Data.Solid) {
-            Messenger.Fire(EventType.PlaceSolid, component.GetOccupiedTiles().ToArray());
+            Messenger.Fire(EventType.PlaceSolid, component.GetOccupiedTiles().ToList());
         }
     }
 
@@ -116,17 +126,30 @@ public class World {
     }
 
     public IEnumerable<IntVec2> GetAdjacentTiles(IntVec2 tile, bool diagonals = false) {
-        for (int i = 0; i < 4; i++) {
+        if (!IsPositionInMap(tile)) yield break;
+        
+        for (var i = 0; i < 4; i++) {
             var adj = GetTileInDirection(tile, (Side)i);
             if (IsPositionInMap(adj)) yield return adj;
         }
 
-        if (diagonals) {
-            for (int i = 0; i < 4; i++) {
-                var adj  = GetTileInDirection(tile, (Side)i);
-                var adj2 = GetTileInDirection(adj, (Side)((i + 1) % 4));
-                if (IsPositionInMap(adj2)) yield return adj2;
-            }
+        if (!diagonals) yield break;
+        
+        for (var i = 0; i < 4; i++) {
+            var adj  = GetTileInDirection(tile, (Side)i);
+            var adj2 = GetTileInDirection(adj, (Side)((i + 1) % 4));
+            if (IsPositionInMap(adj2)) yield return adj2;
+        }
+    }
+
+    public IEnumerable<IntVec2> GetAccessibleAdjacentTiles(IntVec2 tile) {
+        if (!IsPositionInMap(tile)) yield break;
+        
+        for (var i = 0; i < 4; i++) {
+            if (Walls.GetWallAtTile(tile, (Side)i) is { Exists: true }) continue;
+            var adj = GetTileInDirection(tile, (Side)i);
+            if (!IsPositionInMap(adj)) continue;
+            yield return adj;
         }
     }
 
@@ -144,5 +167,17 @@ public class World {
 
     public Entity? GetTileObjectAtTile(IntVec2 tile) {
         return TileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
+    }
+    
+    // TODO (optimisation): cache tile cost grids (paths, no water, etc.)
+    // TODO: Set up consts for tile costs
+    public int GetTileWalkability(IntVec2 tile) {
+        if (!isSetup) return 0;
+        if (!IsPositionInMap(tile)) return 0;
+        if (TileObjectMap.ContainsKey(tile.ToString()) && TileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
+        if (Elevation.IsTileWater(tile)) return 0;
+        if (FootPaths.GetPathAtTile(tile)!.Exists) return 1;
+
+        return 3;
     }
 }

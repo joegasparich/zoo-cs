@@ -25,7 +25,7 @@ public static class WallUtility {
             var right     = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.WorldPos.X + 0.5f, wall.WorldPos.Y));
             var elevation = MathF.Min(left, right);
 
-            if (left.FEquals(right)) return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, elevation );
+            if (left.NearlyEquals(right)) return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, elevation );
             if (left > right)                    return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillWest, elevation );
             if (left < right)                    return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillEast, elevation );
         } else {
@@ -33,7 +33,7 @@ public static class WallUtility {
             var down      = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.WorldPos.X, wall.WorldPos.Y + 0.5f));
             var elevation = MathF.Min(up, down);
 
-            if (up.FEquals(down)) return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, elevation );
+            if (up.NearlyEquals(down)) return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, elevation );
             if (up > down)                    return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillNorth, elevation );
             if (up < down)                    return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillSouth, elevation + ElevationUtility.ElevationHeight );
         }

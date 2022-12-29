@@ -6,6 +6,9 @@ namespace Zoo;
 
 public class ZooScene : Scene {
     public Zoo Zoo;
+    
+    // Test
+    private Entity man;
 
     public ZooScene() : base("Zoo") {}
 
@@ -15,10 +18,13 @@ public class ZooScene : Scene {
         Zoo.Setup();
         
         // Test
-        var testEntity = new Entity(new Vector2(0, 0));
-        var renderer   = testEntity.AddComponent<RenderComponent>();
+        man = new Entity(new Vector2(0, 0));
+        var renderer   = man.AddComponent<RenderComponent>();
         renderer.SetSprite(TEXTURES.KEEPER);
-        Game.RegisterEntity(testEntity);
+        man.AddComponent<PathFollowComponent>();
+        man.AddComponent<PhysicsComponent>();
+        man.AddComponent<MoveComponent>();
+        Game.RegisterEntity(man);
     }
 
     public override void Stop() {
@@ -48,5 +54,11 @@ public class ZooScene : Scene {
 
     public override void OnInput(InputEvent evt) {
         Zoo.OnInput(evt);
+
+        if (evt.consumed) return;
+
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
+            man.GetComponent<PathFollowComponent>()!.PathTo(evt.mouseWorldPos);
+        }
     }
 }

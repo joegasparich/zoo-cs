@@ -50,7 +50,14 @@ public struct IntVec2 : IEquatable<IntVec2> {
         return X == other.X && Y == other.Y;
     }
     
-    public void Deconstruct(out float x, out float y) {
+    public float Distance(Vector2 other) {
+        return MathF.Sqrt(MathF.Pow(X - other.X, 2) + MathF.Pow(Y - other.Y, 2));
+    }
+    public float DistanceSquared(Vector2 other) {
+        return MathF.Pow(X - other.X, 2) + MathF.Pow(Y - other.Y, 2);
+    }
+    
+    public void Deconstruct(out int x, out int y) {
         x = X;
         y = Y;
     }

@@ -60,8 +60,16 @@ public class Entity {
         return component;
     }
     public T? GetComponent<T>() where T : Component {
-        if (!HasComponent(typeof(T))) return null;
-        return (T)components[typeof(T)];
+        if (HasComponent(typeof(T))) return (T)components[typeof(T)];
+        
+        // TODO: Is there a faster way to do this?
+        foreach (var type in components.Keys) {
+            if (type.IsSubclassOf(typeof(T))) {
+                return (T)components[type];
+            }
+        }
+        
+        return null;
     }
     public bool HasComponent(Type type) {
         return components.ContainsKey(type);

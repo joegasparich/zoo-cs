@@ -129,10 +129,10 @@ public class WallGrid {
         var wall = grid[x][y];
         
         // updatePathfindingAtWall(wall);
-        //
-        // if (shouldCheckForLoop(wall) && checkForLoop(&wall)) {
-        //     Root::zoo()->world->areaManager->formAreas(grid.at(x).at(y));
-        // }
+        
+        if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
+            Find.World.Areas.FormAreas(wall);
+        }
 
         return wall;
     }
@@ -158,10 +158,10 @@ public class WallGrid {
             Indestructable = false,
         };
         
-        // auto& wall = grid[x][y];
-        //
+        var wall = grid[x][y];
+        
         // updatePathfindingAtWall(wall);
-        // Root::zoo()->world->areaManager->joinAreas(wall);
+        Find.World.Areas.JoinAreas(wall);
     }
 
     public void PlaceDoor(Wall wall) {
@@ -304,6 +304,48 @@ public class WallGrid {
 
     public bool IsWallSloped(Wall wall) {
         var (v1, v2) = wall.GetVertices();
-        return !Find.World.Elevation.GetElevationAtPos(v1).FEquals(Find.World.Elevation.GetElevationAtPos(v2));     
+        return !Find.World.Elevation.GetElevationAtPos(v1).NearlyEquals(Find.World.Elevation.GetElevationAtPos(v2));     
+    }
+
+    // TODO: See if we can optimise these two function
+    private bool ShouldCheckForLoop(Wall wall) {
+        var adjacent = GetAdjacentWalls(wall);
+        if (adjacent.Length < 2) return false;
+
+        if (wall.Orientation == Orientation.Horizontal) {
+            if (adjacent.Any(w => w.WorldPos.X > wall.WorldPos.X) && adjacent.Any(w => w.WorldPos.X < wall.WorldPos.X)) {
+                return true;
+            }
+        } else {
+            if (adjacent.Any(w => w.WorldPos.Y > wall.WorldPos.Y) && adjacent.Any(w => w.WorldPos.Y < wall.WorldPos.Y)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private readonly HashSet<Wall> loopWalls = new ();
+    private bool CheckForLoop(Wall startWall, Wall? currentWall = null, HashSet<Wall>? checkedWalls = null, int depth = 0) {
+        currentWall  ??= startWall;
+        if (checkedWalls == null) {
+            loopWalls.Clear();
+            checkedWalls = loopWalls;
+        }
+        
+        // Expand current node
+        checkedWalls.Add(currentWall);
+
+        var found = false;
+        foreach (var wall in GetAdjacentWalls(currentWall)) {
+            if (wall == startWall && depth > 1) return true;
+
+            if (!checkedWalls.Contains(wall)) {
+                found = CheckForLoop(startWall, wall, checkedWalls, depth + 1);
+            }
+            if (found) break;
+        }
+
+        return found;
     }
 }
