@@ -26,11 +26,14 @@ public class Pathfinder {
     private int  rows;
     private bool isSetup = false;
 
+    private Dictionary<string, Task<List<IntVec2>?>> pathRequests;
+
     public Pathfinder(int width, int height) {
         cols = width;
         rows = height;
         
         tileGrid = new Tile[cols, rows];
+        pathRequests = new Dictionary<string, Task<List<IntVec2>?>>();
         
         // Populate connections
         for (var i = 0; i < width; i++) {
@@ -41,25 +44,26 @@ public class Pathfinder {
         
         isSetup = true;
     }
-
-    private List<IntVec2> ReconstructPath(Node[,] tileDetails, IntVec2 dest) {
-        var path = new List<IntVec2>();
+    
+    public Task<List<IntVec2>?>? RequestPath(IntVec2 start, IntVec2 end) {
+        if (!isSetup) return null;
         
-        path.Add(dest);
-        var (x, y) = dest;
-        while (tileDetails[x, y].parent != new IntVec2(x, y)) {
-            var nextNode = tileDetails[x, y].parent;
-            path.Add(nextNode);
-            x = nextNode.X;
-            y = nextNode.Y;
+        var key = $"{start.X},{start.Y},{end.X},{end.Y}";
+        if (pathRequests.ContainsKey(key)) {
+            return pathRequests[key];
         }
         
-        path.Reverse();
-        return path;
+        var task = Task.Run(() => {
+            var path = GetPath(start, end);
+            pathRequests.Remove(key);
+            return path;
+        });
+        pathRequests.Add(key, task);
+        return task;
     }
     
     // https://www.geeksforgeeks.org/a-search-algorithm/
-    public List<IntVec2>? GetPath(IntVec2 from, IntVec2 to) {
+    private List<IntVec2>? GetPath(IntVec2 from, IntVec2 to) {
         if (!isSetup) return null;
         if (!Find.World.IsPositionInMap(from) || !Find.World.IsPositionInMap(to)) return null;
         if (!IsAccessible(from) || !IsAccessible(to)) return null;
@@ -123,6 +127,22 @@ public class Pathfinder {
 
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Failed to find route from {from} to {to}");
         return null;
+    }
+
+    private List<IntVec2> ReconstructPath(Node[,] tileDetails, IntVec2 dest) {
+        var path = new List<IntVec2>();
+        
+        path.Add(dest);
+        var (x, y) = dest;
+        while (tileDetails[x, y].parent != new IntVec2(x, y)) {
+            var nextNode = tileDetails[x, y].parent;
+            path.Add(nextNode);
+            x = nextNode.X;
+            y = nextNode.Y;
+        }
+        
+        path.Reverse();
+        return path;
     }
 
     public void SetAccessibility(IntVec2 tile, bool accessible) {

@@ -27,7 +27,7 @@ public class BiomeInfo {
 
 public class BiomeGrid {
     public static readonly int   BiomeScale          = 2;
-    internal const         int   ChunkSize           = 5;
+    internal const         int   ChunkSize           = 6;
     internal const         float SlopeColourStrength = 0.3f;
 
     private int           rows;
@@ -59,8 +59,8 @@ public class BiomeGrid {
                 chunkGrid[i, j] = new BiomeChunk(
                     i, 
                     j,
-                    i == chunkGrid.GetLength(0) - 1 && cols % ChunkSize != 0 ? cols & ChunkSize : ChunkSize,
-                    j == chunkGrid.GetLength(1) - 1 && rows % ChunkSize != 0 ? rows & ChunkSize : ChunkSize
+                    i == chunkGrid.GetLength(0) - 1 && cols % ChunkSize != 0 ? cols % ChunkSize : ChunkSize,
+                    j == chunkGrid.GetLength(1) - 1 && rows % ChunkSize != 0 ? rows % ChunkSize : ChunkSize
                 );
             }
         }
@@ -99,7 +99,7 @@ public class BiomeGrid {
     }
 
     private bool IsChunkInGrid(int col, int row) {
-        return col >= 0 && col < cols / ChunkSize && row >= 0 && row < rows / ChunkSize;
+        return col >= 0 && col < cols / (float)ChunkSize && row >= 0 && row < rows / (float)ChunkSize;
     }
     
     private BiomeChunk GetChunk(int col, int row) {
@@ -150,6 +150,28 @@ public class BiomeGrid {
             chunk.ShouldRegenerate = true;
         }
     }
+    
+    public void RenderChunkDebug() {
+        if (!isSetup) return;
+        // Horizontal
+        for (var i = 0; i < (rows / ChunkSize) + 1; i++) {
+            Debug.DrawLine(
+                new Vector2(0, i * ChunkSize / (float)BiomeScale),
+                new Vector2(Find.World.Height, i * ChunkSize / (float)BiomeScale),
+                Color.ORANGE, 
+                true
+            );
+        }
+        // Vertical
+        for (var i = 0; i < (cols / ChunkSize) + 1; i++) {
+            Debug.DrawLine(
+                new Vector2(i * ChunkSize / (float)BiomeScale, 0),
+                new Vector2(i * ChunkSize / (float)BiomeScale, Find.World.Width),
+                Color.ORANGE, 
+                true
+            );
+        }
+    }
 }
 
 internal class BiomeChunk : IDisposable {
@@ -165,16 +187,16 @@ internal class BiomeChunk : IDisposable {
 
     public Vector2 ChunkPos => new Vector2(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize);
     
-    public BiomeChunk(int x, int y, int rows, int cols) {
+    public BiomeChunk(int x, int y, int cols, int rows) {
         X    = x;
         Y    = y;
         Rows = rows;
         Cols = cols;
         
         grid = new BiomeCell[Cols][];
-        for (int i = 0; i < Cols; i++) {
+        for (var i = 0; i < Cols; i++) {
             grid[i] = new BiomeCell[Rows];
-            for (int j = 0; j < Rows; j++) {
+            for (var j = 0; j < Rows; j++) {
                 grid[i][j] = new BiomeCell(new []{ Biome.Grass, Biome.Grass, Biome.Grass, Biome.Grass});
             }
         }

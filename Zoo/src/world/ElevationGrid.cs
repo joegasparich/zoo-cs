@@ -156,7 +156,7 @@ public class ElevationGrid {
         for (var i = pos.X - radius; i <= pos.X + radius; i++) {
             for (var j = pos.Y - radius; j <= pos.Y + radius; j++) {
                 var gridPos = new Vector2(i, j).Floor();
-                if (!Find.World.IsPositionInMap(gridPos)) continue;
+                if (!IsGridPosInGrid(gridPos)) continue;
                 if (!JMath.PointInCircle(pos, radius, gridPos)) continue;
                 if (GetElevationAtGridPos(gridPos) == elevation) continue;
 
@@ -231,7 +231,7 @@ public class ElevationGrid {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
             return Elevation.Flat;
         }
-        if (!Find.World.IsPositionInMap(gridPos)) return Elevation.Flat;
+        if (!IsGridPosInGrid(gridPos)) return Elevation.Flat;
         
         return grid[gridPos.X, gridPos.Y];
     }
@@ -255,7 +255,7 @@ public class ElevationGrid {
     }
 
     public float GetElevationAtPos(Vector2 pos) {
-        if (!Find.World.IsPositionInMap(pos)) return 0;
+        if (!IsGridPosInGrid(pos.Floor())) return 0;
 
         var baseElevation = GetTileBaseElevation(pos.Floor());
         var slopeVariant = GetTileSlopeVariant(pos.Floor());
@@ -294,5 +294,35 @@ public class ElevationGrid {
     public bool IsTileWater(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return false;
         return GetTileBaseElevation(tile) < 0;
+    }
+
+    private bool IsGridPosInGrid(IntVec2 gridPos) {
+        return gridPos.X >= 0 && gridPos.X < cols && gridPos.Y >= 0 && gridPos.Y < rows;
+    }
+    
+    public void RenderDebug() {
+        if (!isSetup) return;
+
+        for (var i = 0; i < cols; i++) {
+            for (var j = 0; j < rows; j++) {
+                if (i < cols - 1) {
+                    Debug.DrawLine(
+                        new Vector2(i, j - grid[i, j].ToInt() * ElevationUtility.ElevationHeight),
+                        new Vector2(i + 1, j - grid[i + 1, j].ToInt() * ElevationUtility.ElevationHeight),
+                        Color.WHITE,
+                        true
+                    );
+                }
+
+                if (j < rows - 1) {
+                    Debug.DrawLine(
+                        new Vector2(i, j - grid[i, j].ToInt() * ElevationUtility.ElevationHeight),
+                        new Vector2(i, j - grid[i, j + 1].ToInt() * ElevationUtility.ElevationHeight + 1),
+                        Color.WHITE,
+                        true
+                    );
+                }
+            }
+        }
     }
 }

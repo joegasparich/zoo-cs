@@ -192,4 +192,12 @@ public class AreaManager {
 
         return new List<Area>();
     }
+    
+    public void RenderDebugAreaGrid() {
+        foreach (var (_, area) in areas) {
+            foreach (var tile in area.Tiles) {
+                Debug.DrawRect(tile, IntVec2.One, area.Colour.WithAlpha(0.5f), true);
+            }
+        }
+    }
 }

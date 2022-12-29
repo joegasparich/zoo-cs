@@ -87,7 +87,7 @@ public class Renderer {
 
     public void BeginDrawing() {
         Raylib.BeginDrawing();
-        Raylib.ClearBackground(Color.WHITE);
+        Raylib.ClearBackground(Color.DARKBLUE);
         
         Raylib.BeginShaderMode(discardAlphaShader);
     }

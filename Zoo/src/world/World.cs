@@ -39,11 +39,11 @@ public class World {
         Width  = width;
         Height = height;
 
-        Elevation = new ElevationGrid(Width, Height);
-        Biomes    = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
-        Walls     = new WallGrid(Width, Height);
-        FootPaths = new FootPathGrid(Width, Height);
-        Areas     = new AreaManager();
+        Elevation  = new ElevationGrid(Width + 1, Height + 1);
+        Biomes     = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
+        Walls      = new WallGrid(Width, Height);
+        FootPaths  = new FootPathGrid(Width, Height);
+        Areas      = new AreaManager();
         Pathfinder = new Pathfinder(Width, Height);
     }
 
@@ -88,10 +88,10 @@ public class World {
         FootPaths.Render();
     }
     public void RenderDebug() {
-        // if (DebugSettings.CellGrid) RenderDebugCellGrid();
-        // if (DebugSettings.BiomeChunks) Biomes.RenderChunkDebug();
-        // if (DebugSettings.ElevationGrid) Elevation.RenderDebug();
-        // if (DebugSettings.AreaGrid) Areas.RenderDebugAreaGrid();
+        if (DebugSettings.CellGrid) RenderDebugCellGrid();
+        if (DebugSettings.BiomeChunks) Biomes.RenderChunkDebug();
+        if (DebugSettings.ElevationGrid) Elevation.RenderDebug();
+        if (DebugSettings.AreaGrid) Areas.RenderDebugAreaGrid();
         if (DebugSettings.PathfindingGrid) Pathfinder.DrawDebugGrid();
     }
 
@@ -115,6 +115,18 @@ public class World {
         foreach (var tile in component.GetOccupiedTiles()) {
             TileObjectMap.Remove(tile.ToString());
         }
+    }
+    
+    // TODO (optimisation): cache tile cost grids (paths, no water, etc.)
+    // TODO: Set up consts for tile costs
+    public int GetTileWalkability(IntVec2 tile) {
+        if (!isSetup) return 0;
+        if (!IsPositionInMap(tile)) return 0;
+        if (TileObjectMap.ContainsKey(tile.ToString()) && TileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
+        if (Elevation.IsTileWater(tile)) return 0;
+        if (FootPaths.GetPathAtTile(tile)!.Exists) return 1;
+
+        return 30;
     }
 
     public bool IsPositionInMap(Vector2 pos) {
@@ -174,16 +186,26 @@ public class World {
     public Entity? GetTileObjectAtTile(IntVec2 tile) {
         return TileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
     }
-    
-    // TODO (optimisation): cache tile cost grids (paths, no water, etc.)
-    // TODO: Set up consts for tile costs
-    public int GetTileWalkability(IntVec2 tile) {
-        if (!isSetup) return 0;
-        if (!IsPositionInMap(tile)) return 0;
-        if (TileObjectMap.ContainsKey(tile.ToString()) && TileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
-        if (Elevation.IsTileWater(tile)) return 0;
-        if (FootPaths.GetPathAtTile(tile)!.Exists) return 1;
 
-        return 30;
+    private void RenderDebugCellGrid() {
+        if (!isSetup) return;
+        
+        for (var i = 0; i < Height + 1; i++) {
+            Debug.DrawLine(
+                new Vector2(0, i),
+                new Vector2(Height, i),
+                Color.WHITE, 
+                true
+            );
+        }
+        // Vertical
+        for (var i = 0; i < Width + 1; i++) {
+            Debug.DrawLine(
+                new Vector2(i, 0),
+                new Vector2(i, Width),
+                Color.WHITE, 
+                true
+            );
+        }
     }
 }

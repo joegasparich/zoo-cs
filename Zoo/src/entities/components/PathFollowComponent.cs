@@ -5,10 +5,11 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public class PathFollowComponent : InputComponent {
-    protected const float          NodeReachedDist = 0.2f;
-    private         List<IntVec2>? path;
-    private         string         placeSolidHandle;
-    protected       bool           pathCompleted;
+    protected const float                 NodeReachedDist = 0.2f;
+    private         List<IntVec2>?        path;
+    private         Task<List<IntVec2>?>? pathRequest;
+    private         string                placeSolidHandle;
+    protected       bool                  pathCompleted;
 
     public PathFollowComponent(Entity entity) : base(entity) {}
 
@@ -33,8 +34,9 @@ public class PathFollowComponent : InputComponent {
     }
 
     public override void Update() {
-        if (CheckPathCompleted())
-            return;
+        if (pathRequest != null) CheckPathRequest();
+        if (path == null) return;
+        if (CheckPathCompleted()) return;
 
         if (entity.Pos.DistanceSquared(GetCurrentNode()!.Value) < NodeReachedDist * NodeReachedDist) {
             // TODO (optimisation): should we reverse the path so we can pop?
@@ -57,12 +59,27 @@ public class PathFollowComponent : InputComponent {
     }
 
     public virtual void PathTo(Vector2 targetPos) {
-        path = Find.World.Pathfinder.GetPath(entity.Pos.Floor(), targetPos.Floor());
+        ResetPath();
+        
+        pathRequest   = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), targetPos.Floor());
+    }
+
+    private void CheckPathRequest() {
+        if (!pathRequest.IsCompleted) return;
+        
+        path        = pathRequest.Result;
+        pathRequest = null;
+        
         if (path.NullOrEmpty()) {
             path = null;
             return;
         }
         path!.Dequeue(); // Dequeue first node as it's the current position
+        pathCompleted = false;
+    }
+
+    private void ResetPath() {
+        path          = null;
         pathCompleted = false;
     }
     
