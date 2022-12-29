@@ -62,6 +62,9 @@ public static class ExtensionMethods {
         if (v.LengthSquared() == 0) return Vector2.Zero;
         return v / v.Length();
     }
+    public static Vector3 ToVector3(this Vector2 v) {
+        return new Vector3(v.X, v.Y, 0);
+    }
     
     // Rectangle //
     public static Vector2 Position(this Rectangle rect) {

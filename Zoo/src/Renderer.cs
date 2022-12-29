@@ -28,6 +28,9 @@ public class Renderer {
     private Camera3D camera;
     private Shader   discardAlphaShader;
     private float    zoom = 1;
+
+    private Vector2? dragStart;
+    private Vector2? dragCameraOrigin;
     
     public Renderer() {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Initialising Renderer");
@@ -40,8 +43,8 @@ public class Renderer {
         camera.position   = new Vector3(0, 0, Depth.Camera.ToInt());
         camera.up         = new Vector3(0, -1, 0);
         
-        // dragStart        = GetMousePosition();
-        // dragCameraOrigin = {camera.target.x, camera.target.y};
+        dragStart        = Find.Input.GetMousePos();
+        dragCameraOrigin = camera.target.XY();
         
         Rlgl.rlEnableDepthTest();
     }
@@ -53,18 +56,18 @@ public class Renderer {
         float inputHorizontal = Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) - Raylib.IsKeyDown(KeyboardKey.KEY_LEFT);
         float inputVertical = Raylib.IsKeyDown(KeyboardKey.KEY_DOWN) - Raylib.IsKeyDown(KeyboardKey.KEY_UP);
 
+        if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_MIDDLE)) {
+            dragStart        = Find.Input.GetMousePos();
+            dragCameraOrigin = camera.target.XY();
+        }
+        if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_MIDDLE)) {
+            var newPos = dragCameraOrigin.Value + (dragStart.Value - Find.Input.GetMousePos()) / zoom;
+            camera.position = new Vector3(newPos.X, newPos.Y, camera.position.Z);
+        }
+        
         camera.position.X += inputHorizontal * CameraSpeed / zoom;
         camera.position.Y += inputVertical * CameraSpeed / zoom;
         camera.target     =  camera.position with { Z = 0 };
-        
-        // TODO
-    //    if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
-    //        dragStart = GetMousePosition();
-    //        dragCameraOrigin = camera.target;
-    //    }
-    //    if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
-    //        camera.target = dragCameraOrigin + (dragStart - GetMousePosition()) / (camera.zoom * WORLD_SCALE);
-    //    } 
         
         // Camera zoom
         float zoomDelta = Raylib.GetMouseWheelMove() / 10.0f;
