@@ -128,7 +128,7 @@ public class WallGrid {
         
         var wall = grid[x][y];
         
-        // updatePathfindingAtWall(wall);
+        UpdatePathfindingAtWall(wall);
         
         if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
             Find.World.Areas.FormAreas(wall);
@@ -160,7 +160,7 @@ public class WallGrid {
         
         var wall = grid[x][y];
         
-        // updatePathfindingAtWall(wall);
+        UpdatePathfindingAtWall(wall);
         Find.World.Areas.JoinAreas(wall);
     }
 
@@ -169,14 +169,14 @@ public class WallGrid {
         
         wall.IsDoor = true;
         
-        // auto adjacentTiles = getAdjacentTiles(*wall);
-        // if (adjacentTiles.size() < 2) return;
-        //
-        // auto areaA = Root::zoo()->world->areaManager->getAreaAtPosition(adjacentTiles[0]);
-        // auto areaB = Root::zoo()->world->areaManager->getAreaAtPosition(adjacentTiles[1]);
-        //
-        // areaA->addAreaConnection(areaB, wall);
-        // areaB->addAreaConnection(areaA, wall);
+        var adjacentTiles = GetAdjacentTiles(wall);
+        if (adjacentTiles.Length < 2) return;
+        
+        var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
+        var areaB = Find.World.Areas.GetAreaAtTile(adjacentTiles[1]);
+        
+        areaA.AddAreaConnection(areaB, wall);
+        areaB.AddAreaConnection(areaA, wall);
     }
 
     public void RemoveDoor(Wall wall) {
@@ -184,14 +184,69 @@ public class WallGrid {
         
         wall.IsDoor = false;
         
-        // auto adjacentTiles = getAdjacentTiles(*wall);
-        // if (adjacentTiles.size() < 2) return;
-        //
-        // auto areaA = Root::zoo()->world->areaManager->getAreaAtPosition(adjacentTiles[0]);
-        // auto areaB = Root::zoo()->world->areaManager->getAreaAtPosition(adjacentTiles[1]);
-        //
-        // areaA->removeAreaConnection(areaB, wall);
-        // areaB->removeAreaConnection(areaA, wall);
+        var adjacentTiles = GetAdjacentTiles(wall);
+        if (adjacentTiles.Length < 2) return;
+        
+        var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
+        var areaB = Find.World.Areas.GetAreaAtTile(adjacentTiles[1]);
+        
+        areaA.RemoveAreaConnection(areaB, wall);
+        areaB.RemoveAreaConnection(areaA, wall);
+    }
+
+    private void UpdatePathfindingAtWall(Wall wall) {
+        if (!isSetup) return;
+
+        var (x, y) = wall.WorldPos;
+
+        if (wall.Orientation == Orientation.Horizontal) {
+            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y - 1))) {
+                var north = new Vector2(x - 0.5f, y - 1.0f).Floor();
+                Find.World.Pathfinder.SetAccessibility(north, Direction.S, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(north, Direction.SE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(north, Direction.SW, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(north + new IntVec2(-1, 0), Direction.SE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(north + new IntVec2(1, 0), Direction.SW, !wall.Exists);
+            }
+            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y))) {
+                var south = new Vector2(x - 0.5f, y).Floor();
+                Find.World.Pathfinder.SetAccessibility(south, Direction.N, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(south, Direction.NE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(south, Direction.NW, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(south + new IntVec2(-1, 0), Direction.NE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(south + new IntVec2(1, 0), Direction.NW, !wall.Exists);
+            }
+        } else {
+            if (Find.World.IsPositionInMap(new Vector2(x - 1.0f, y - 0.5f))) {
+                var west = new Vector2(x - 1.0f, y - 0.5f).Floor();
+                Find.World.Pathfinder.SetAccessibility(west, Direction.E, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(west, Direction.NE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(west, Direction.SE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(west + new IntVec2(0, -1), Direction.SE, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(west + new IntVec2(0, 1), Direction.NE, !wall.Exists);
+            }
+            if (Find.World.IsPositionInMap(new Vector2(x, y - 0.5f))) {
+                var east = new Vector2(x, y - 0.5f).Floor();
+                Find.World.Pathfinder.SetAccessibility(east, Direction.W, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(east, Direction.NW, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(east, Direction.SW, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(east + new IntVec2(0, -1), Direction.SW, !wall.Exists);
+                Find.World.Pathfinder.SetAccessibility(east + new IntVec2(0, 1), Direction.NW, !wall.Exists);
+            }
+        }
+    }
+
+    // TODO: use cached accessibility grids instead
+    // This is expensive as fuck so only use it on load
+    private void UpdatePathfinding() {
+        for (var i = 0; i < cols * 2 + 1; i++) {
+            var orientation = i % 2;
+            for (var j = 0; j < rows + orientation; j++) {
+                var wall = grid[i][j];
+                if (wall.Exists)
+                    UpdatePathfindingAtWall(wall);
+            }
+        }
     }
 
     public Wall? GetWallAtTile(IntVec2 tile, Side side) {

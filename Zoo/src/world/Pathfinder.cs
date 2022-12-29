@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using System.Numerics;
+using Raylib_cs;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -18,6 +19,8 @@ internal struct Node {
 }
 
 public class Pathfinder {
+    private const bool Diagonals = false;
+        
     private Tile[,] tileGrid;
     private int  cols;
     private int  rows;
@@ -64,6 +67,12 @@ public class Pathfinder {
 
         var closedList  = new bool[cols, rows];
         var cellDetails = new Node[cols, rows];
+        // Populate nodes
+        for (var i = 0; i < cols; i++) {
+            for (var j = 0; j < rows; j++) {
+                cellDetails[i, j] = new Node();
+            }
+        }
 
         var (x, y) = from;
         cellDetails[x, y].fCost = 0;
@@ -73,7 +82,7 @@ public class Pathfinder {
 
         var openList = new PriorityQueue<IntVec2, float>();
 
-        openList.Enqueue(new IntVec2(x, y), 0.0f);
+        openList.Enqueue(from, cellDetails[x, y].fCost);
 
         while (openList.Count > 0) {
             (x, y) = openList.Dequeue();
@@ -101,7 +110,7 @@ public class Pathfinder {
                 //             OR
                 // If it is on the open list already, check to see if this path to that square is better, using
                 // 'f' cost as the measure.
-                if (cellDetails[nx, ny].fCost.NearlyEquals(-1.0f) && cellDetails[nx, ny].fCost <= fNew) continue;
+                if (!cellDetails[nx, ny].fCost.NearlyEquals(-1.0f) && cellDetails[nx, ny].fCost <= fNew) continue;
 
                 openList.Enqueue(new IntVec2(nx, ny), fNew);
                 // Update the details of this cell
@@ -128,7 +137,7 @@ public class Pathfinder {
         tileGrid[tile.X, tile.Y].connections[(int) direction] = accessible;
     }
 
-    public bool IsAccessible(IntVec2 tilePos) {
+    private bool IsAccessible(IntVec2 tilePos) {
         if (!isSetup) return false;
         if (!Find.World.IsPositionInMap(tilePos)) return false;
         var (x, y) = tilePos;
@@ -139,18 +148,21 @@ public class Pathfinder {
         
         // Make sure at least one direction is accessible
         if (y > 0 &&                    tileGrid[x,     y - 1].connections[Direction.S.ToInt()])  return true;
-        if (x < cols-1 && y > 0 &&      tileGrid[x + 1, y - 1].connections[Direction.SW.ToInt()]) return true;
         if (x < cols-1 &&               tileGrid[x + 1, y]    .connections[Direction.W.ToInt()])  return true;
-        if (x < cols-1 && y < rows-1 && tileGrid[x + 1, y + 1].connections[Direction.NW.ToInt()]) return true;
         if (y < rows-1 &&               tileGrid[x,     y + 1].connections[Direction.N.ToInt()])  return true;
-        if (x > 0 && y < rows-1 &&      tileGrid[x - 1, y + 1].connections[Direction.NE.ToInt()]) return true;
         if (x > 0 &&                    tileGrid[x - 1, y]    .connections[Direction.E.ToInt()])  return true;
+
+        if (!Diagonals) return false;
+        
+        if (x < cols-1 && y > 0 &&      tileGrid[x + 1, y - 1].connections[Direction.SW.ToInt()]) return true;
+        if (x < cols-1 && y < rows-1 && tileGrid[x + 1, y + 1].connections[Direction.NW.ToInt()]) return true;
+        if (x > 0 && y < rows-1 &&      tileGrid[x - 1, y + 1].connections[Direction.NE.ToInt()]) return true;
         if (x > 0 && y > 0 &&           tileGrid[x - 1, y - 1].connections[Direction.SE.ToInt()]) return true;
 
         return false;
     }
     
-    public List<IntVec2> GetNeighbours(IntVec2 tilePos) {
+    private List<IntVec2> GetNeighbours(IntVec2 tilePos) {
         if (!isSetup) return new List<IntVec2>();
         if (!Find.World.IsPositionInMap(tilePos)) return new List<IntVec2>();
         var (x, y) = tilePos;
@@ -161,12 +173,15 @@ public class Pathfinder {
         var connections = new List<IntVec2>();
 
         if (y > 0                       && IsAccessible(new IntVec2(x, y - 1))     && tile.connections[Direction.N.ToInt()])  connections.Add(new IntVec2(x, y - 1));
-        if (x < width-1 && y > 0        && IsAccessible(new IntVec2(x + 1, y - 1)) && tile.connections[Direction.NE.ToInt()]) connections.Add(new IntVec2(x + 1, y - 1));
         if (x < width-1                 && IsAccessible(new IntVec2(x + 1, y))     && tile.connections[Direction.E.ToInt()])  connections.Add(new IntVec2(x + 1, y));
-        if (x < width-1 && y < height-1 && IsAccessible(new IntVec2(x + 1, y + 1)) && tile.connections[Direction.SE.ToInt()]) connections.Add(new IntVec2(x + 1, y + 1));
         if (y < height-1                && IsAccessible(new IntVec2(x, y + 1))     && tile.connections[Direction.S.ToInt()])  connections.Add(new IntVec2(x, y + 1));
-        if (x > 0 && y < height-1       && IsAccessible(new IntVec2(x - 1, y + 1)) && tile.connections[Direction.SW.ToInt()]) connections.Add(new IntVec2(x - 1, y + 1));
         if (x > 0                       && IsAccessible(new IntVec2(x - 1, y))     && tile.connections[Direction.W.ToInt()])  connections.Add(new IntVec2(x - 1, y));
+
+        if (!Diagonals) return connections;
+        
+        if (x < width-1 && y > 0        && IsAccessible(new IntVec2(x + 1, y - 1)) && tile.connections[Direction.NE.ToInt()]) connections.Add(new IntVec2(x + 1, y - 1));
+        if (x < width-1 && y < height-1 && IsAccessible(new IntVec2(x + 1, y + 1)) && tile.connections[Direction.SE.ToInt()]) connections.Add(new IntVec2(x + 1, y + 1));
+        if (x > 0 && y < height-1       && IsAccessible(new IntVec2(x - 1, y + 1)) && tile.connections[Direction.SW.ToInt()]) connections.Add(new IntVec2(x - 1, y + 1));
         if (x > 0 && y > 0              && IsAccessible(new IntVec2(x - 1, y - 1)) && tile.connections[Direction.NW.ToInt()]) connections.Add(new IntVec2(x - 1, y - 1));
 
         return connections;
@@ -174,5 +189,18 @@ public class Pathfinder {
 
     private static float CalculateHValue(IntVec2 a, IntVec2 b) {
         return a.DistanceSquared(b);
+    }
+
+    public void DrawDebugGrid() {
+        for (var i = 0; i < cols; i++) {
+            for (var j = 0; j < rows; j++) {
+                if (!IsAccessible(new IntVec2(i, j))) continue;
+
+                foreach(var neighbour in GetNeighbours(new IntVec2(i, j))) {
+                    var (nx, ny) = neighbour;
+                    Debug.DrawLine(new Vector2(i + 0.5f, j + 0.5f), new Vector2(nx + 0.5f, ny + 0.5f), Color.BLUE, true);
+                }
+            }
+        }
     }
 }

@@ -7,6 +7,8 @@ public class Toolbar : Window {
     private const int ButtonWidth = 70;
     private const int ButtonHeight = 25;
 
+    private string debugPanelId;
+
     private ToolManager toolManager;
 
     public Toolbar(ToolManager toolManager) : base(new Rectangle(0, 0, Game.ScreenWidth, 45)) {
@@ -64,7 +66,13 @@ public class Toolbar : Window {
         GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Load");
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Debug");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Debug")) {
+            if (!Find.UI.IsWindowOpen(debugPanelId)) {
+                debugPanelId = Find.UI.PushWindow(new DebugPanel());
+            } else {
+                Find.UI.CloseWindow(debugPanelId);
+            }
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
         GUI.TextAlign = AlignMode.TopLeft;

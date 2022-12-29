@@ -17,7 +17,7 @@ public enum AlignMode {
 }
 
 public static class GUI {
-    public const float GapSmall = 10;
+    public const int GapSmall = 10;
 
     public static           Color     TextColour     = Color.BLACK;
     public static           AlignMode TextAlign      = AlignMode.TopLeft;

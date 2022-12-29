@@ -45,6 +45,9 @@ public static class ExtensionMethods {
     public static IntVec2 Floor(this Vector2 vec) {
         return new IntVec2(vec.X.FloorToInt(), vec.Y.FloorToInt());
     }
+    public static IntVec2 Round(this Vector2 vec) {
+        return new IntVec2(vec.X.RoundToInt(), vec.Y.RoundToInt());
+    }
     public static void Deconstruct(this Vector2 v, out float x, out float y) {
         x = v.X;
         y = v.Y;
@@ -112,6 +115,12 @@ public static class ExtensionMethods {
         if(!source.Any()) throw new Exception();
         var element = source[^1];
         source.RemoveAt(source.Count - 1);
+        return element;
+    }
+    public static T Dequeue<T>(this IList<T> source) {
+        if(!source.Any()) throw new Exception();
+        var element = source[0];
+        source.RemoveAt(0);
         return element;
     }
     public static void MoveItemAtIndexToFront<T>(this IList<T> list, int index) {

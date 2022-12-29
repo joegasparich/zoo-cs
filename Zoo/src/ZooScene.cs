@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using Zoo.entities;
+using Zoo.util;
 
 namespace Zoo; 
 
@@ -21,7 +22,7 @@ public class ZooScene : Scene {
         man = new Entity(new Vector2(0, 0));
         var renderer   = man.AddComponent<RenderComponent>();
         renderer.SetSprite(TEXTURES.KEEPER);
-        man.AddComponent<PathFollowComponent>();
+        man.AddComponent<AreaPathFollowComponent>();
         man.AddComponent<PhysicsComponent>();
         man.AddComponent<MoveComponent>();
         Game.RegisterEntity(man);
@@ -46,6 +47,19 @@ public class ZooScene : Scene {
     }
     public override void RenderLate() {
         Zoo.RenderLate();
+        
+        // Temp
+        var path = man.GetComponent<AreaPathFollowComponent>()!.GetPath();
+        if (!path.NullOrEmpty()) {
+            for (var i = 1; i < path.Count; i++) {
+                Debug.DrawLine(
+                    path[i -1] + new Vector2(0.5f, 0.5f),
+                    path[i] + new Vector2(0.5f, 0.5f),
+                    Color.RED, 
+                    true
+                );
+            }
+        }
     }
 
     public override void OnGUI() {

@@ -5,10 +5,10 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public class PathFollowComponent : InputComponent {
-    private const float          NodeReachedDist = 0.2f;
-    private       List<IntVec2>? path;
-    private       string         placeSolidHandle;
-    private       bool           pathCompleted;
+    protected const float          NodeReachedDist = 0.2f;
+    private         List<IntVec2>? path;
+    private         string         placeSolidHandle;
+    protected       bool           pathCompleted;
 
     public PathFollowComponent(Entity entity) : base(entity) {}
 
@@ -56,18 +56,23 @@ public class PathFollowComponent : InputComponent {
         return true;
     }
 
-    public void PathTo(Vector2 targetPos) {
+    public virtual void PathTo(Vector2 targetPos) {
         path = Find.World.Pathfinder.GetPath(entity.Pos.Floor(), targetPos.Floor());
+        if (path.NullOrEmpty()) {
+            path = null;
+            return;
+        }
+        path!.Dequeue(); // Dequeue first node as it's the current position
         pathCompleted = false;
     }
     
-    public bool ReachedDestination() {
+    public virtual bool ReachedDestination() {
         return pathCompleted;
     }
     
     private Vector2? GetCurrentNode() {
         if (path.NullOrEmpty()) return null; 
-        return path![0];
+        return path![0] + new Vector2(0.5f, 0.5f);
     }
 
     public List<IntVec2>? GetPath() {

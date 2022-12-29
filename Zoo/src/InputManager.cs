@@ -12,12 +12,12 @@ public enum InputEventType {
 
 public class InputEvent {
     public InputEventType type;
-    public KeyboardKey?   keyDown   = KeyboardKey.KEY_NULL;
-    public KeyboardKey?   keyUp     = KeyboardKey.KEY_NULL;
-    public KeyboardKey?   keyHeld   = KeyboardKey.KEY_NULL;
-    public MouseButton?   mouseDown = MouseButton.MOUSE_LEFT_BUTTON;
-    public MouseButton?   mouseUp   = MouseButton.MOUSE_LEFT_BUTTON;
-    public MouseButton?   mouseHeld = MouseButton.MOUSE_LEFT_BUTTON;
+    public KeyboardKey?   keyDown   = null;
+    public KeyboardKey?   keyUp     = null;
+    public KeyboardKey?   keyHeld   = null;
+    public MouseButton?   mouseDown = null;
+    public MouseButton?   mouseUp   = null;
+    public MouseButton?   mouseHeld = null;
     public Vector2        mousePos;
     public Vector2        mouseWorldPos;
     public float          mouseScroll;

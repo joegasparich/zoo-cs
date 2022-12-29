@@ -37,7 +37,12 @@ public class UIManager {
         Game.OnGUI();
         
         // Clear closed immediate windows
-        windowStack.RemoveAll(window => window.Immediate && !immediateWindows.Contains(window.Id));
+        for (var i = windowStack.Count - 1; i >= 0; i--) {
+            if (windowStack[i].Immediate && !immediateWindows.Contains(windowStack[i].Id)) {
+                openWindowMap.Remove(windowStack[i].Id);
+                windowStack.RemoveAt(i);
+            }
+        }
         immediateWindows.Clear();
         
         // Loop backwards so that top windows consume events first
@@ -73,7 +78,12 @@ public class UIManager {
         Game.OnGUI();
         
         // Clear closed immediate windows
-        windowStack.RemoveAll(window => window.Immediate && !immediateWindows.Contains(window.Id));
+        for (var i = windowStack.Count - 1; i >= 0; i--) {
+            if (windowStack[i].Immediate && !immediateWindows.Contains(windowStack[i].Id)) {
+                openWindowMap.Remove(windowStack[i].Id);
+                windowStack.RemoveAt(i);
+            }
+        }
         immediateWindows.Clear();
         
         // First loop through in reverse to find the hovered window
@@ -125,6 +135,7 @@ public class UIManager {
     }
     
     public bool IsWindowOpen(string id) {
+        if (id.NullOrEmpty()) return false;
         return openWindowMap.ContainsKey(id);
     }
 

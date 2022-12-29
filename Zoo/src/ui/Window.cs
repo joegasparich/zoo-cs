@@ -11,9 +11,9 @@ public class Window {
 
     public string    Id        { get; private set; }
     public Rectangle AbsRect   { get; private set; }
-    public bool      Immediate { get; set; } = false;
-    public bool      Draggable { get; }      = false;
-    public string    Title     { get; }
+    public bool      Immediate { get; set; }           = false;
+    public bool      Draggable { get; protected set; } = false;
+    public string    Title     { get; protected set; }
 
     protected bool              headerHovered = false;
     private   Action<Rectangle> OnUI;

@@ -87,7 +87,13 @@ public class World {
         Walls.Render();
         FootPaths.Render();
     }
-    public void RenderDebug() {}
+    public void RenderDebug() {
+        // if (DebugSettings.CellGrid) RenderDebugCellGrid();
+        // if (DebugSettings.BiomeChunks) Biomes.RenderChunkDebug();
+        // if (DebugSettings.ElevationGrid) Elevation.RenderDebug();
+        // if (DebugSettings.AreaGrid) Areas.RenderDebugAreaGrid();
+        if (DebugSettings.PathfindingGrid) Pathfinder.DrawDebugGrid();
+    }
 
     public void RegisterTileObject(Entity tileObject) {
         var component = tileObject.GetComponent<TileObjectComponent>();
@@ -178,6 +184,6 @@ public class World {
         if (Elevation.IsTileWater(tile)) return 0;
         if (FootPaths.GetPathAtTile(tile)!.Exists) return 1;
 
-        return 3;
+        return 30;
     }
 }

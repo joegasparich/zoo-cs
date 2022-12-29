@@ -1,7 +1,15 @@
 using Zoo.tools;
 using Zoo.world;
 
-namespace Zoo; 
+namespace Zoo;
+
+public static class DebugSettings {
+    public static bool CellGrid        = false;
+    public static bool BiomeChunks     = false;
+    public static bool ElevationGrid   = false;
+    public static bool AreaGrid        = false;
+    public static bool PathfindingGrid = false;
+}
 
 public class Zoo {
     public World World { get; }
@@ -43,6 +51,7 @@ public class Zoo {
 
     public void RenderLate() {
         Tools.Render();
+        World.RenderDebug();
     }
 
     public void OnGUI() {
