@@ -57,13 +57,19 @@ public class Toolbar : Window {
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "New");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "New")) {
+            Find.SaveManager.NewGame();
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Save");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Save")) {
+            Find.SaveManager.SaveGame("save.json");
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Load");
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Load")) {
+            Find.SaveManager.LoadGame("save.json");
+        }
         curX += ButtonWidth + GUI.GapSmall;
 
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Debug")) {

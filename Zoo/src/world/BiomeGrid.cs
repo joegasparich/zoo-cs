@@ -1,4 +1,6 @@
 using System.Numerics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Raylib_cs;
 using Zoo.util;
 
@@ -25,28 +27,23 @@ public class BiomeInfo {
     }
 }
 
-public class BiomeGrid {
+public class BiomeGrid : ISerialisable {
     public static readonly int   BiomeScale          = 2;
     internal const         int   ChunkSize           = 6;
     internal const         float SlopeColourStrength = 0.3f;
 
-    private int           rows;
-    private int           cols;
-    private bool          isSetup = false;
-    private BiomeChunk[,] chunkGrid;
-    private string        elevationListenerHandle;
+    private int            rows;
+    private int            cols;
+    private bool           isSetup = false;
+    private BiomeChunk[][] chunkGrid;
+    private string         elevationListenerHandle;
 
     public BiomeGrid(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-        
-        var chunkCols = cols / ChunkSize + Convert.ToInt32(cols % ChunkSize != 0);
-        var chunkRows = rows / ChunkSize + Convert.ToInt32(rows % ChunkSize != 0);
-        
-        chunkGrid = new BiomeChunk[chunkCols, chunkRows];
     }
 
-    public void Setup() {
+    public void Setup(Biome[][][][][]? data = null) {
         if (isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup BiomeGrid which was already setup");
             return;
@@ -54,13 +51,21 @@ public class BiomeGrid {
         
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
         
-        for (var i = 0; i < chunkGrid.GetLength(0); i++) {
-            for (var j = 0; j < chunkGrid.GetLength(1); j++) {
-                chunkGrid[i, j] = new BiomeChunk(
+        var chunkCols = cols / ChunkSize + Convert.ToInt32(cols % ChunkSize != 0);
+        var chunkRows = rows / ChunkSize + Convert.ToInt32(rows % ChunkSize != 0);
+        
+        chunkGrid = new BiomeChunk[chunkCols][];
+        
+        for (var i = 0; i < chunkCols; i++) {
+            chunkGrid[i] = new BiomeChunk[chunkRows];
+            
+            for (var j = 0; j < chunkRows; j++) {
+                chunkGrid[i][j] = new BiomeChunk(
                     i, 
                     j,
-                    i == chunkGrid.GetLength(0) - 1 && cols % ChunkSize != 0 ? cols % ChunkSize : ChunkSize,
-                    j == chunkGrid.GetLength(1) - 1 && rows % ChunkSize != 0 ? rows % ChunkSize : ChunkSize
+                    i == chunkCols - 1 && cols % ChunkSize != 0 ? cols % ChunkSize : ChunkSize,
+                    j == chunkRows - 1 && rows % ChunkSize != 0 ? rows % ChunkSize : ChunkSize,
+                    data?[i][j]
                 );
             }
         }
@@ -87,14 +92,18 @@ public class BiomeGrid {
     }
 
     public void PostUpdate() {
-        foreach (var chunk in chunkGrid) {
-            chunk.PostUpdate();
+        foreach (var row in chunkGrid) {
+            foreach (var chunk in row) {
+                chunk.PostUpdate();
+            }
         }
     }
 
     public void Render() {
-        foreach (var chunk in chunkGrid) {
-            chunk.Render();
+        foreach (var row in chunkGrid) {
+            foreach (var chunk in row) {
+                chunk.Render();
+            }
         }
     }
 
@@ -104,7 +113,7 @@ public class BiomeGrid {
     
     private BiomeChunk GetChunk(int col, int row) {
         if (!IsChunkInGrid(col, row)) return null;
-        return chunkGrid[col, row];
+        return chunkGrid[col][row];
     }
 
     private IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
@@ -122,7 +131,7 @@ public class BiomeGrid {
                         radius
                     )
                 ) {
-                    yield return chunkGrid[floorX + i, floorY + j];
+                    yield return chunkGrid[floorX + i][floorY + j];
                 }
             }
         }
@@ -146,8 +155,10 @@ public class BiomeGrid {
     }
 
     public void RegenerateAllChunks() {
-        foreach (var chunk in chunkGrid) {
-            chunk.ShouldRegenerate = true;
+        foreach (var row in chunkGrid) {
+            foreach (var chunk in row) {
+                chunk.ShouldRegenerate = true;
+            }
         }
     }
     
@@ -172,6 +183,19 @@ public class BiomeGrid {
             );
         }
     }
+
+    public void Serialise() {
+        if (Find.SaveManager.mode == SerialiseMode.Loading)
+            Reset();
+        
+        Find.SaveManager.SerialiseValue("cols", ref cols);
+        Find.SaveManager.SerialiseValue("rows", ref rows);
+
+        Find.SaveManager.SerialiseValue("data", 
+            () => chunkGrid.Select(row => row.Select(chunk => chunk.Save()).ToArray()).ToArray(), 
+            chunkData => Setup(chunkData)
+        );
+    }
 }
 
 internal class BiomeChunk : IDisposable {
@@ -187,7 +211,7 @@ internal class BiomeChunk : IDisposable {
 
     public Vector2 ChunkPos => new Vector2(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize);
     
-    public BiomeChunk(int x, int y, int cols, int rows) {
+    public BiomeChunk(int x, int y, int cols, int rows, Biome[][][]? data = null) {
         X    = x;
         Y    = y;
         Rows = rows;
@@ -197,7 +221,11 @@ internal class BiomeChunk : IDisposable {
         for (var i = 0; i < Cols; i++) {
             grid[i] = new BiomeCell[Rows];
             for (var j = 0; j < Rows; j++) {
-                grid[i][j] = new BiomeCell(new []{ Biome.Grass, Biome.Grass, Biome.Grass, Biome.Grass});
+                if (data != null) {
+                    grid[i][j] = new BiomeCell(data[i][j]);
+                } else {
+                    grid[i][j] = new BiomeCell(new []{ Biome.Grass, Biome.Grass, Biome.Grass, Biome.Grass});
+                }
             }
         }
 
@@ -331,6 +359,10 @@ internal class BiomeChunk : IDisposable {
 
     public bool IsPositionInChunk(Vector2 pos) {
         return pos.X >= 0 && pos.X < Cols && pos.Y >= 0 && pos.Y < Rows;
+    }
+
+    internal Biome[][][] Save() {
+        return grid.Select(row => row.Select(cell => cell.Quadrants).ToArray()).ToArray();
     }
 }
 

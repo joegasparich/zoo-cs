@@ -16,12 +16,12 @@ public enum Direction {
     N, NE, E, SE, S, SW, W, NW
 };
 
-public class World {
+public class World : ISerialisable {
     public const int WorldScale      = 32;
     public const int LargerThanWorld = 10000;
 
-    public int Width  { get; }
-    public int Height { get; }
+    public int Width;
+    public int Height;
 
     public ElevationGrid Elevation  { get; }
     public BiomeGrid     Biomes     { get; }
@@ -207,5 +207,13 @@ public class World {
                 true
             );
         }
+    }
+
+    public void Serialise() {
+        Find.SaveManager.SerialiseValue("width", ref Width);
+        Find.SaveManager.SerialiseValue("height", ref Height);
+        
+        Find.SaveManager.SerialiseDeep("elevation", Elevation);
+        Find.SaveManager.SerialiseDeep("biomes", Biomes);
     }
 }

@@ -1,12 +1,11 @@
 using System.Numerics;
 using Raylib_cs;
-using Zoo.util;
 
 namespace Zoo.entities; 
 
-public class Entity {
-    public int     Id  { get; set; }
-    public Vector2 Pos { get; set; }
+public class Entity : ISerialisable {
+    public int     Id;
+    public Vector2 Pos;
 
     private Dictionary<Type, Component> components = new();
 
@@ -79,6 +78,14 @@ public class Entity {
     public bool HasComponent(Type type) {
         return components.ContainsKey(type);
     }
-    
-    // TODO: Serialise
+
+    public void Serialise() {
+        Find.SaveManager.SerialiseValue("id", ref Id);
+        Find.SaveManager.SerialiseValue("pos", ref Pos);
+        
+        Find.SaveManager.SerialiseCustom("components",
+            () => EntityUtility.SaveComponents(components.Values),
+            data => EntityUtility.LoadComponents(this, data)
+        );
+    }
 }

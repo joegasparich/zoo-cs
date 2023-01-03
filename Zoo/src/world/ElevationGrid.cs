@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json.Nodes;
 using Raylib_cs;
 using Zoo.entities;
 using Zoo.util;
@@ -19,22 +20,21 @@ public enum SlopeVariant {
     I1, I2
 };
 
-public class ElevationGrid {
+public class ElevationGrid : ISerialisable {
     private static readonly Color WaterColour = new Color(0, 76, 255, 204);
     
     private int             rows;
     private int             cols;
-    private Elevation[,]    grid;
+    private Elevation[][]?  grid;
     private List<Vector2[]> waterPolygons = new ();
     private bool            isSetup       = false;
     
     public ElevationGrid(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-        grid = new Elevation[rows, cols];
     }
 
-    public void Setup() {
+    public void Setup(Elevation[][]? data = null) {
         if (isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup ElevationGrid which was already setup");
             return;
@@ -42,14 +42,19 @@ public class ElevationGrid {
         
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
 
-        for (var i = 0; i < cols; i++) {
-            for (var j = 0; j < rows; j++) {
-                grid[i, j] = Elevation.Flat;
+        grid = data;
+        if (grid == null) {
+            grid = new Elevation[cols][];
+            
+            for (var i = 0; i < cols; i++) {
+                grid[i] = new Elevation[rows];
+                
+                for (var j = 0; j < rows; j++) {
+                    grid[i][j] = Elevation.Flat;
+                }
             }
         }
 
-        grid[3, 3] = Elevation.Water;
-        
         isSetup = true;
 
         GenerateWaterMesh();
@@ -136,7 +141,7 @@ public class ElevationGrid {
                 return false;
         }
         
-        grid[gridPos.X, gridPos.Y] = elevation;
+        grid[gridPos.X][gridPos.Y] = elevation;
         return true;
     }
     
@@ -233,7 +238,7 @@ public class ElevationGrid {
         }
         if (!IsGridPosInGrid(gridPos)) return Elevation.Flat;
         
-        return grid[gridPos.X, gridPos.Y];
+        return grid[gridPos.X][gridPos.Y];
     }
 
     public float GetTileBaseElevation(IntVec2 tile) {
@@ -307,8 +312,8 @@ public class ElevationGrid {
             for (var j = 0; j < rows; j++) {
                 if (i < cols - 1) {
                     Debug.DrawLine(
-                        new Vector2(i, j - grid[i, j].ToInt() * ElevationUtility.ElevationHeight),
-                        new Vector2(i + 1, j - grid[i + 1, j].ToInt() * ElevationUtility.ElevationHeight),
+                        new Vector2(i, j - grid[i][j].ToInt() * ElevationUtility.ElevationHeight),
+                        new Vector2(i + 1, j - grid[i + 1][j].ToInt() * ElevationUtility.ElevationHeight),
                         Color.WHITE,
                         true
                     );
@@ -316,13 +321,25 @@ public class ElevationGrid {
 
                 if (j < rows - 1) {
                     Debug.DrawLine(
-                        new Vector2(i, j - grid[i, j].ToInt() * ElevationUtility.ElevationHeight),
-                        new Vector2(i, j - grid[i, j + 1].ToInt() * ElevationUtility.ElevationHeight + 1),
+                        new Vector2(i, j - grid[i][j].ToInt() * ElevationUtility.ElevationHeight),
+                        new Vector2(i, j - grid[i][j + 1].ToInt() * ElevationUtility.ElevationHeight + 1),
                         Color.WHITE,
                         true
                     );
                 }
             }
         }
+    }
+
+    public void Serialise() {
+        if (Find.SaveManager.mode == SerialiseMode.Loading)
+            Reset();
+        
+        Find.SaveManager.SerialiseValue("cols", ref cols);
+        Find.SaveManager.SerialiseValue("rows", ref rows);
+        Find.SaveManager.SerialiseValue("data", 
+            () => grid,
+            data => Setup(data)
+        );
     }
 }

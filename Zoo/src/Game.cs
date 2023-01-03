@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json.Nodes;
 using Raylib_cs;
 using Zoo.entities;
 using Zoo.ui;
@@ -25,7 +26,7 @@ public static class Game {
     private static List<Entity>            entitiesToAdd    = new();
     private static List<Entity>            entitiesToRemove = new();
     
-    // State TODO: Save these
+    // State
     private static int ticksSinceGameStart;
     private static int framesSinceGameStart;
     private static int nextEntityId;
@@ -167,5 +168,17 @@ public static class Game {
     
     public static Entity GetEntityById(int id) {
         return entities[id];
+    }
+
+    public static void Serialise() {
+        SaveManager.SerialiseDeep("scene", SceneManager.GetCurrentScene());
+        SaveManager.SerialiseCustom("entities", 
+            () => EntityUtility.SaveEntities(entities.Values),
+            data => EntityUtility.LoadEntities(data)
+        );
+        
+        SaveManager.SerialiseValue("ticksSinceGameStart", ref ticksSinceGameStart);
+        SaveManager.SerialiseValue("framesSinceGameStart", ref framesSinceGameStart);
+        SaveManager.SerialiseValue("nextEntityId", ref nextEntityId);
     }
 }

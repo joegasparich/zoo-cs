@@ -1,6 +1,6 @@
 namespace Zoo; 
 
-public abstract class Scene {
+public abstract class Scene : ISerialisable {
     public string Name { get; set; }
 
     protected Scene(string name) {
@@ -16,4 +16,5 @@ public abstract class Scene {
     public virtual void OnGUI()                 {}
     public virtual void OnInput(InputEvent evt) {}
     public virtual void Stop()                  {}
+    public virtual void Serialise()             {}
 }

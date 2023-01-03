@@ -1,6 +1,6 @@
 namespace Zoo.entities; 
 
-public abstract class Component {
+public abstract class Component : ISerialisable {
     protected Entity entity;
     
     public Component(Entity entity) {
@@ -13,6 +13,8 @@ public abstract class Component {
     public virtual void PostUpdate() {}
     public virtual void Render() {}
     public virtual void End() {}
-    
-    // TODO: Serialise
+
+    public virtual void Serialise() {
+        
+    }
 }

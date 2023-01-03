@@ -5,7 +5,7 @@ using Zoo.util;
 
 namespace Zoo; 
 
-public class ZooScene : Scene {
+public class ZooScene : Scene, ISerialisable {
     public Zoo Zoo;
     
     // Test
@@ -74,5 +74,9 @@ public class ZooScene : Scene {
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             man.GetComponent<PathFollowComponent>()!.PathTo(evt.mouseWorldPos);
         }
+    }
+    
+    public override void Serialise() {
+        Find.SaveManager.SerialiseDeep("zoo", Zoo);
     }
 }

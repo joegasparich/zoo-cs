@@ -11,7 +11,7 @@ public static class DebugSettings {
     public static bool PathfindingGrid = false;
 }
 
-public class Zoo {
+public class Zoo : ISerialisable {
     public World World { get; }
     public ToolManager Tools;
     
@@ -60,5 +60,9 @@ public class Zoo {
 
     public void OnInput(InputEvent evt) {
         Tools.OnInput(evt);
+    }
+
+    public void Serialise() {
+        Find.SaveManager.SerialiseDeep("world", World);
     }
 }
