@@ -14,39 +14,42 @@ public enum FootPathSpriteIndex {
 
 public class FootPath {
     public FootPathData? Data           = null;
-    public IntVec2   Pos            = default;
-    public bool      Exists         = false;
-    public bool      Indestructable = false;
-    public Color     OverrideColour = Color.WHITE;
+    public IntVec2       Pos            = default;
+    public bool          Exists         = false;
+    public bool          Indestructable = false;
+    public Color         OverrideColour = Color.WHITE;
     public FootPath() {}
 }
 
-public class FootPathGrid {
-    private bool        isSetup = false;
-    private FootPath[,] grid;
-    private int         cols;
-    private int         rows;
+public class FootPathGrid : ISerialisable {
+    private bool         isSetup = false;
+    private FootPath[][] grid;
+    private int          cols;
+    private int          rows;
     
     public FootPathGrid(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
-        grid = new FootPath[cols, rows];
     }
 
-    public void Setup() {
+    public void Setup(string[][]? data = null) {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up path grid");
         
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
-                grid[i, j] = new FootPath() {
-                    Pos = new IntVec2(i, j)
+        grid = new FootPath[cols][];
+        
+        for (var i = 0; i < cols; i++) {
+            grid[i] = new FootPath[rows];
+            for (var j = 0; j < rows; j++) {
+                var pathData = data?[i][j] != null ? Find.Registry.GetFootPath(data[i][j]) : null;
+                grid[i][j] = new FootPath() {
+                    Data = pathData,
+                    Pos = new IntVec2(i, j),
+                    Exists = pathData != null
                 };
             }
         }
         
         isSetup = true;
-
-        PlacePathAtTile(Find.Registry.GetFootPath(FOOTPATHS.DIRT_PATH), new IntVec2(5, 5));
     }
 
     public void Reset() {
@@ -65,7 +68,7 @@ public class FootPathGrid {
         
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
-                var path = grid[i, j];
+                var path = grid[i][j];
                 if (!path.Exists || path.Data == null) continue;
 
                 var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
@@ -90,7 +93,7 @@ public class FootPathGrid {
         if (!Find.World.IsPositionInMap(tile)) return null;
         if (GetPathAtTile(tile)!.Exists) return null;
         
-        grid[tile.X, tile.Y] = new FootPath() {
+        grid[tile.X][tile.Y] = new FootPath() {
             Data = data,
             Pos = tile,
             Exists = true
@@ -98,14 +101,14 @@ public class FootPathGrid {
         
         // TODO: update pathfinding once using walkability grid
         
-        return grid[tile.X, tile.Y];
+        return grid[tile.X][tile.Y];
     }
 
     public void RemovePathAtTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return;
         if (!GetPathAtTile(tile)!.Exists) return;
         
-        grid[tile.X, tile.Y] = new FootPath() {
+        grid[tile.X][tile.Y] = new FootPath() {
             Pos = tile
         };
 
@@ -114,6 +117,18 @@ public class FootPathGrid {
 
     public FootPath? GetPathAtTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
-        return grid[tile.X, tile.Y];
+        return grid[tile.X][tile.Y];
+    }
+
+    public void Serialise() {
+        if (Find.SaveManager.mode == SerialiseMode.Loading)
+            Reset();
+        
+        Find.SaveManager.SerialiseValue("cols", ref cols);
+        Find.SaveManager.SerialiseValue("rows", ref rows);
+        Find.SaveManager.SerialiseValue("data", 
+            () => grid.Select(row => row.Select(path => path.Data?.AssetPath).ToArray()).ToArray(),
+            data => Setup(data)
+        );
     }
 }

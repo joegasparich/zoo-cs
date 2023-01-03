@@ -30,8 +30,8 @@ public class World : ISerialisable {
     public AreaManager   Areas      { get; }
     public Pathfinder    Pathfinder { get; }
 
-    private Dictionary<int, Entity>    TileObjects   = new();
-    private Dictionary<string, Entity> TileObjectMap = new();
+    private readonly Dictionary<int, Entity>    tileObjects   = new();
+    private readonly Dictionary<string, Entity> tileObjectMap = new();
 
     private bool isSetup = false;
 
@@ -68,8 +68,8 @@ public class World : ISerialisable {
         FootPaths.Reset();
         Areas.Reset();
 
-        TileObjects.Clear();
-        TileObjectMap.Clear();
+        tileObjects.Clear();
+        tileObjectMap.Clear();
         
         isSetup = false;
     }
@@ -98,9 +98,9 @@ public class World : ISerialisable {
     public void RegisterTileObject(Entity tileObject) {
         var component = tileObject.GetComponent<TileObjectComponent>();
 
-        TileObjects.Add(tileObject.Id, tileObject);
+        tileObjects.Add(tileObject.Id, tileObject);
         foreach (var tile in component.GetOccupiedTiles()) {
-            TileObjectMap.Add(tile.ToString(), tileObject);
+            tileObjectMap.Add(tile.ToString(), tileObject);
         }
 
         if (component.Data.Solid) {
@@ -111,9 +111,9 @@ public class World : ISerialisable {
     public void UnregisterTileObject(Entity tileObject) {
         var component = tileObject.GetComponent<TileObjectComponent>();
 
-        TileObjects.Remove(tileObject.Id);
+        tileObjects.Remove(tileObject.Id);
         foreach (var tile in component.GetOccupiedTiles()) {
-            TileObjectMap.Remove(tile.ToString());
+            tileObjectMap.Remove(tile.ToString());
         }
     }
     
@@ -122,7 +122,7 @@ public class World : ISerialisable {
     public int GetTileWalkability(IntVec2 tile) {
         if (!isSetup) return 0;
         if (!IsPositionInMap(tile)) return 0;
-        if (TileObjectMap.ContainsKey(tile.ToString()) && TileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
+        if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
         if (Elevation.IsTileWater(tile)) return 0;
         if (FootPaths.GetPathAtTile(tile)!.Exists) return 1;
 
@@ -184,7 +184,7 @@ public class World : ISerialisable {
     }
 
     public Entity? GetTileObjectAtTile(IntVec2 tile) {
-        return TileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
+        return tileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
     }
 
     private void RenderDebugCellGrid() {
@@ -210,9 +210,12 @@ public class World : ISerialisable {
     }
 
     public void Serialise() {
+        // TODO: We're gonna need to properly reset and setup here
         if (Find.SaveManager.mode == SerialiseMode.Loading) {
-            TileObjects.Clear();
-            TileObjectMap.Clear();
+            tileObjects.Clear();
+            tileObjectMap.Clear();
+            
+            Areas.Reset();
         }
             
         Find.SaveManager.SerialiseValue("width", ref Width);
@@ -220,5 +223,11 @@ public class World : ISerialisable {
         
         Find.SaveManager.SerialiseDeep("elevation", Elevation);
         Find.SaveManager.SerialiseDeep("biomes", Biomes);
+        Find.SaveManager.SerialiseDeep("walls", Walls);
+        Find.SaveManager.SerialiseDeep("footpaths", FootPaths);
+
+        if (Find.SaveManager.mode == SerialiseMode.Loading) {
+            Areas.Setup();
+        }
     }
 }

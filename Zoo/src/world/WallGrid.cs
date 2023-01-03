@@ -31,7 +31,9 @@ public class Wall {
     public Color       OverrideColour = Color.WHITE;
 }
 
-public class WallGrid {
+public record WallSaveData(string? assetPath, bool isDoor, bool indestructable);
+
+public class WallGrid : ISerialisable {
     private bool     isSetup = false;
     private Wall[][] grid;
     private int      cols;
@@ -42,7 +44,7 @@ public class WallGrid {
         this.rows = rows;
     }
 
-    public void Setup() {
+    public void Setup(WallSaveData[][]? data = null) {
         if (isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup WallGrid which was already setup");
             return;
@@ -58,18 +60,22 @@ public class WallGrid {
             
             for (var j = 0; j < rows + orientation.ToInt(); j++) {
                 var worldPos = WallUtility.WallToWorldPosition(new IntVec2(i, j), orientation);
+                var wallData = data?[i][j].assetPath != null ? Find.Registry.GetWall(data[i][j].assetPath!) : null;
                 grid[i][j] = new() {
-                    Data = null,
+                    Data        = wallData,
                     Orientation = orientation,
-                    WorldPos = worldPos,
-                    GridPos = new IntVec2(i, j),
+                    WorldPos    = worldPos,
+                    GridPos     = new IntVec2(i, j),
+                    Exists      = wallData != null,
+                    IsDoor = data?[i][j].isDoor ?? false,
+                    Indestructable = data?[i][j].indestructable ?? false
                 };
             }
         }
 
+        UpdatePathfinding();
+
         isSetup = true;
-        
-        PlaceWallAtTile(Find.Registry.GetWall(WALLS.IRON_FENCE), new IntVec2(3, 3), Side.North);
     }
 
     public void Reset() {
@@ -131,7 +137,7 @@ public class WallGrid {
         UpdatePathfindingAtWall(wall);
         
         if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
-            Find.World.Areas.FormAreas(wall);
+            Find.World.Areas.FormAreasAtWall(wall);
         }
 
         return wall;
@@ -161,7 +167,7 @@ public class WallGrid {
         var wall = grid[x][y];
         
         UpdatePathfindingAtWall(wall);
-        Find.World.Areas.JoinAreas(wall);
+        Find.World.Areas.JoinAreasAtWall(wall);
     }
 
     public void PlaceDoor(Wall wall) {
@@ -169,7 +175,7 @@ public class WallGrid {
         
         wall.IsDoor = true;
         
-        var adjacentTiles = GetAdjacentTiles(wall);
+        var adjacentTiles = wall.GetAdjacentTiles();
         if (adjacentTiles.Length < 2) return;
         
         var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
@@ -180,11 +186,11 @@ public class WallGrid {
     }
 
     public void RemoveDoor(Wall wall) {
-            if (!wall.Exists) return;
+        if (!wall.Exists) return;
         
         wall.IsDoor = false;
         
-        var adjacentTiles = GetAdjacentTiles(wall);
+        var adjacentTiles = wall.GetAdjacentTiles();
         if (adjacentTiles.Length < 2) return;
         
         var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
@@ -195,8 +201,6 @@ public class WallGrid {
     }
 
     private void UpdatePathfindingAtWall(Wall wall) {
-        if (!isSetup) return;
-
         var (x, y) = wall.WorldPos;
 
         if (wall.Orientation == Orientation.Horizontal) {
@@ -249,6 +253,17 @@ public class WallGrid {
         }
     }
 
+    public IEnumerable<Wall> GetAllWalls() {
+        for (var i = 0; i < cols * 2 + 1; i++) {
+            var orientation = i % 2;
+            for (var j = 0; j < rows + orientation; j++) {
+                var wall = grid[i][j];
+                if (wall.Exists)
+                    yield return wall;
+            }
+        }
+    }
+
     public Wall? GetWallAtTile(IntVec2 tile, Side side) {
         if (!IsWallPosInMap(tile, side)) {
             // Invert position and side if tile pos is correct but on the outside of the map
@@ -297,50 +312,8 @@ public class WallGrid {
         return gridPos.X >= 0 && gridPos.X < grid.Length && gridPos.Y >= 0 && gridPos.Y < grid[gridPos.X].Length;
     }
 
-    private List<Wall> adjacentWalls = new ();
-    public Wall[] GetAdjacentWalls(Wall wall) {
-        adjacentWalls.Clear();
-        var x = wall.GridPos.X;
-        var y = wall.GridPos.Y;
-
-        if (wall.Orientation == Orientation.Horizontal) {
-            if (GetWallByGridPos(new IntVec2(x - 2, y))     is { Exists: true }) adjacentWalls.Add(grid[x - 2][y]);
-            if (GetWallByGridPos(new IntVec2(x + 2, y))     is { Exists: true }) adjacentWalls.Add(grid[x + 2][y]);
-            if (GetWallByGridPos(new IntVec2(x - 1, y))     is { Exists: true }) adjacentWalls.Add(grid[x - 1][y]);
-            if (GetWallByGridPos(new IntVec2(x + 1, y))     is { Exists: true }) adjacentWalls.Add(grid[x + 1][y]);
-            if (GetWallByGridPos(new IntVec2(x - 1, y - 1)) is { Exists: true }) adjacentWalls.Add(grid[x - 1][y - 1]);
-            if (GetWallByGridPos(new IntVec2(x + 1, y - 1)) is { Exists: true }) adjacentWalls.Add(grid[x + 1][y - 1]);
-        } else {
-            if (GetWallByGridPos(new IntVec2(x - 1, y))     is { Exists: true }) adjacentWalls.Add(grid[x - 1][y]);
-            if (GetWallByGridPos(new IntVec2(x + 1, y))     is { Exists: true }) adjacentWalls.Add(grid[x + 1][y]);
-            if (GetWallByGridPos(new IntVec2(x - 1, y + 1)) is { Exists: true }) adjacentWalls.Add(grid[x - 1][y + 1]);
-            if (GetWallByGridPos(new IntVec2(x + 1, y + 1)) is { Exists: true }) adjacentWalls.Add(grid[x + 1][y + 1]);
-            if (GetWallByGridPos(new IntVec2(x, y + 1))     is { Exists: true }) adjacentWalls.Add(grid[x][y + 1]);
-            if (GetWallByGridPos(new IntVec2(x, y - 1))     is { Exists: true }) adjacentWalls.Add(grid[x][y - 1]);
-        }
-
-        return adjacentWalls.ToArray();
-    }
-
-    private List<IntVec2> adjacentTiles = new ();
-    public IntVec2[] GetAdjacentTiles(Wall wall) {
-        adjacentTiles.Clear();
-
-        var (x, y) = wall.WorldPos;
-        
-        if (wall.Orientation == Orientation.Horizontal) {
-            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y - 1.0f))) adjacentTiles.Add(new Vector2(x - 0.5f, y - 1.0f).Floor());
-            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y))) adjacentTiles.Add(new Vector2(x - 0.5f, y).Floor());
-        } else {
-            if (Find.World.IsPositionInMap(new Vector2(x - 1.0f, y - 0.5f))) adjacentTiles.Add(new Vector2(x - 1.0f, y - 0.5f).Floor());
-            if (Find.World.IsPositionInMap(new Vector2(x, y - 0.5f))) adjacentTiles.Add(new Vector2(x, y - 0.5f).Floor());
-        }
-
-        return adjacentTiles.ToArray();
-    }
-
     public IntVec2? GetOppositeTile(Wall wall, IntVec2 tile) {
-        foreach (var t in GetAdjacentTiles(wall)) {
+        foreach (var t in wall.GetAdjacentTiles()) {
             if (t != tile) return t;
         }
         return null;
@@ -364,7 +337,7 @@ public class WallGrid {
 
     // TODO: See if we can optimise these two function
     private bool ShouldCheckForLoop(Wall wall) {
-        var adjacent = GetAdjacentWalls(wall);
+        var adjacent = wall.GetAdjacentWalls();
         if (adjacent.Length < 2) return false;
 
         if (wall.Orientation == Orientation.Horizontal) {
@@ -392,7 +365,7 @@ public class WallGrid {
         checkedWalls.Add(currentWall);
 
         var found = false;
-        foreach (var wall in GetAdjacentWalls(currentWall)) {
+        foreach (var wall in currentWall.GetAdjacentWalls()) {
             if (wall == startWall && depth > 1) return true;
 
             if (!checkedWalls.Contains(wall)) {
@@ -402,5 +375,17 @@ public class WallGrid {
         }
 
         return found;
+    }
+
+    public void Serialise() {
+        if (Find.SaveManager.mode == SerialiseMode.Loading)
+            Reset();
+        
+        Find.SaveManager.SerialiseValue("cols", ref cols);
+        Find.SaveManager.SerialiseValue("rows", ref rows);
+        Find.SaveManager.SerialiseValue("data", 
+            () => grid.Select(row => row.Select(wall => new WallSaveData(wall.Data?.AssetPath, wall.IsDoor, wall.Indestructable)).ToArray()).ToArray(),
+            data => Setup(data)
+        );
     }
 }

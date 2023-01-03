@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using System.Numerics;
+using Raylib_cs;
 using Zoo.util;
 
 namespace Zoo.world; 
@@ -18,13 +19,8 @@ public class AreaManager {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Areas already setup");
             return;
         }
-        
-        var zooArea  = new Area(ZooArea);
-        zooArea.Tiles = FloodFill(new IntVec2(1, 1)); // TODO: change this to zoo entrance
-        areas.Add(zooArea.Id, zooArea);
-        foreach (var tile in zooArea.Tiles) {
-            tileAreaMap.Add(tile.ToString(), zooArea);
-        }
+
+        RegenerateAreas();
 
         isSetup = true;
     }
@@ -41,12 +37,55 @@ public class AreaManager {
         isSetup = false;
     }
 
-    public void FormAreas(Wall placedWall) {
+    public void RegenerateAreas() {
+        // Form areas
+        FormZooArea(new IntVec2(1, 1)); // TODO: change this to zoo entrance
+        
+        for (var i = 0; i < Find.World.Width; i++) {
+            for (var j = 0; j < Find.World.Height; j++) {
+                var tile = new IntVec2(i, j);
+                if (tileAreaMap.ContainsKey(tile.ToString())) {
+                    continue;
+                }
+                
+                var area = new Area(Guid.NewGuid().ToString());
+                area.Tiles = FloodFill(tile);
+                areas.Add(area.Id, area);
+                foreach (var areaTile in area.Tiles) {
+                    tileAreaMap.Add(areaTile.ToString(), area);
+                }
+            }
+        }
+
+        // Form connections
+        foreach (var wall in Find.World.Walls.GetAllWalls()) {
+            if (!wall.IsDoor) continue;
+            var adjacentTiles = wall.GetAdjacentTiles();
+            if (adjacentTiles.Length < 2) continue;
+
+            var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
+            var areaB = Find.World.Areas.GetAreaAtTile(adjacentTiles[1]);
+        
+            areaA.AddAreaConnection(areaB, wall);
+            areaB.AddAreaConnection(areaA, wall);
+        }
+    }
+
+    public void FormZooArea(IntVec2 entrance) {
+        var zooArea = new Area(ZooArea);
+        zooArea.Tiles = FloodFill(entrance);
+        areas.Add(zooArea.Id, zooArea);
+        foreach (var tile in zooArea.Tiles) {
+            tileAreaMap.Add(tile.ToString(), zooArea);
+        }
+    }
+
+    public void FormAreasAtWall(Wall placedWall) {
         if (!placedWall.Exists) return;
 
         List<IntVec2> areaATiles = new();
         List<IntVec2> areaBTiles = new();
-        var           startTiles = Find.World.Walls.GetAdjacentTiles(placedWall);
+        var           startTiles = placedWall.GetAdjacentTiles();
         
         // ! Does not handle situations where final wall is placed on the edge of the map
         // Current solution is to ensure that the map is already surrounded by walls
@@ -83,8 +122,8 @@ public class AreaManager {
         areas.Add(newArea.Id, newArea);
     }
 
-    public void JoinAreas(Wall removedWall) {
-        var tiles = Find.World.Walls.GetAdjacentTiles(removedWall);
+    public void JoinAreasAtWall(Wall removedWall) {
+        var tiles = removedWall.GetAdjacentTiles();
         if (tiles.Length < 2) return;
 
         var areaA = GetAreaAtTile(tiles[0]);
@@ -197,6 +236,13 @@ public class AreaManager {
         foreach (var (_, area) in areas) {
             foreach (var tile in area.Tiles) {
                 Debug.DrawRect(tile, IntVec2.One, area.Colour.WithAlpha(0.5f), true);
+            }
+
+            foreach (var (_, doors) in area.ConnectedAreas) {
+                foreach (var door in doors) {
+                    var tiles = door.GetAdjacentTiles();
+                    Debug.DrawLine(tiles[0] + new Vector2(0.5f, 0.5f), tiles[1] + new Vector2(0.5f, 0.5f), Color.BLACK, true);
+                }
             }
         }
     }

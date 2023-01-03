@@ -6,6 +6,7 @@ namespace Zoo.entities;
 
 public class PathFollowComponent : InputComponent {
     protected const float                 NodeReachedDist = 0.2f;
+    private         Vector2?              destination;
     private         List<IntVec2>?        path;
     private         Task<List<IntVec2>?>? pathRequest;
     private         string                placeSolidHandle;
@@ -52,16 +53,23 @@ public class PathFollowComponent : InputComponent {
     private bool CheckPathCompleted() {
         if (!path.NullOrEmpty()) return false;
         
-        InputVector   = Vector2.Zero;
-        pathCompleted = true;
+        InputVector    = Vector2.Zero;
+        pathCompleted  = true;
+        destination = null;
 
         return true;
     }
 
     public virtual void PathTo(Vector2 targetPos) {
         ResetPath();
-        
-        pathRequest   = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), targetPos.Floor());
+
+        if (entity.Pos.Floor() == targetPos.Floor()) {
+            pathCompleted = true;
+            return;
+        }
+
+        destination = targetPos;
+        pathRequest    = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), targetPos.Floor());
     }
 
     private void CheckPathRequest() {
@@ -79,8 +87,10 @@ public class PathFollowComponent : InputComponent {
     }
 
     private void ResetPath() {
-        path          = null;
-        pathCompleted = false;
+        InputVector    = Vector2.Zero;
+        path           = null;
+        pathCompleted  = false;
+        destination = null;
     }
     
     public virtual bool ReachedDestination() {
@@ -99,7 +109,9 @@ public class PathFollowComponent : InputComponent {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.SerialiseValue("path", ref path);
-        // TODO: serialise pathRequest?
+        Find.SaveManager.SerialiseValue("destination", ref destination);
+        
+        if (Find.SaveManager.mode == SerialiseMode.Loading && destination.HasValue)
+            PathTo(destination.Value);
     }
 }

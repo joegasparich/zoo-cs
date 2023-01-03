@@ -66,6 +66,9 @@ public class SaveManager {
                 CurrentSaveNode.Add(label, JsonSerializer.SerializeToNode(value, serializeOptions));
                 break;
             case SerialiseMode.Loading:
+                if (CurrentSaveNode[label] == null)
+                    break;
+                
                 value = JsonSerializer.Deserialize<T>(CurrentSaveNode[label]!.ToJsonString(), serializeOptions);
                 break;
         }

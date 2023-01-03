@@ -150,7 +150,7 @@ public class Tool_Wall : Tool {
         if (Find.World.Elevation.GetElevationAtPos(v1) < 0) return false;
         if (Find.World.Elevation.GetElevationAtPos(v2) < 0) return false;
         
-        var tiles = Find.World.Walls.GetAdjacentTiles(wall);
+        var    tiles       = wall.GetAdjacentTiles();
         Entity blockingObj = null;
         foreach(var t in tiles) {
             var obj = Find.World.GetTileObjectAtTile(t);

@@ -6,7 +6,7 @@ namespace Zoo.entities;
 
 public class AreaPathFollowComponent : PathFollowComponent {
     private List<Area>? areaPath;
-    private Vector2?    targetPos;
+    private Vector2?    destination;
     private Area?       currentArea;
     private Wall?       currentDoor;
 
@@ -18,13 +18,13 @@ public class AreaPathFollowComponent : PathFollowComponent {
     public AreaPathFollowComponent(Entity entity) : base(entity) {}
 
     public override void Update() {
-        if (areaPath.NullOrEmpty()) {
+        if (areaPath.NullOrEmpty() && !enterDoorPos.HasValue) {
             base.Update();
             currentDoor = null;
             return;
         }
 
-        if (currentDoor == null) {
+        if (!areaPath.NullOrEmpty() && currentDoor == null) {
             // We don't have a door to go to
             // Find and path to the next dor
             var nextArea = areaPath!.First();
@@ -36,18 +36,21 @@ public class AreaPathFollowComponent : PathFollowComponent {
                     minDistSquared = distSquared;
                 }
             }
-            var doorTiles  = Find.World.Walls.GetAdjacentTiles(currentDoor!);
+            var doorTiles  = currentDoor.GetAdjacentTiles();
             var targetTile = doorTiles.First(tile => Find.World.Areas.GetAreaAtTile(tile) == currentArea);
             base.PathTo(targetTile);
         }
-        
-        // Head to door
-        base.Update();
 
-        if (base.ReachedDestination()) {
-            // We've made it to the door
-            var doorTiles = Find.World.Walls.GetAdjacentTiles(currentDoor);
-            enterDoorPos = doorTiles.First(tile => Find.World.Areas.GetAreaAtTile(tile) != currentArea) + new Vector2(0.5f, 0.5f);
+        if (currentDoor != null & !enterDoorPos.HasValue) {
+            // We have a door to go through and aren't currently going through it
+            // Head to door
+            base.Update();
+
+            if (base.ReachedDestination()) {
+                // We've made it to the door
+                var doorTiles = currentDoor.GetAdjacentTiles();
+                enterDoorPos = doorTiles.First(tile => Find.World.Areas.GetAreaAtTile(tile) != currentArea) + new Vector2(0.5f, 0.5f);
+            }
         }
 
         if (enterDoorPos.HasValue) {
@@ -69,7 +72,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
 
                 if (!areaPath.Any()) {
                     // We're in the final area, path to final destination
-                    base.PathTo(targetPos.Value);
+                    base.PathTo(destination.Value);
                     areaPathCompleted = pathCompleted;
                 }
             }
@@ -90,8 +93,8 @@ public class AreaPathFollowComponent : PathFollowComponent {
         if (curArea != targetArea) {
             areaPath = Find.World.Areas.BFS(curArea, targetArea);
             if (areaPath.Any()) {
-                currentArea    = areaPath.Dequeue();
-                targetPos = target;
+                currentArea = areaPath.Dequeue();
+                destination = target;
             }
         } else {
             base.PathTo(target);
@@ -106,14 +109,22 @@ public class AreaPathFollowComponent : PathFollowComponent {
         areaPath          = null;
         currentArea       = null;
         currentDoor       = null;
-        targetPos         = null;
+        destination       = null;
         enterDoorPos      = null;
         deferredTargetPos = null;
     }
 
     public override void Serialise() {
         base.Serialise();
-        
-        // TODO: once areas are serialised
+
+        Find.SaveManager.SerialiseValue("areaDestination", ref destination);
+        Find.SaveManager.SerialiseValue("enterDoorPos", ref enterDoorPos);
+
+        if (Find.SaveManager.mode == SerialiseMode.Loading) {
+            if (enterDoorPos.HasValue) {
+                deferredTargetPos = destination;
+            } else if (destination.HasValue)
+                PathTo(destination.Value);
+        }
     }
 }
