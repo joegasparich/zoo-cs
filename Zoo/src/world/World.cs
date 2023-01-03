@@ -61,7 +61,7 @@ public class World : ISerialisable {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "World setup complete");
     }
     
-    public void Cleanup() {
+    public void Reset() {
         Elevation.Reset();
         Biomes.Reset();
         Walls.Reset();
@@ -210,6 +210,11 @@ public class World : ISerialisable {
     }
 
     public void Serialise() {
+        if (Find.SaveManager.mode == SerialiseMode.Loading) {
+            TileObjects.Clear();
+            TileObjectMap.Clear();
+        }
+            
         Find.SaveManager.SerialiseValue("width", ref Width);
         Find.SaveManager.SerialiseValue("height", ref Height);
         

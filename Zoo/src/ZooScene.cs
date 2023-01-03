@@ -18,7 +18,7 @@ public class ZooScene : Scene, ISerialisable {
         Zoo = new Zoo();
         Zoo.Setup();
         
-        // Test
+        // Test TODO: move this into controllable component
         man = new Entity(new Vector2(0, 0));
         var renderer   = man.AddComponent<RenderComponent>();
         renderer.SetSprite(TEXTURES.KEEPER);

@@ -20,10 +20,8 @@ public class CustomEncoder : TextEncoderSettings {
 
 public class SaveManager {
     private readonly JsonSerializerOptions serializeOptions = new() {
+        IncludeFields = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        Converters = {
-            new Vector2JsonConverter()
-        }
     };
     
     public JsonObject CurrentSaveNode { get; set; }
@@ -57,19 +55,23 @@ public class SaveManager {
         CurrentSaveNode = saveData;
         Game.Serialise();
     }
+
+    public T? Parse<T>(JsonNode node) {
+        return node.Deserialize<T>(serializeOptions);
+    }
     
     public void SerialiseValue<T>(string label, ref T? value) {
         switch (mode) {
             case SerialiseMode.Saving:
-                CurrentSaveNode[label] = JsonSerializer.Serialize(value, serializeOptions);
+                CurrentSaveNode.Add(label, JsonSerializer.SerializeToNode(value, serializeOptions));
                 break;
             case SerialiseMode.Loading:
-                value = JsonSerializer.Deserialize<T>(CurrentSaveNode[label]!.ToString(), serializeOptions);
+                value = JsonSerializer.Deserialize<T>(CurrentSaveNode[label]!.ToJsonString(), serializeOptions);
                 break;
         }
     }
 
-    public void SerialiseValue<T>(string label, Func<T> get, Action<T?> set) {
+    public void SerialiseValue<T>(string label, Func<T> get, Action<T?>? set) {
         switch (mode) {
             case SerialiseMode.Saving: {
                 var value = get();
@@ -77,6 +79,8 @@ public class SaveManager {
                 break;
             }
             case SerialiseMode.Loading: {
+                if (set == null) break;
+                
                 var value = default(T);
                 SerialiseValue(label, ref value);
                 set(value);

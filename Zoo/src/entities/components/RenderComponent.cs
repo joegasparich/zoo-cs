@@ -9,9 +9,9 @@ public class RenderComponent : Component {
     private string    spritePath = "";
     private Rectangle source = new (0, 0, 1, 1);
     
-    public Vector2 Origin         { get; set; } = new (0.5f, 0.5f);
-    public Vector2 Offset         { get; set; } = Vector2.Zero;
-    public Color   OverrideColour { get; set; } = Color.WHITE;
+    public Vector2 Origin         = new (0.5f, 0.5f);
+    public Vector2 Offset         = Vector2.Zero;
+    public Color   OverrideColour = Color.WHITE;
     
     public RenderComponent(Entity entity) : base(entity) {}
 
@@ -36,5 +36,17 @@ public class RenderComponent : Component {
 
     public void SetSource(Rectangle source) {
         this.source = source;
+    }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        Find.SaveManager.SerialiseValue("spritePath", ref spritePath);
+        Find.SaveManager.SerialiseValue("source", ref source);
+        Find.SaveManager.SerialiseValue("origin", ref Origin);
+        Find.SaveManager.SerialiseValue("offset", ref Offset);
+        
+        if (Find.SaveManager.mode == SerialiseMode.Loading)
+            SetSprite(spritePath);
     }
 }

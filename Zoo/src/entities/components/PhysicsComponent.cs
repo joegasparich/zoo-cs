@@ -6,8 +6,8 @@ public class PhysicsComponent : Component {
     private Vector2 velocity = Vector2.Zero;
     private Vector2 force = Vector2.Zero;
     
-    public float Mass { get; set; } = 50;
-    public float Friction { get; set; } = 0.5f;
+    public float Mass = 50;
+    public float Friction = 0.5f;
 
     public PhysicsComponent(Entity entity) : base(entity) {}
 
@@ -26,5 +26,14 @@ public class PhysicsComponent : Component {
     
     public void AddForce(Vector2 force) {
         this.force += force;
+    }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        Find.SaveManager.SerialiseValue("velocity", ref velocity);
+        Find.SaveManager.SerialiseValue("force", ref force);
+        Find.SaveManager.SerialiseValue("mass", ref Mass);
+        Find.SaveManager.SerialiseValue("friction", ref Friction);
     }
 }

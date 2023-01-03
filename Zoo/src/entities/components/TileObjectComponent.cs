@@ -27,4 +27,13 @@ public class TileObjectComponent : Component {
             }
         }
     }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        Find.SaveManager.SerialiseValue("dataPath",
+            () => Data.AssetPath,
+            path => Data = Find.Registry.GetObject(path)
+        );
+    }
 }

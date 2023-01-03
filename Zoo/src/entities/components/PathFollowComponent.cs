@@ -95,4 +95,11 @@ public class PathFollowComponent : InputComponent {
     public List<IntVec2>? GetPath() {
         return path;
     }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        Find.SaveManager.SerialiseValue("path", ref path);
+        // TODO: serialise pathRequest?
+    }
 }

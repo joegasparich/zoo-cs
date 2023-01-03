@@ -63,6 +63,11 @@ public class Entity : ISerialisable {
         components.Add(component.GetType(), component);
         return component;
     }
+    public T AddComponent<T>(T component) where T : Component {
+        components.Add(component.GetType(), component);
+        return component;
+    }
+    
     public T? GetComponent<T>() where T : Component {
         if (HasComponent(typeof(T))) return (T)components[typeof(T)];
         

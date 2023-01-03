@@ -65,16 +65,6 @@ public static class ExtensionMethods {
     public static Vector3 ToVector3(this Vector2 v) {
         return new Vector3(v.X, v.Y, 0);
     }
-    public static Vector2 ToVector2(this string s) {
-        if (s.Length == 0) return Vector2.Zero;
-        if (s[0] == '<') s = s.Substring(1);
-        if (s[^1] == '>') s = s.Substring(0, s.Length - 1);
-        var split = s.Split(',');
-        if (split.Length != 2) return Vector2.Zero;
-        if (!float.TryParse(split[0], out float x)) return Vector2.Zero;
-        if (!float.TryParse(split[1], out float y)) return Vector2.Zero;
-        return new Vector2(x, y);
-    }
     
     // Rectangle //
     public static Vector2 Position(this Rectangle rect) {

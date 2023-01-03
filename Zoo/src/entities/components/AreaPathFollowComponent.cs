@@ -110,4 +110,10 @@ public class AreaPathFollowComponent : PathFollowComponent {
         enterDoorPos      = null;
         deferredTargetPos = null;
     }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        // TODO: once areas are serialised
+    }
 }

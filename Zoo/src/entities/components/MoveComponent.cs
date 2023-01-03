@@ -4,7 +4,7 @@ public class MoveComponent : Component {
     private InputComponent   input;
     private PhysicsComponent physics;
 
-    public float Acceleration { get; set; } = 0.5f;
+    public float Acceleration = 0.5f;
 
     public MoveComponent(Entity entity) : base(entity) {}
 
@@ -16,5 +16,11 @@ public class MoveComponent : Component {
 
     public override void Update() {
         physics.AddForce(input.InputVector * Acceleration);
+    }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        Find.SaveManager.SerialiseValue("acceleration", ref Acceleration);
     }
 }

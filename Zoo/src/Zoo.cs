@@ -26,7 +26,7 @@ public class Zoo : ISerialisable {
     }
 
     public void Cleanup() {
-        World.Cleanup();
+        World.Reset();
         Tools.Cleanup();
     }
 
