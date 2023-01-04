@@ -8,7 +8,6 @@ public class AssetManager {
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
         
     private readonly Dictionary<string, Texture2D> textureMap = new ();
-    private readonly Dictionary<string, SpriteSheet> spriteSheetMap = new ();
 
     public void LoadAssets() {
         // Textures
@@ -25,18 +24,11 @@ public class AssetManager {
             if (!path.EndsWith(".json")) {
                 continue;
             }
-            var finalPath = path.Replace("\\", "/");
 
-            var        json = File.ReadAllText(finalPath);
+            var        json = File.ReadAllText(path.Replace("\\", "/"));
             ObjectData data = JsonSerializer.Deserialize<ObjectData>(json, JsonOpts)!;
 
-            data.AssetPath = finalPath;
-            if (data.SpritePath != null)
-                data.Sprite = GetTexture(data.SpritePath);
-            if (data.SpriteSheet?.TexturePath != null)
-                data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet);
-            
-            Find.Registry.RegisterObject(finalPath, data);
+            Find.Registry.RegisterObject(data);
         }
         
         // Paths
@@ -44,15 +36,11 @@ public class AssetManager {
             if (!path.EndsWith(".json")) {
                 continue;
             }
-            var finalPath = path.Replace("\\", "/");
 
-            var      json = File.ReadAllText(finalPath);
+            var json = File.ReadAllText(path.Replace("\\", "/"));
             FootPathData data = JsonSerializer.Deserialize<FootPathData>(json, JsonOpts)!;
 
-            data.AssetPath = finalPath;
-            data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;
-            
-            Find.Registry.RegisterPath(finalPath, data);
+            Find.Registry.RegisterPath(data);
         }
         
         // Walls
@@ -60,15 +48,11 @@ public class AssetManager {
             if (!path.EndsWith(".json")) {
                 continue;
             }
-            var finalPath = path.Replace("\\", "/");
             
-            var      json = File.ReadAllText(finalPath);
+            var      json = File.ReadAllText(path.Replace("\\", "/"));
             WallData data = JsonSerializer.Deserialize<WallData>(json, JsonOpts)!;
 
-            data.AssetPath   = finalPath;
-            data.SpriteSheet = LoadSpriteSheet(data.SpriteSheet) ?? data.SpriteSheet;
-            
-            Find.Registry.RegisterWall(finalPath, data);
+            Find.Registry.RegisterWall(data);
         }
     }
 
@@ -82,21 +66,4 @@ public class AssetManager {
         return textureMap[path];
     }
 
-    public SpriteSheet? LoadSpriteSheet(SpriteSheet spritesheet) {
-        if (spritesheet.TexturePath.NullOrEmpty()) return null;
-
-        if (!spriteSheetMap.ContainsKey(spritesheet.TexturePath)) {
-            spritesheet.Texture = GetTexture(spritesheet.TexturePath);
-            spriteSheetMap.Add(spritesheet.TexturePath, spritesheet);
-        }
-
-        return spriteSheetMap[spritesheet.TexturePath];
-    }
-    
-    public SpriteSheet? GetSpriteSheet(string texturePath) {
-        if (texturePath.NullOrEmpty()) return null;
-        if (!spriteSheetMap.ContainsKey(texturePath)) return null;
-        
-        return spriteSheetMap[texturePath];
-    }
 }

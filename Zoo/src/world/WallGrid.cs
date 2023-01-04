@@ -31,7 +31,7 @@ public class Wall {
     public Color       OverrideColour = Color.WHITE;
 }
 
-public record WallSaveData(string? assetPath, bool isDoor, bool indestructable);
+public record WallSaveData(string? id, bool isDoor, bool indestructable);
 
 public class WallGrid : ISerialisable {
     private bool     isSetup = false;
@@ -44,7 +44,7 @@ public class WallGrid : ISerialisable {
         this.rows = rows;
     }
 
-    public void Setup(WallSaveData[][]? data = null) {
+    public void Setup(WallSaveData?[][]? data = null) {
         if (isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup WallGrid which was already setup");
             return;
@@ -60,15 +60,15 @@ public class WallGrid : ISerialisable {
             
             for (var j = 0; j < rows + orientation.ToInt(); j++) {
                 var worldPos = WallUtility.WallToWorldPosition(new IntVec2(i, j), orientation);
-                var wallData = data?[i][j].assetPath != null ? Find.Registry.GetWall(data[i][j].assetPath!) : null;
-                grid[i][j] = new() {
-                    Data        = wallData,
-                    Orientation = orientation,
-                    WorldPos    = worldPos,
-                    GridPos     = new IntVec2(i, j),
-                    Exists      = wallData != null,
-                    IsDoor = data?[i][j].isDoor ?? false,
-                    Indestructable = data?[i][j].indestructable ?? false
+                var wallData = data?[i][j]?.id != null ? Find.Registry.GetWall(data[i][j]!.id!) : null;
+                grid[i][j] = new Wall {
+                    Data           = wallData,
+                    Orientation    = orientation,
+                    WorldPos       = worldPos,
+                    GridPos        = new IntVec2(i, j),
+                    Exists         = wallData != null,
+                    IsDoor         = data?[i][j]?.isDoor ?? false,
+                    Indestructable = data?[i][j]?.indestructable ?? false
                 };
             }
         }
@@ -97,19 +97,17 @@ public class WallGrid : ISerialisable {
             for (var j = 0; j < rows + orientation.ToInt(); j++) {
                 var wall = grid[i][j];
                 if (!wall.Exists) continue;
+                if (wall.Data == null) continue;
                 
                 var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall);
                 var pos = orientation == Orientation.Horizontal ? new Vector2(i / 2.0f, j) : new Vector2(i / 2.0f, j + 1);
                 pos -= new Vector2(0.5f, 2.0f + elevation); // Offset cell size
-                var spriteSheet = wall.Data!.SpriteSheet;
                 
-                Find.Renderer.Blit(
-                    texture: spriteSheet.Texture,
+                wall.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
-                    scale: new Vector2(1, 2) * World.WorldScale,
-                    source: spriteSheet.GetCellBounds(spriteIndex.ToInt()),
-                    color: wall.OverrideColour
+                    colour: wall.OverrideColour,
+                    index: spriteIndex.ToInt()
                 );
                 
                 wall.OverrideColour = Color.WHITE;
@@ -384,7 +382,7 @@ public class WallGrid : ISerialisable {
         Find.SaveManager.ArchiveValue("cols", ref cols);
         Find.SaveManager.ArchiveValue("rows", ref rows);
         Find.SaveManager.ArchiveValue("data", 
-            () => grid.Select(row => row.Select(wall => new WallSaveData(wall.Data?.AssetPath, wall.IsDoor, wall.Indestructable)).ToArray()).ToArray(),
+            () => grid.Select(row => row.Select(wall => wall.Exists ? new WallSaveData(wall.Data?.Id, wall.IsDoor, wall.Indestructable) : null).ToArray()).ToArray(),
             data => Setup(data)
         );
     }

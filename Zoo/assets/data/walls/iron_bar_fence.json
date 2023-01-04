@@ -1,8 +1,9 @@
 {
+    "id": "iron_bar",
     "name": "Iron Bar Fence",
     "type": "fence",
-    "spriteSheet": {
-        "texturePath": "assets/data/walls/iron_bar_fence.png",
+    "graphicData": {
+        "spritePath": "assets/data/walls/iron_bar_fence.png",
         "cellHeight": 32,
         "cellWidth": 16
     },

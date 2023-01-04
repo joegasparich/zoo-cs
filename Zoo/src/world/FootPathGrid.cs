@@ -69,19 +69,18 @@ public class FootPathGrid : ISerialisable {
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
                 var path = grid[i][j];
-                if (!path.Exists || path.Data == null) continue;
+                if (!path.Exists) continue;
+                if (path.Data == null) continue;
 
                 var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
                 Vector2 pos = path.Pos;
                 pos -= new Vector2(0, 1 + elevation);
                 
-                Find.Renderer.Blit(
-                    texture: path.Data!.SpriteSheet.Texture,
+                path.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: Depth.GroundCover.ToInt(),
-                    scale: new Vector2(1, 2) * World.WorldScale,
-                    source: path.Data!.SpriteSheet.GetCellBounds(spriteIndex.ToInt()),
-                    color: path.OverrideColour
+                    colour: path.OverrideColour,
+                    index: spriteIndex.ToInt()
                 );
                 
                 path.OverrideColour = Color.WHITE;
@@ -127,7 +126,7 @@ public class FootPathGrid : ISerialisable {
         Find.SaveManager.ArchiveValue("cols", ref cols);
         Find.SaveManager.ArchiveValue("rows", ref rows);
         Find.SaveManager.ArchiveValue("data", 
-            () => grid.Select(row => row.Select(path => path.Data?.AssetPath).ToArray()).ToArray(),
+            () => grid.Select(row => row.Select(path => path.Data?.Id).ToArray()).ToArray(),
             data => Setup(data)
         );
     }

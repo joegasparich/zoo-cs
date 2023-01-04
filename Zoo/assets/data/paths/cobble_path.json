@@ -1,7 +1,8 @@
 {
+  "id": "cobble",
   "name": "Cobble Path",
-  "spriteSheet": {
-    "texturePath": "assets/data/paths/cobble_path.png",
+  "graphicData": {
+    "spritePath": "assets/data/paths/cobble_path.png",
     "cellHeight": 32,
     "cellWidth": 16
   }

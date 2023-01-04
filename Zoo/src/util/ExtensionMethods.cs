@@ -134,4 +134,9 @@ public static class ExtensionMethods {
     public static bool NullOrEmpty<T>( this List<T>? list ) {
         return list == null || list.Count == 0;
     }
+    
+    // Texture2D //
+    public static bool Empty(this Texture2D tex) {
+        return tex.id == 0;
+    }
 }

@@ -20,8 +20,8 @@ public class ZooScene : Scene, ISerialisable {
         
         // TODO: move this into controllable component
         man = new Entity(new Vector2(0, 0));
-        var renderer   = man.AddComponent<RenderComponent>();
-        renderer.SetSprite(TEXTURES.KEEPER);
+        var renderer = man.AddComponent<RenderComponent>();
+        renderer.Graphics.SetSprite(TEXTURES.KEEPER);
         man.AddComponent<AreaPathFollowComponent>();
         man.AddComponent<PhysicsComponent>();
         man.AddComponent<MoveComponent>();

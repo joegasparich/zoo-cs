@@ -1,7 +1,8 @@
 {
+  "id": "dirt",
   "name": "Dirt Path",
-  "spriteSheet": {
-    "texturePath": "assets/data/paths/dirt_path.png",
+  "graphicData": {
+    "spritePath": "assets/data/paths/dirt_path.png",
     "cellHeight": 32,
     "cellWidth": 16
   }

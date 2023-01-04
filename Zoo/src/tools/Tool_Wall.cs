@@ -25,7 +25,7 @@ public class Tool_Wall : Tool {
     }
 
     public override void Set() {
-        Ghost.Type   = GhostType.SpriteSheet;
+        Ghost.Type   = GhostType.Sprite;
         Ghost.Snap   = true;
         Ghost.Scale  = new Vector2(1, 2);
         Ghost.Offset = new Vector2(0, -1);
@@ -89,12 +89,12 @@ public class Tool_Wall : Tool {
             // Push new ghosts to reach length
             while (ghosts.Count < length) {
                 var ghost = new ToolGhost(toolManager) {
-                    Type        = GhostType.SpriteSheet,
-                    Follow      = false,
-                    SpriteSheet = Ghost.SpriteSheet,
-                    Offset      = Ghost.Offset,
-                    Side        = dragQuadrant,
-                    Scale       = Ghost.Scale
+                    Type     = GhostType.Sprite,
+                    Follow   = false,
+                    Graphics = Ghost.Graphics,
+                    Offset   = Ghost.Offset,
+                    Side     = dragQuadrant,
+                    Scale    = Ghost.Scale
                 };
                 ghosts.Add(ghost);
             }
@@ -136,10 +136,10 @@ public class Tool_Wall : Tool {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
                 
-                GUI.DrawSubTexture(buttonRect, wall.SpriteSheet.Texture, wall.SpriteSheet.GetCellBounds(0).BottomPct(0.25f));
+                GUI.DrawSubTexture(buttonRect, wall.GraphicData.Sprite, wall.GraphicData.GetCellBounds(0).BottomPct(0.25f));
                 GUI.HighlightMouseover(buttonRect);
                 
-                if (currentWall.AssetPath == wall.AssetPath)
+                if (currentWall.Id == wall.Id)
                     GUI.DrawBorder(buttonRect, 2, Color.BLACK);
                 
                 if (GUI.ClickableArea(buttonRect))
@@ -203,6 +203,6 @@ public class Tool_Wall : Tool {
 
     private void SetWall(WallData data) {
         currentWall       = data;
-        Ghost.SpriteSheet = data.SpriteSheet;
+        Ghost.Graphics = data.GraphicData;
     }
 }

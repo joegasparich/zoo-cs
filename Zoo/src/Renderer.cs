@@ -110,7 +110,7 @@ public class Renderer {
     }
 
     public void Blit(
-        Texture2D  texture,
+        Texture2D texture,
         Vector2    pos,
         float      depth  = 0,
         Vector2?   scale  = null,

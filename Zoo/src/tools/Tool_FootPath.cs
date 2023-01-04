@@ -23,9 +23,9 @@ public class Tool_FootPath : Tool {
     }
 
     public override void Set() {
-        Ghost.Type  = GhostType.SpriteSheet;
-        Ghost.Snap  = true;
-        Ghost.Scale = new Vector2(1, 2);
+        Ghost.Type   = GhostType.Sprite;
+        Ghost.Snap   = true;
+        Ghost.Scale  = new Vector2(1, 2);
         Ghost.Offset = new Vector2(0, -1);
         
         // Temp, should handle having no path
@@ -80,11 +80,11 @@ public class Tool_FootPath : Tool {
             // Push new ghosts to reach length
             while (ghosts.Count < length) {
                 var ghost = new ToolGhost(toolManager);
-                ghost.Type        = GhostType.SpriteSheet;
-                ghost.Follow      = false;
-                ghost.SpriteSheet = Ghost.SpriteSheet;
-                ghost.Offset      = Ghost.Offset;
-                ghost.Scale       = Ghost.Scale;
+                ghost.Type     = GhostType.Sprite;
+                ghost.Follow   = false;
+                ghost.Graphics = Ghost.Graphics;
+                ghost.Offset   = Ghost.Offset;
+                ghost.Scale    = Ghost.Scale;
                 ghosts.Add(ghost);
             }
 
@@ -125,10 +125,10 @@ public class Tool_FootPath : Tool {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
                 
-                GUI.DrawSubTexture(buttonRect, footPath.SpriteSheet.Texture, footPath.SpriteSheet.GetCellBounds(0).BottomHalf());
+                GUI.DrawSubTexture(buttonRect, footPath.GraphicData.Sprite, footPath.GraphicData.GetCellBounds(0).BottomHalf());
                 GUI.HighlightMouseover(buttonRect);
                 
-                if (currentFootPath.AssetPath == footPath.AssetPath)
+                if (currentFootPath.Id == footPath.Id)
                     GUI.DrawBorder(buttonRect, 2, Color.BLACK);
                 
                 if (GUI.ClickableArea(buttonRect))
@@ -164,6 +164,6 @@ public class Tool_FootPath : Tool {
 
     private void SetFootPath(FootPathData data) {
         currentFootPath = data;
-        Ghost.SpriteSheet = data.SpriteSheet;
+        Ghost.Graphics  = data.GraphicData;
     }
 }

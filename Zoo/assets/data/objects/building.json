@@ -1,21 +1,26 @@
 {
+    "id": "building",
     "name": "building",
     "solid": true,
-    "origin": {
-        "x": 0.5,
-        "y": 0.5
-    },
     "size": {
         "x": 2,
         "y": 2
     },
-    "spriteSheet": {
-        "texturePath": "assets/data/objects/building.png",
-        "cellHeight": 32,
-        "cellWidth": 32
-    },
     "rotations": 4,
     "canPlaceOnSlopes": false,
     "canPlaceInWater": false,
-    "type": "building"
+    "type": "building",
+    "graphicData": {
+        "spritePath": "assets/data/objects/building.png",
+        "cellHeight": 32,
+        "cellWidth": 32,
+        "origin": {
+            "x": 0.5,
+            "y": 0.5
+        },
+        "scale": {
+            "x": 2,
+            "y": 2
+        }
+    }
 }

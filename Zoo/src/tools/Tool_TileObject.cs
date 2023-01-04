@@ -33,7 +33,7 @@ public class Tool_TileObject : Tool {
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             if (!Ghost.CanPlace) return;
 
-            var obj = GenEntity.CreateTileObject(currentObject.AssetPath, Ghost.Pos);
+            var obj = GenEntity.CreateTileObject(currentObject.Id, Ghost.Pos);
             if (obj == null) return;
 
             Game.RegisterEntity(obj);
@@ -57,14 +57,12 @@ public class Tool_TileObject : Tool {
                 
                 GUI.DrawRect(buttonRect, GUI.UIButtonColour);
                 
-                if (obj.Sprite.HasValue)
-                    GUI.DrawTexture(buttonRect.ContractedBy(2), obj.Sprite.Value);
-                else if (obj.SpriteSheet != null)
-                    GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.SpriteSheet.Texture, obj.SpriteSheet.GetCellBounds(0));
+                // TODO: Write an icon helper for this
+                GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.GraphicData.Sprite, obj.GraphicData.GetCellBounds(0));
                 
                 GUI.HighlightMouseover(buttonRect);
                 
-                if (currentObject.AssetPath == obj.AssetPath)
+                if (currentObject.Id == obj.Id)
                     GUI.DrawBorder(buttonRect, 2, Color.BLACK);
                 
                 if (GUI.ClickableArea(buttonRect))
@@ -92,18 +90,7 @@ public class Tool_TileObject : Tool {
     private void SetObject(ObjectData data) {
         currentObject = data;
 
-        if (data.Sprite.HasValue) {
-            Ghost.Type   = GhostType.Sprite;
-            Ghost.Sprite = data.Sprite;
-        } else if (data.SpriteSheet != null) {
-            Ghost.Type        = GhostType.SpriteSheet;
-            Ghost.SpriteSheet = data.SpriteSheet;
-            Ghost.SpriteIndex = 0;
-        } else {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, $"[TileObjectTool] No object sprite: {data.Name}");
-        }
-
-        Ghost.Origin = data.Origin;
+        Ghost.Graphics = data.GraphicData;
         Ghost.Offset = data.Size / 2f;
     }
 }

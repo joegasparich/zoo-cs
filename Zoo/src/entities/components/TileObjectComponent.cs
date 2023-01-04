@@ -31,8 +31,8 @@ public class TileObjectComponent : Component {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.ArchiveValue("dataPath",
-            () => Data.AssetPath,
+        Find.SaveManager.ArchiveValue("objectId",
+            () => Data.Id,
             path => Data = Find.Registry.GetObject(path)
         );
     }

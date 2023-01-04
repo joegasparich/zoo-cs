@@ -1,8 +1,9 @@
 {
+    "id": "wooden",
     "name": "Wooden Fence",
     "type": "fence",
-    "spriteSheet": {
-        "texturePath": "assets/data/walls/wooden_fence.png",
+    "graphicData": {
+        "spritePath": "assets/data/walls/wooden_fence.png",
         "cellHeight": 32,
         "cellWidth": 16
     },

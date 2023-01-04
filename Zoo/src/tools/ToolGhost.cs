@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices.ComTypes;
 using Raylib_cs;
+using Zoo.entities;
 using Zoo.util;
 using Zoo.world;
 
@@ -10,8 +11,7 @@ public enum GhostType {
     None,
     Circle,
     Square,
-    Sprite,
-    SpriteSheet
+    Sprite
 }
 
 public class ToolGhost {
@@ -21,22 +21,20 @@ public class ToolGhost {
 
     private ToolManager toolManager;
 
-    public GhostType    Type          { get; set; }
-    public bool         Snap          { get; set; }
-    public bool         Follow        { get; set; }
-    public bool         Elevate       { get; set; }
-    public bool         Visible       { get; set; }
-    public Texture2D?   Sprite        { get; set; }
-    public SpriteSheet? SpriteSheet   { get; set; }
-    public int          SpriteIndex   { get; set; }
-    public Vector2      Pos           { get; set; }
-    public Side         Side          { get; set; }
-    public Vector2      Scale         { get; set; }
-    public float        Radius        { get; set; }
-    public Vector2      Offset        { get; set; }
-    public Vector2      Origin        { get; set; }
-    public Color        GhostColour   { get; set; } = DefaultGhostColour;
-    public Color        BlockedColour { get; set; } = DefaultBlockedColour;
+    public GhostType    Type;
+    public bool         Snap;
+    public bool         Follow;
+    public bool         Elevate;
+    public bool         Visible;
+    public GraphicData? Graphics;
+    public int          SpriteIndex;
+    public Vector2      Scale;
+    public Vector2      Pos;
+    public Side         Side;
+    public float        Radius;
+    public Vector2      Offset;
+    public Color        GhostColour   = DefaultGhostColour;
+    public Color        BlockedColour = DefaultBlockedColour;
 
     public bool CanPlace => toolManager.GetActiveTool().CanPlace(this);       
 
@@ -52,8 +50,7 @@ public class ToolGhost {
         Follow        = true;
         Elevate       = false;
         Visible       = true;
-        Sprite        = null;
-        SpriteSheet   = null;
+        Graphics      = null;
         SpriteIndex   = 0;
         GhostColour   = DefaultGhostColour;
         BlockedColour = DefaultBlockedColour;
@@ -63,7 +60,6 @@ public class ToolGhost {
         Scale  = Vector2.One;
         Radius = 1;
         Offset = Vector2.Zero;
-        Origin = Vector2.Zero;
     }
     
     public void Render() {
@@ -86,9 +82,6 @@ public class ToolGhost {
                 break;
             case GhostType.Sprite:
                 RenderSprite();
-                break;
-            case GhostType.SpriteSheet:
-                RenderSpriteSheet();
                 break;
             case GhostType.None:
             default:
@@ -140,38 +133,17 @@ public class ToolGhost {
     }
 
     private void RenderSprite() {
-        if (!Sprite.HasValue) return;
+        if (Graphics == null) return;
         
         var pos = (Pos + Offset) * World.WorldScale;
         if (Elevate)
             pos.Y -= Find.World.Elevation.GetElevationAtPos(Pos + Offset);
-
-        Find.Renderer.Blit(
-            texture: Sprite.Value,
+        
+        Graphics.Blit(
             pos: pos,
             depth: Depth.UI.ToInt(),
-            scale: new Vector2(Sprite.Value.width, Sprite.Value.height) * Renderer.PixelScale,
-            origin: Origin,
-            color: CanPlace ? GhostColour : BlockedColour
-        );
-    }
-
-    private void RenderSpriteSheet() {
-        if (SpriteSheet == null) return;
-        
-        var pos = (Pos + Offset) * World.WorldScale;
-        if (Elevate)
-            pos.Y -= Find.World.Elevation.GetElevationAtPos(Pos + Offset);
-        var source = SpriteSheet.GetCellBounds(SpriteIndex);
-        
-        Find.Renderer.Blit(
-            texture: SpriteSheet.Texture,
-            pos: pos,
-            depth: Depth.UI.ToInt(),
-            scale: new Vector2(SpriteSheet.Texture.width * source.width, SpriteSheet.Texture.height * source.height) * Renderer.PixelScale,
-            origin: Origin,
-            source: source,
-            color: CanPlace ? GhostColour : BlockedColour
+            colour: CanPlace ? GhostColour : BlockedColour,
+            index: SpriteIndex
         );
     }
 }

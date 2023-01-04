@@ -12,7 +12,7 @@ public class Tool_Door : Tool {
     public Tool_Door(ToolManager tm) : base(tm) {}
 
     public override void Set() {
-        Ghost.Type   = GhostType.SpriteSheet;
+        Ghost.Type   = GhostType.Sprite;
         Ghost.Snap   = true;
         Ghost.Scale  = new Vector2(1, 2);
         Ghost.Offset = new Vector2(0, -1);
@@ -45,7 +45,7 @@ public class Tool_Door : Tool {
         if (!Ghost.Visible) return;
 
         var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall, true);
-        Ghost.SpriteSheet = wall.Data!.SpriteSheet;
+        Ghost.Graphics = wall.Data.GraphicData;
         Ghost.SpriteIndex = spriteIndex.ToInt();
 
         Ghost.Offset = Ghost.Side switch {

@@ -1,16 +1,19 @@
 {
-  "name": "tree",
-  "solid": true,
-  "origin": {
-    "x": 0.5,
-    "y": 0.7
-  },
-  "size": {
-    "x": 1,
-    "y": 1
-  },
-  "spritePath": "assets/data/objects/tree.png",
-  "canPlaceOnSlopes": true,
-  "canPlaceInWater": false,
-  "type": "foliage"
+    "id": "tree",
+    "name": "tree",
+    "solid": true,
+    "size": {
+        "x": 1,
+        "y": 1
+    },
+    "canPlaceOnSlopes": true,
+    "canPlaceInWater": false,
+    "type": "foliage",
+    "graphicData": {
+        "spritePath": "assets/data/objects/tree.png",
+        "origin": {
+            "x": 0.5,
+            "y": 0.7
+        }
+    }
 }
