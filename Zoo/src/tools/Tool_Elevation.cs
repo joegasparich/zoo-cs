@@ -8,8 +8,11 @@ namespace Zoo.tools;
 
 public class Tool_Elevation : Tool {
     // Constants
-    private const float     DefaultRadius      = 0.65f;
-    private const int       PlaceIntervalTicks = 5;
+    private const float DefaultRadius      = 0.65f;
+    private const float RadiusStep         = 0.1f;
+    private const float RadiusMin          = 0.45f;
+    private const float RadiusMax          = 2.05f;
+    private const int   PlaceIntervalTicks = 5;
 
     // Virtual Properties
     public override string   Name => "Elevation Tool";
@@ -19,6 +22,7 @@ public class Tool_Elevation : Tool {
     private Elevation                      currentElevation = Elevation.Hill;
     private bool                           isDragging;
     private Dictionary<IntVec2, Elevation> oldElevationData = new();
+    private float                          radius           = DefaultRadius;
 
     public Tool_Elevation(ToolManager tm) : base(tm) {}
 
@@ -26,7 +30,7 @@ public class Tool_Elevation : Tool {
         currentElevation = Elevation.Hill;
 
         Ghost.Type    = GhostType.Circle;
-        Ghost.Radius  = DefaultRadius;
+        Ghost.Radius  = radius;
         Ghost.Elevate = true;
     }
 
@@ -54,12 +58,23 @@ public class Tool_Elevation : Tool {
             
             evt.Consume();
         }
+        
+        if (evt.keyDown == KeyboardKey.KEY_LEFT_BRACKET) {
+            radius       = Math.Max(RadiusMin, radius - RadiusStep);
+            Ghost.Radius = radius;
+            evt.Consume();
+        }
+        if (evt.keyDown == KeyboardKey.KEY_RIGHT_BRACKET) {
+            radius       = Math.Min(RadiusMax, radius + RadiusStep);
+            Ghost.Radius = radius;
+            evt.Consume();
+        }
     }
 
     public override void Update() {
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
         
-        var oldPoints = Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), Ghost.Radius, currentElevation);
+        var oldPoints = Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), radius, currentElevation);
 
         foreach (var (p, e) in oldPoints) {
             oldElevationData.TryAdd(p, e);

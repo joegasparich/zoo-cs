@@ -60,11 +60,13 @@ public class Tool_TileObject : Tool {
             if (evt.keyDown == KeyboardKey.KEY_Q) {
                 rotation = (Side)JMath.PositiveMod((int)rotation - 1, 4);
                 Ghost.SpriteIndex = (int)rotation;
+                evt.Consume();
             }
 
             if (evt.keyDown == KeyboardKey.KEY_E) {
                 rotation = (Side)JMath.PositiveMod((int)rotation + 1, 4);
                 Ghost.SpriteIndex = (int)rotation;
+                evt.Consume();
             }
         }
     }

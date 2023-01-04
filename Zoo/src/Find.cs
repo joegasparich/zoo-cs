@@ -8,7 +8,7 @@ public static class Find {
         get {
             var scene = Game.SceneManager.GetCurrentScene();
             if (scene.Name == "Zoo") {
-                return ((ZooScene)scene).Zoo;
+                return ((Scene_Zoo)scene).Zoo;
             }
             return null!;
         }

@@ -5,14 +5,17 @@ using Zoo.util;
 
 namespace Zoo; 
 
-public class ZooScene : Scene, ISerialisable {
+public class Scene_Zoo : Scene {
+    // Constants
+    private const string SceneName = "Zoo";
+    
     // State
     public Zoo Zoo;
     
     // Test
     // private Entity man;
 
-    public ZooScene() : base("Zoo") {}
+    public Scene_Zoo() : base(SceneName) {}
 
     public override void Start() {
         Debug.Log("Creating new zoo");
@@ -30,6 +33,8 @@ public class ZooScene : Scene, ISerialisable {
     }
 
     public override void Stop() {
+        base.Stop();
+        
         Zoo.Cleanup();
     }
 

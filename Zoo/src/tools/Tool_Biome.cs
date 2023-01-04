@@ -9,6 +9,9 @@ namespace Zoo.tools;
 public class Tool_Biome : Tool {
     // Constants
     private const float DefaultRadius      = 0.65f;
+    private const float RadiusStep         = 0.1f;
+    private const float RadiusMin          = 0.45f;
+    private const float RadiusMax          = 2.05f;
     private const int   PlaceIntervalTicks = 5;
     private const int   ButtonSize         = 30;
 
@@ -20,6 +23,7 @@ public class Tool_Biome : Tool {
     private Biome                           currentBiome;
     private bool                            isDragging;
     private Dictionary<string, Biome[][][]> oldChunkData = new();
+    private float                           radius       = DefaultRadius;
 
     public Tool_Biome(ToolManager tm) : base(tm) {}
 
@@ -27,7 +31,7 @@ public class Tool_Biome : Tool {
         SetBiome(Biome.Sand);
 
         Ghost.Type    = GhostType.Circle;
-        Ghost.Radius  = DefaultRadius;
+        Ghost.Radius  = radius;
         Ghost.Elevate = true;
     }
 
@@ -58,23 +62,33 @@ public class Tool_Biome : Tool {
             
             evt.Consume();
         }
+
+        if (evt.keyDown == KeyboardKey.KEY_LEFT_BRACKET) {
+            radius = Math.Max(RadiusMin, radius - RadiusStep);
+            Ghost.Radius =  radius;
+            evt.Consume();
+        }
+        if (evt.keyDown == KeyboardKey.KEY_RIGHT_BRACKET) {
+            radius = Math.Min(RadiusMax, radius + RadiusStep);
+            Ghost.Radius =  radius;
+            evt.Consume();
+        }
     }
 
     public override void Update() {
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
 
         var pos    = Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale;
-        var radius = Ghost.Radius * BiomeGrid.BiomeScale;
         
         // Save backups for undo
-        foreach (var chunk in Find.World.Biomes.GetChunksInRadius(pos, radius)) {
+        foreach (var chunk in Find.World.Biomes.GetChunksInRadius(pos, radius * BiomeGrid.BiomeScale)) {
             var key = new IntVec2(chunk.X, chunk.Y).ToString();
             if (!oldChunkData.ContainsKey(key))
                 oldChunkData.Add(key, chunk.Save());
         }
         
         // Set biome in a circle
-        Find.World.Biomes.SetBiomeInRadius(pos, radius, currentBiome);
+        Find.World.Biomes.SetBiomeInRadius(pos, radius * BiomeGrid.BiomeScale, currentBiome);
     }
 
     public override void OnGUI() {

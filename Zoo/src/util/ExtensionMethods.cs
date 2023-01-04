@@ -34,8 +34,11 @@ public static class ExtensionMethods {
     }
     
     // String //
-    public static bool NullOrEmpty( this string str ) {
+    public static bool NullOrEmpty(this string str) {
         return string.IsNullOrEmpty(str);
+    }
+    public static string ToSnakeCase(this string str) {
+        return str.ToLower().Replace(" ", "_");
     }
     
     // Vector2 //

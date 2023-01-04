@@ -12,12 +12,20 @@ public enum SerialiseMode {
     Loading
 }
 
+public class SaveFile {
+    public string Name;
+    public string Path;
+}
+
 public class SaveManager {
     // Constants
     private readonly JsonSerializerOptions serializeOptions = new() {
         IncludeFields = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
+
+    private const string SaveDir         = "saves/";
+    private const string DefaultSaveName = "save";
     
     // State
     public JsonObject    CurrentSaveNode;
@@ -25,24 +33,34 @@ public class SaveManager {
     
     public void NewGame() {
         Debug.Log("Starting new game");
-        Find.SceneManager.LoadScene(new ZooScene());
+        Find.SceneManager.LoadScene(new Scene_Zoo());
     }
 
-    public void SaveGame(string filePath) {
+    public void SaveGame(string name = DefaultSaveName) {
         Debug.Log("Saving game");
         
         JsonObject saveData = new JsonObject();
+        saveData.Add("saveName", name);
         Mode            = SerialiseMode.Saving;
         CurrentSaveNode = saveData;
         Game.Serialise();
+
+        var fileName = name.ToSnakeCase();
+        var postFix = 1;
+        while (File.Exists($"{SaveDir}{fileName}.json")) {
+            fileName = $"{name.ToSnakeCase()}_{postFix}";
+            postFix++;
+        }
         
         // Save json object to file
         string json = JsonSerializer.Serialize(saveData, serializeOptions);
-        File.WriteAllText(filePath, json);
+        File.WriteAllText($"{SaveDir}{fileName}.json", json);
     }
     
     public void LoadGame(string filePath) {
         Debug.Log("Loading game");
+        
+        Find.SceneManager.LoadScene(new Scene_Zoo());
         
         var json = File.ReadAllText(filePath);
         var saveData = JsonSerializer.Deserialize<JsonObject>(json, serializeOptions);
@@ -50,6 +68,16 @@ public class SaveManager {
         Mode            = SerialiseMode.Loading;
         CurrentSaveNode = saveData;
         Game.Serialise();
+    }
+
+    public IEnumerable<SaveFile> GetSaveFiles() {
+        var files = Directory.GetFiles(SaveDir, "*.json");
+        return files.ToList()
+            .OrderByDescending(File.GetLastWriteTime)
+            .Select(f => new SaveFile {
+                Name = Path.GetFileNameWithoutExtension(f),
+                Path = f
+            });
     }
 
     // TODO: Allow serialising regular values

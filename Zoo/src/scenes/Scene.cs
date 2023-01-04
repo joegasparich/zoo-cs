@@ -16,6 +16,10 @@ public abstract class Scene : ISerialisable {
     public virtual void RenderLate()            {}
     public virtual void OnGUI()                 {}
     public virtual void OnInput(InputEvent evt) {}
-    public virtual void Stop()                  {}
+
+    public virtual void Stop() {
+        Game.ClearEntities();
+    }
+    
     public virtual void Serialise()             {}
 }

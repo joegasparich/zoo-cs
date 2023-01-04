@@ -50,7 +50,7 @@ public static class Game {
 
         AssetManager.LoadAssets();
         UI.Init();
-        SaveManager.NewGame();
+        Find.SceneManager.LoadScene(new Scene_Menu());
     }
 
     private static void Cleanup() {
@@ -170,6 +170,19 @@ public static class Game {
     
     public static Entity GetEntityById(int id) {
         return entities[id];
+    }
+
+    public static void ClearEntities() {
+        foreach (var entity in entities) {
+            entity.Value.Destroy();
+        }
+        foreach (var entity in entitiesToAdd) {
+            entity.Destroy();
+        }
+        
+        entities.Clear();
+        entitiesToAdd.Clear();
+        entitiesToRemove.Clear();
     }
 
     public static void Serialise() {

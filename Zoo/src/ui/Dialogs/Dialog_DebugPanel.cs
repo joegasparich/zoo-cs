@@ -2,7 +2,7 @@
 
 namespace Zoo.ui; 
 
-public class DebugPanel : Window {
+public class Dialog_DebugPanel : Dialog {
     // Constants
     private const           int       ButtonWidth   = 100;
     private const           int       ButtonHeight  = 25;
@@ -11,7 +11,7 @@ public class DebugPanel : Window {
     private static readonly Color     EnabledColor  = new Color(26, 110, 20, 255);
     private static readonly Color     DisabledColor = new Color(130, 26, 26, 255);
 
-    public DebugPanel() : base(Dimensions) {
+    public Dialog_DebugPanel() : base(Dimensions) {
         Title     = "Debug";
         Draggable = true;
     }

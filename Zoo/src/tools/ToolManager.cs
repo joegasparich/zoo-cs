@@ -26,7 +26,7 @@ public class ToolManager {
 
     public void Setup() {
         SetTool(ToolType.None);
-        toolbarHandle = Find.UI.PushWindow(new Toolbar(this));
+        toolbarHandle = Find.UI.PushWindow(new Widget_Toolbar(this));
     }
 
     public void Cleanup() {
