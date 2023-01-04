@@ -30,7 +30,7 @@ public class TileObjectComponent : Component {
         if (!Data.CanRotate) return;
         
         this.rotation = rotation;
-        renderer.SpriteIndex = rotation.ToInt();
+        renderer.SpriteIndex = (int)rotation;
     }
 
     public IEnumerable<IntVec2> GetOccupiedTiles() {
@@ -53,7 +53,7 @@ public class TileObjectComponent : Component {
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             renderer.Graphics    = Data.GraphicData;
-            renderer.SpriteIndex = rotation.ToInt();
+            renderer.SpriteIndex = (int)rotation;
         }
     }
 }

@@ -40,7 +40,7 @@ public class Renderer {
 
         camera.projection = CameraProjection.CAMERA_ORTHOGRAPHIC;
         camera.fovy       = Game.ScreenHeight / zoom;
-        camera.position   = new Vector3(0, 0, Depth.Camera.ToInt());
+        camera.position   = new Vector3(0, 0, (int)Depth.Camera);
         camera.up         = new Vector3(0, -1, 0);
         
         dragStart        = Find.Input.GetMousePos();
@@ -106,7 +106,7 @@ public class Renderer {
     }
 
     public float GetDepth(float yPos) {
-        return Math.Clamp(yPos / World.LargerThanWorld, 0, 1) * -1 + Depth.YSorting.ToInt();
+        return Math.Clamp(yPos / World.LargerThanWorld, 0, 1) * -1 + (int)Depth.YSorting;
     }
 
     public void Blit(

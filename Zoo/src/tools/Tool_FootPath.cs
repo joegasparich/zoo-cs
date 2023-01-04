@@ -158,7 +158,7 @@ public class Tool_FootPath : Tool {
 
         var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path!);
 
-        ghost.SpriteIndex = spriteIndex.ToInt();
+        ghost.SpriteIndex = (int)spriteIndex;
         ghost.Offset      = new Vector2(0, -1 - elevation);
     }
 

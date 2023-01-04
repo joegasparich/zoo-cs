@@ -54,13 +54,13 @@ public class Tool_TileObject : Tool {
 
         if (currentObject.CanRotate) {
             if (evt.keyDown == KeyboardKey.KEY_Q) {
-                rotation = (Side)JMath.PositiveMod(rotation.ToInt() - 1, 4);
-                Ghost.SpriteIndex = rotation.ToInt();
+                rotation = (Side)JMath.PositiveMod((int)rotation - 1, 4);
+                Ghost.SpriteIndex = (int)rotation;
             }
 
             if (evt.keyDown == KeyboardKey.KEY_E) {
-                rotation = (Side)JMath.PositiveMod(rotation.ToInt() + 1, 4);
-                Ghost.SpriteIndex = rotation.ToInt();
+                rotation = (Side)JMath.PositiveMod((int)rotation + 1, 4);
+                Ghost.SpriteIndex = (int)rotation;
             }
         }
     }

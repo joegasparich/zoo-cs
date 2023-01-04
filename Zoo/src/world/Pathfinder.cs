@@ -167,17 +167,17 @@ public class Pathfinder {
         if (Find.World.GetTileWalkability(tilePos) <= 0) return false;
         
         // Make sure at least one direction is accessible
-        if (y > 0 &&                    tileGrid[x,     y - 1].connections[Direction.S.ToInt()])  return true;
-        if (x < cols-1 &&               tileGrid[x + 1, y]    .connections[Direction.W.ToInt()])  return true;
-        if (y < rows-1 &&               tileGrid[x,     y + 1].connections[Direction.N.ToInt()])  return true;
-        if (x > 0 &&                    tileGrid[x - 1, y]    .connections[Direction.E.ToInt()])  return true;
+        if (y > 0 &&                    tileGrid[x,     y - 1].connections[(int)Direction.S])  return true;
+        if (x < cols-1 &&               tileGrid[x + 1, y]    .connections[(int)Direction.W])  return true;
+        if (y < rows-1 &&               tileGrid[x,     y + 1].connections[(int)Direction.N])  return true;
+        if (x > 0 &&                    tileGrid[x - 1, y]    .connections[(int)Direction.E])  return true;
 
         if (!Diagonals) return false;
         
-        if (x < cols-1 && y > 0 &&      tileGrid[x + 1, y - 1].connections[Direction.SW.ToInt()]) return true;
-        if (x < cols-1 && y < rows-1 && tileGrid[x + 1, y + 1].connections[Direction.NW.ToInt()]) return true;
-        if (x > 0 && y < rows-1 &&      tileGrid[x - 1, y + 1].connections[Direction.NE.ToInt()]) return true;
-        if (x > 0 && y > 0 &&           tileGrid[x - 1, y - 1].connections[Direction.SE.ToInt()]) return true;
+        if (x < cols-1 && y > 0 &&      tileGrid[x + 1, y - 1].connections[(int)Direction.SW]) return true;
+        if (x < cols-1 && y < rows-1 && tileGrid[x + 1, y + 1].connections[(int)Direction.NW]) return true;
+        if (x > 0 && y < rows-1 &&      tileGrid[x - 1, y + 1].connections[(int)Direction.NE]) return true;
+        if (x > 0 && y > 0 &&           tileGrid[x - 1, y - 1].connections[(int)Direction.SE]) return true;
 
         return false;
     }
@@ -192,17 +192,17 @@ public class Pathfinder {
 
         var connections = new List<IntVec2>();
 
-        if (y > 0                       && IsAccessible(new IntVec2(x, y - 1))     && tile.connections[Direction.N.ToInt()])  connections.Add(new IntVec2(x, y - 1));
-        if (x < width-1                 && IsAccessible(new IntVec2(x + 1, y))     && tile.connections[Direction.E.ToInt()])  connections.Add(new IntVec2(x + 1, y));
-        if (y < height-1                && IsAccessible(new IntVec2(x, y + 1))     && tile.connections[Direction.S.ToInt()])  connections.Add(new IntVec2(x, y + 1));
-        if (x > 0                       && IsAccessible(new IntVec2(x - 1, y))     && tile.connections[Direction.W.ToInt()])  connections.Add(new IntVec2(x - 1, y));
+        if (y > 0                       && IsAccessible(new IntVec2(x, y - 1))     && tile.connections[(int)Direction.N])  connections.Add(new IntVec2(x, y - 1));
+        if (x < width-1                 && IsAccessible(new IntVec2(x + 1, y))     && tile.connections[(int)Direction.E])  connections.Add(new IntVec2(x + 1, y));
+        if (y < height-1                && IsAccessible(new IntVec2(x, y + 1))     && tile.connections[(int)Direction.S])  connections.Add(new IntVec2(x, y + 1));
+        if (x > 0                       && IsAccessible(new IntVec2(x - 1, y))     && tile.connections[(int)Direction.W])  connections.Add(new IntVec2(x - 1, y));
 
         if (!Diagonals) return connections;
         
-        if (x < width-1 && y > 0        && IsAccessible(new IntVec2(x + 1, y - 1)) && tile.connections[Direction.NE.ToInt()]) connections.Add(new IntVec2(x + 1, y - 1));
-        if (x < width-1 && y < height-1 && IsAccessible(new IntVec2(x + 1, y + 1)) && tile.connections[Direction.SE.ToInt()]) connections.Add(new IntVec2(x + 1, y + 1));
-        if (x > 0 && y < height-1       && IsAccessible(new IntVec2(x - 1, y + 1)) && tile.connections[Direction.SW.ToInt()]) connections.Add(new IntVec2(x - 1, y + 1));
-        if (x > 0 && y > 0              && IsAccessible(new IntVec2(x - 1, y - 1)) && tile.connections[Direction.NW.ToInt()]) connections.Add(new IntVec2(x - 1, y - 1));
+        if (x < width-1 && y > 0        && IsAccessible(new IntVec2(x + 1, y - 1)) && tile.connections[(int)Direction.NE]) connections.Add(new IntVec2(x + 1, y - 1));
+        if (x < width-1 && y < height-1 && IsAccessible(new IntVec2(x + 1, y + 1)) && tile.connections[(int)Direction.SE]) connections.Add(new IntVec2(x + 1, y + 1));
+        if (x > 0 && y < height-1       && IsAccessible(new IntVec2(x - 1, y + 1)) && tile.connections[(int)Direction.SW]) connections.Add(new IntVec2(x - 1, y + 1));
+        if (x > 0 && y > 0              && IsAccessible(new IntVec2(x - 1, y - 1)) && tile.connections[(int)Direction.NW]) connections.Add(new IntVec2(x - 1, y - 1));
 
         return connections;
     }

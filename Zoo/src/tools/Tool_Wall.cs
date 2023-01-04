@@ -184,7 +184,7 @@ public class Tool_Wall : Tool {
 
         var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall!);
 
-        ghost.SpriteIndex = spriteIndex.ToInt();
+        ghost.SpriteIndex = (int)spriteIndex;
 
         switch (quadrant) {
             case Side.North:

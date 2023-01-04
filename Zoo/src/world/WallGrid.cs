@@ -64,9 +64,9 @@ public class WallGrid : ISerialisable {
         
         for (var i = 0; i < cols * 2 + 1; i++) {
             var orientation = (Orientation)(i % 2);
-            grid[i] = new Wall[rows + orientation.ToInt()];
+            grid[i] = new Wall[rows + (int)orientation];
             
-            for (var j = 0; j < rows + orientation.ToInt(); j++) {
+            for (var j = 0; j < rows + (int)orientation; j++) {
                 var worldPos = WallUtility.WallToWorldPosition(new IntVec2(i, j), orientation);
                 var wallData = data?[i][j]?.id != null ? Find.Registry.GetWall(data[i][j]!.id!) : null;
                 grid[i][j] = new Wall {
@@ -99,7 +99,7 @@ public class WallGrid : ISerialisable {
     public void Render() {
         for (var i = 0; i < cols * 2 + 1; i++) {
             var orientation = (Orientation)(i % 2);
-            for (var j = 0; j < rows + orientation.ToInt(); j++) {
+            for (var j = 0; j < rows + (int)orientation; j++) {
                 var wall = grid[i][j];
                 if (!wall.Exists) continue;
                 if (wall.Data == null) continue;
@@ -112,7 +112,7 @@ public class WallGrid : ISerialisable {
                     pos: pos * World.WorldScale,
                     depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
                     colour: wall.OverrideColour,
-                    index: spriteIndex.ToInt()
+                    index: (int)spriteIndex
                 );
                 
                 wall.OverrideColour = Color.WHITE;

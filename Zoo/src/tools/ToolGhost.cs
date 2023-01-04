@@ -108,8 +108,8 @@ public class ToolGhost {
         }
         fillVertices[CircleResolution + 1] = fillVertices[1];
 
-        Draw.DrawLineStrip3D(lineVertices, GhostColour, Depth.UI.ToInt());
-        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), Depth.UI.ToInt());
+        Draw.DrawLineStrip3D(lineVertices, GhostColour, (int)Depth.UI);
+        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), (int)Depth.UI);
     }
 
     private void RenderSquare() {
@@ -128,8 +128,8 @@ public class ToolGhost {
         lineVertices[2] = fillVertices[3];
         lineVertices[3] = fillVertices[4];
 
-        Draw.DrawLineStrip3D(lineVertices, GhostColour, Depth.UI.ToInt());
-        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), Depth.UI.ToInt());
+        Draw.DrawLineStrip3D(lineVertices, GhostColour, (int)Depth.UI);
+        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), (int)Depth.UI);
     }
 
     private void RenderSprite() {
@@ -141,7 +141,7 @@ public class ToolGhost {
         
         Graphics.Blit(
             pos: pos,
-            depth: Depth.UI.ToInt(),
+            depth: (int)Depth.UI,
             colour: CanPlace ? GhostColour : BlockedColour,
             index: SpriteIndex
         );

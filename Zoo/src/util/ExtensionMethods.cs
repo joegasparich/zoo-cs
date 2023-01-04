@@ -15,9 +15,6 @@ public static class ExtensionMethods {
     public static int CeilToInt(this float  f) => (int)MathF.Ceiling(f);
     
     // Enum //
-    public static int ToInt(this Enum e) {
-        return Convert.ToInt32(e);
-    }
     // https://stackoverflow.com/questions/1415140/can-my-enums-have-friendly-names
     public static string? GetDescription(this Enum value)
     {

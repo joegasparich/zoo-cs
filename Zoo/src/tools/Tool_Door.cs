@@ -46,7 +46,7 @@ public class Tool_Door : Tool {
 
         var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall, true);
         Ghost.Graphics = wall.Data.GraphicData;
-        Ghost.SpriteIndex = spriteIndex.ToInt();
+        Ghost.SpriteIndex = (int)spriteIndex;
 
         Ghost.Offset = Ghost.Side switch {
             Side.North => new Vector2(0.0f, -2.0f - elevation),

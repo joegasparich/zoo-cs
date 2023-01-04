@@ -74,7 +74,7 @@ public class ElevationGrid : ISerialisable {
 
     public void Render() {
         foreach (var polygon in waterPolygons) {
-            Draw.DrawTriangleFan3D(polygon, WaterColour, Depth.Water.ToInt());
+            Draw.DrawTriangleFan3D(polygon, WaterColour, (int)Depth.Water);
         }
     }
 
@@ -134,7 +134,7 @@ public class ElevationGrid : ISerialisable {
             var failedToFlatten = false;
             foreach (var pos in Find.World.GetAdjacentTiles(gridPos, true)) {
                 var elevationAtFlattenPoint = GetElevationAtGridPos(pos);
-                if (elevationAtFlattenPoint.ToInt() != -elevation.ToInt())
+                if ((int)elevationAtFlattenPoint != -(int)elevation)
                     continue;
                     
                 oldPoints.TryAdd(pos, elevationAtFlattenPoint);
@@ -283,10 +283,10 @@ public class ElevationGrid : ISerialisable {
 
     public float GetTileBaseElevation(IntVec2 tile) {
         return JMath.Min(
-            GetElevationAtGridPos(tile).ToInt(),
-            GetElevationAtGridPos(tile + new IntVec2(0, 1)).ToInt(),
-            GetElevationAtGridPos(tile + new IntVec2(1, 0)).ToInt(),
-            GetElevationAtGridPos(tile + new IntVec2(1, 1)).ToInt()
+            (int)GetElevationAtGridPos(tile),
+            (int)GetElevationAtGridPos(tile + new IntVec2(0, 1)),
+            (int)GetElevationAtGridPos(tile + new IntVec2(1, 0)),
+            (int)GetElevationAtGridPos(tile + new IntVec2(1, 1))
         ) * ElevationUtility.ElevationHeight;
     }
     
@@ -352,8 +352,8 @@ public class ElevationGrid : ISerialisable {
             for (var j = 0; j < rows; j++) {
                 if (i < cols - 1) {
                     Debug.DrawLine(
-                        new Vector2(i, j - grid[i][j].ToInt() * ElevationUtility.ElevationHeight),
-                        new Vector2(i + 1, j - grid[i + 1][j].ToInt() * ElevationUtility.ElevationHeight),
+                        new Vector2(i, j - (int)grid[i][j] * ElevationUtility.ElevationHeight),
+                        new Vector2(i + 1, j - (int)grid[i + 1][j] * ElevationUtility.ElevationHeight),
                         Color.WHITE,
                         true
                     );
@@ -361,8 +361,8 @@ public class ElevationGrid : ISerialisable {
 
                 if (j < rows - 1) {
                     Debug.DrawLine(
-                        new Vector2(i, j - grid[i][j].ToInt() * ElevationUtility.ElevationHeight),
-                        new Vector2(i, j - grid[i][j + 1].ToInt() * ElevationUtility.ElevationHeight + 1),
+                        new Vector2(i, j - (int)grid[i][j] * ElevationUtility.ElevationHeight),
+                        new Vector2(i, j - (int)grid[i][j + 1] * ElevationUtility.ElevationHeight + 1),
                         Color.WHITE,
                         true
                     );
