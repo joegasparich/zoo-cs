@@ -1,7 +1,8 @@
 namespace Zoo; 
 
 public abstract class Scene : ISerialisable {
-    public string Name { get; set; }
+    // Config
+    public string Name { get; }
 
     protected Scene(string name) {
         Name = name;

@@ -5,12 +5,15 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public class PathFollowComponent : InputComponent {
-    protected const float                 NodeReachedDist = 0.2f;
-    private         Vector2?              destination;
-    private         List<IntVec2>?        path;
-    private         Task<List<IntVec2>?>? pathRequest;
-    private         string                placeSolidHandle;
-    protected       bool                  pathCompleted;
+    // Constants
+    protected const float NodeReachedDist = 0.2f;
+    
+    // State
+    private   Vector2?              destination;
+    private   List<IntVec2>?        path;
+    private   Task<List<IntVec2>?>? pathRequest;
+    private   string                placeSolidHandle;
+    protected bool                  pathCompleted;
 
     public PathFollowComponent(Entity entity) : base(entity) {}
 

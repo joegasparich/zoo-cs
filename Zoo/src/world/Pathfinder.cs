@@ -19,11 +19,15 @@ internal struct Node {
 }
 
 public class Pathfinder {
+    // Constants
     private const bool Diagonals = false;
-        
-    private Tile[,] tileGrid;
+    
+    // Config
     private int  cols;
     private int  rows;
+    
+    // State
+    private Tile[,] tileGrid;
     private bool isSetup = false;
 
     private Dictionary<string, Task<List<IntVec2>?>> pathRequests;

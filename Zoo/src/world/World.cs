@@ -17,21 +17,25 @@ public enum Direction {
 };
 
 public class World : ISerialisable {
+    // Constants
     public const int WorldScale      = 32;
     public const int LargerThanWorld = 10000;
 
+    // Config
     public int Width;
     public int Height;
 
+    // Collections
+    private readonly Dictionary<int, Entity>    tileObjects   = new();
+    private readonly Dictionary<string, Entity> tileObjectMap = new();
+
+    // Grids
     public ElevationGrid Elevation  { get; }
     public BiomeGrid     Biomes     { get; }
     public WallGrid      Walls      { get; }
     public FootPathGrid  FootPaths  { get; }
     public AreaManager   Areas      { get; }
     public Pathfinder    Pathfinder { get; }
-
-    private readonly Dictionary<int, Entity>    tileObjects   = new();
-    private readonly Dictionary<string, Entity> tileObjectMap = new();
 
     private bool isSetup = false;
 

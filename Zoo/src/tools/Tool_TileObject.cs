@@ -8,15 +8,19 @@ using Zoo.world;
 namespace Zoo.tools; 
 
 public class Tool_TileObject : Tool {
+    // Constants
     private const int ButtonSize = 30;
-
-    private ObjectData       currentObject;
+    
+    // References
     private List<ObjectData> allObjects;
 
-    private Side rotation;
-
+    // Virtual Properties
     public override string   Name => "Object Tool";
     public override ToolType Type => ToolType.TileObject;
+
+    // State
+    private ObjectData       currentObject;
+    private Side             rotation;
 
     public Tool_TileObject(ToolManager tm) : base(tm) {
         allObjects = Find.Registry.GetAllObjects();

@@ -13,11 +13,13 @@ public enum FootPathSpriteIndex {
 }
 
 public class FootPath : ISerialisable {
+    // Config
     public FootPathData? Data           = null;
     public IntVec2       Pos            = default;
     public bool          Indestructable = false;
     public Color         OverrideColour = Color.WHITE;
 
+    // Properties
     public bool Exists => Data != null;
 
     public void Serialise() {
@@ -28,10 +30,13 @@ public class FootPath : ISerialisable {
 }
 
 public class FootPathGrid : ISerialisable {
-    private bool         isSetup = false;
-    private FootPath[][] grid;
+    // Config
     private int          cols;
     private int          rows;
+    
+    // State
+    private bool         isSetup = false;
+    private FootPath[][] grid;
     
     public FootPathGrid(int cols, int rows) {
         this.cols = cols;

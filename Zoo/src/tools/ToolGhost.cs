@@ -15,12 +15,15 @@ public enum GhostType {
 }
 
 public class ToolGhost {
+    // Constants
     private const int CircleResolution = 16;
     private static readonly Color DefaultGhostColour = new(102, 204, 255, 255);
     private static readonly Color DefaultBlockedColour = new(255, 102, 26, 255);
 
+    // References
     private ToolManager toolManager;
 
+    // Config
     public GhostType    Type;
     public bool         Snap;
     public bool         Follow;
@@ -36,6 +39,7 @@ public class ToolGhost {
     public Color        GhostColour   = DefaultGhostColour;
     public Color        BlockedColour = DefaultBlockedColour;
 
+    // Properties
     public bool CanPlace => toolManager.GetActiveTool().CanPlace(this);       
 
     public ToolGhost(ToolManager toolManager) {

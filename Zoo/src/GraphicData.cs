@@ -8,6 +8,7 @@ namespace Zoo;
 // This class is per objectType so can't be changed on a per object basis
 // Any per object changes need to be sent through the blit params
 public class GraphicData {
+    // Config
     public  string    SpritePath;
     public  Texture2D Sprite;
     public  Vector2   Origin = Vector2.Zero;
@@ -15,6 +16,7 @@ public class GraphicData {
     private int       cellWidth;
     private int       cellHeight;
 
+    // Properties
     public int CellWidth => cellWidth == 0 ? Sprite.width : cellWidth;
     public int CellHeight => cellHeight == 0 ? Sprite.height : cellHeight;
     

@@ -6,6 +6,7 @@ using Zoo.world;
 namespace Zoo.tools; 
 
 public class Tool_Door : Tool {
+    // Virtual Properties
     public override string   Name => "Door Tool";
     public override ToolType Type => ToolType.Door;
 

@@ -3,6 +3,7 @@
 namespace Zoo.entities; 
 
 public class InputComponent : Component {
+    // State
     public Vector2 InputVector;
     
     public InputComponent(Entity entity) : base(entity) {}

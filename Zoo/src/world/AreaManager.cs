@@ -5,8 +5,10 @@ using Zoo.util;
 namespace Zoo.world; 
 
 public class AreaManager {
+    // Constants
     private const string ZooArea = "Zoo;";
     
+    // State
     private Dictionary<string, Area> areas = new();
     private Dictionary<string, Area> tileAreaMap = new();
     

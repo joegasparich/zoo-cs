@@ -14,11 +14,14 @@ public enum ToolType {
 }
 
 public abstract class Tool {
+    // References
     protected ToolManager toolManager;
 
+    // Virtual Properties
     public virtual string   Name => "";
     public virtual ToolType Type => ToolType.None;
-
+    
+    // Properties
     protected ToolGhost Ghost => toolManager.Ghost;
     
     public Tool(ToolManager toolManager) {

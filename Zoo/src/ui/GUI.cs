@@ -17,13 +17,15 @@ public enum AlignMode {
 }
 
 public static class GUI {
-    public const int GapSmall = 10;
+    // Constants
+    public const            int   GapSmall       = 10;
+    private static readonly Color HighlightColor = new Color(255, 255, 255, 150);
+    public static readonly  Color UIButtonColour = new Color(230, 230, 230, 255);
 
-    public static           Color     TextColour     = Color.BLACK;
-    public static           AlignMode TextAlign      = AlignMode.TopLeft;
-    public static           int       FontSize       = 10;
-    private static readonly Color     HighlightColor = new Color(255, 255, 255, 150);
-    public static readonly Color     UIButtonColour = new Color(230, 230, 230, 255);
+    // Config
+    public static Color     TextColour = Color.BLACK;
+    public static AlignMode TextAlign  = AlignMode.TopLeft;
+    public static int       FontSize   = 10;
 
     private static Rectangle MaintainAspectRatio(Rectangle rect, Texture2D texture, Rectangle? source = null) {
         source ??= new Rectangle(0, 0, 1, 1);

@@ -7,17 +7,20 @@ using Zoo.world;
 namespace Zoo.tools; 
 
 public class Tool_Elevation : Tool {
+    // Constants
     private const float     DefaultRadius      = 0.65f;
     private const int       PlaceIntervalTicks = 5;
+
+    // Virtual Properties
+    public override string   Name => "Elevation Tool";
+    public override ToolType Type => ToolType.Elevation;
     
+    // State
     private Elevation                      currentElevation = Elevation.Hill;
     private bool                           isDragging;
     private Dictionary<IntVec2, Elevation> oldElevationData = new();
 
     public Tool_Elevation(ToolManager tm) : base(tm) {}
-
-    public override string   Name => "Elevation Tool";
-    public override ToolType Type => ToolType.Elevation;
 
     public override void Set() {
         currentElevation = Elevation.Hill;

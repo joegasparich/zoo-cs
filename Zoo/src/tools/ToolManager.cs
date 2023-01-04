@@ -11,8 +11,10 @@ public class ToolAction {
 }
 
 public class ToolManager {
+    // References
     public  ToolGhost Ghost { get;}
 
+    // State
     private Tool              activeTool;
     private Stack<ToolAction> actionStack = new();
     private string            toolbarHandle;

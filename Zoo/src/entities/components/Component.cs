@@ -1,7 +1,10 @@
 namespace Zoo.entities; 
 
 public abstract class Component : ISerialisable {
+    // References
     protected Entity entity;
+    
+    // Properties
     protected virtual Type[] Dependencies => Array.Empty<Type>();
     
     public Component(Entity entity) {

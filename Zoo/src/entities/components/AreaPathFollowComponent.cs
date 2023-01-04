@@ -5,15 +5,14 @@ using Zoo.world;
 namespace Zoo.entities; 
 
 public class AreaPathFollowComponent : PathFollowComponent {
-    private List<Area>? areaPath;
+    // State
     private Vector2?    destination;
+    private List<Area>? areaPath;
     private Area?       currentArea;
     private Wall?       currentDoor;
-
-    // This is for when we receive a new path when moving through a door
-    private Vector2? deferredTargetPos;
-    private Vector2? enterDoorPos;
-    private bool     areaPathCompleted;
+    private Vector2?    deferredTargetPos; // This is for when we receive a new path when moving through a door
+    private Vector2?    enterDoorPos;
+    private bool        areaPathCompleted;
     
     public AreaPathFollowComponent(Entity entity) : base(entity) {}
 

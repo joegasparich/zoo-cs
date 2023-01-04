@@ -5,8 +5,10 @@ using Zoo.util;
 namespace Zoo;
 
 public class AssetManager {
+    // Config
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
         
+    // State
     private readonly Dictionary<string, Texture2D> textureMap = new ();
 
     public void LoadAssets() {

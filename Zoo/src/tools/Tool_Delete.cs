@@ -8,16 +8,19 @@ using Zoo.util;
 namespace Zoo.tools; 
 
 public class Tool_Delete : Tool {
+    // Constants
     private static readonly Color GhostColour = new (255, 102, 26, 255);
     private const string TileObjectsSaveKey = "tileObjects";
     private const string WallsSaveKey = "walls";
     private const string PathsSaveKey = "paths";
     
-    private bool    isDragging;
-    private IntVec2 dragStartTile;
-    
+    // Virtual Properties
     public override string   Name => "Delete Tool";
     public override ToolType Type => ToolType.Delete;
+    
+    // State
+    private bool    isDragging;
+    private IntVec2 dragStartTile;
 
     public Tool_Delete(ToolManager tm) : base(tm) {}
 

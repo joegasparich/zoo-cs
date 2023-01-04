@@ -5,21 +5,24 @@ using Zoo.util;
 namespace Zoo.ui; 
 
 public class Window {
+    // Constants
     private const string WindowNPatchPath       = "assets/textures/ui/window.png";
     private const string WindowHeaderNPatchPath = "assets/textures/ui/window_header.png";
     public const  int    WindowHeaderHeight     = 18;
 
-    public string    Id        { get; private set; }
-    public Rectangle AbsRect   { get; private set; }
-    public bool      Immediate { get; set; }           = false;
-    public bool      Draggable { get; protected set; } = false;
-    public string    Title     { get; protected set; }
+    // Config
+    public  string            Id        { get; }
+    public  Rectangle         AbsRect   { get; private set; }
+    public  bool              Draggable { get; protected set; }
+    public  string            Title     { get; protected set; }
+    public  bool              Immediate = false;
+    private Action<Rectangle> OnUI;
+    private bool              doBackground = true;
 
-    protected bool              headerHovered = false;
-    private   Action<Rectangle> OnUI;
-    private   bool              doBackground = true;
-    protected bool              isDragging   = false;
-    private   Vector2           dragPos      = Vector2.Zero;
+    // State
+    protected bool    headerHovered;
+    protected bool    isDragging;
+    private   Vector2 dragPos = Vector2.Zero;
 
     public Window(Rectangle rect) {
         Id = Guid.NewGuid().ToString();

@@ -4,11 +4,14 @@ using Zoo.util;
 namespace Zoo.world; 
 
 public class Area {
-    public string                          Id             { get; set; }
-    public Color                           Colour         { get; set; }
+    // Config
+    public string Id     { get; set; }
+    public Color  Colour { get; set; }
+
+    // State
     public List<IntVec2>                   Tiles          { get; set; }
     public Dictionary<Area, HashSet<Wall>> ConnectedAreas { get; set; }
-    
+
     public Area(string id) {
         Id             = id;
         Colour         = new Color(Rand.randByte(), Rand.randByte(), Rand.randByte(), (byte)255);

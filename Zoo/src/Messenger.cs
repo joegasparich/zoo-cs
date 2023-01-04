@@ -6,6 +6,7 @@ public enum EventType {
 }
 
 public static class Messenger {
+    // State
     private static readonly Dictionary<EventType, List<Action<object>>> listeners = new ();
     
     public static string On(EventType eventType, Action<object> callback) {

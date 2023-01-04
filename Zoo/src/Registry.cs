@@ -38,6 +38,7 @@ public class FootPathData {
 }
 
 public class Registry {
+    // Collections
     private readonly Dictionary<string, ObjectData>   objectRegistry = new();
     private readonly Dictionary<string, WallData>     wallRegistry   = new();
     private readonly Dictionary<string, FootPathData> pathRegistry   = new();

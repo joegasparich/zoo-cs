@@ -3,11 +3,13 @@
 namespace Zoo.entities; 
 
 public class PhysicsComponent : Component {
+    // Config
+    public float Mass     = 50;
+    public float Friction = 0.5f;
+    
+    // State
     private Vector2 velocity = Vector2.Zero;
     private Vector2 force = Vector2.Zero;
-    
-    public float Mass = 50;
-    public float Friction = 0.5f;
 
     public PhysicsComponent(Entity entity) : base(entity) {}
 

@@ -7,16 +7,19 @@ using Zoo.world;
 namespace Zoo.tools; 
 
 public class Tool_Biome : Tool {
+    // Constants
     private const float DefaultRadius      = 0.65f;
     private const int   PlaceIntervalTicks = 5;
     private const int   ButtonSize         = 30;
+
+    // Virtual Properties
+    public override string   Name => "Biome Tool";
+    public override ToolType Type => ToolType.Biome;
     
+    // State
     private Biome                           currentBiome;
     private bool                            isDragging;
     private Dictionary<string, Biome[][][]> oldChunkData = new();
-
-    public override string   Name => "Biome Tool";
-    public override ToolType Type => ToolType.Biome;
 
     public Tool_Biome(ToolManager tm) : base(tm) {}
 

@@ -6,6 +6,7 @@ using Zoo.util;
 namespace Zoo; 
 
 public class ZooScene : Scene, ISerialisable {
+    // State
     public Zoo Zoo;
     
     // Test

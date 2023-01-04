@@ -21,12 +21,14 @@ public enum WallSpriteIndex {
 };
 
 public class Wall : ISerialisable {
+    // Config
     public WallData?   Data           = null;
     public IntVec2     GridPos        = default;
     public bool        Indestructable = false;
     public bool        IsDoor         = false;
     public Color       OverrideColour = Color.WHITE;
     
+    // Properties
     public Orientation Orientation => (Orientation)(GridPos.X % 2);
     public Vector2     WorldPos    => WallUtility.WallToWorldPosition(GridPos, Orientation);
     public bool        Exists      => Data != null;
@@ -42,10 +44,13 @@ public class Wall : ISerialisable {
 public record WallSaveData(string? id, bool isDoor, bool indestructable);
 
 public class WallGrid : ISerialisable {
+    // Config
+    private int cols;
+    private int rows;
+    
+    // State
     private bool     isSetup = false;
     private Wall[][] grid;
-    private int      cols;
-    private int      rows;
     
     public WallGrid(int cols, int rows) {
         this.cols = cols;

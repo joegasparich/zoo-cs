@@ -28,12 +28,16 @@ public class BiomeInfo {
 }
 
 public class BiomeGrid : ISerialisable {
+    // Constants
     public static readonly int   BiomeScale          = 2;
     internal const         int   ChunkSize           = 6;
     internal const         float SlopeColourStrength = 0.3f;
 
-    private int            rows;
-    private int            cols;
+    // Config
+    private int rows;
+    private int cols;
+    
+    // State
     private bool           isSetup = false;
     private BiomeChunk[][] chunkGrid;
     private string         elevationListenerHandle;

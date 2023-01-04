@@ -7,6 +7,7 @@ using Zoo.ui;
 namespace Zoo;
 
 public static class Game {
+    // Constants
     // TODO: Config options
     private const int MsPerUpdate  = 10;
     public const  int ScreenWidth  = 1280;
@@ -31,6 +32,7 @@ public static class Game {
     private static int framesSinceGameStart;
     private static int nextEntityId;
 
+    // Properties
     public static int Ticks => ticksSinceGameStart;
     
     public static void Run() {

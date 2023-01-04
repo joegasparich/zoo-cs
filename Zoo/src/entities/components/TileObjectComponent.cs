@@ -4,12 +4,16 @@ using Zoo.world;
 namespace Zoo.entities; 
 
 public class TileObjectComponent : Component {
-    public  ObjectData Data;
-    private Side       rotation;
-    
-    // Component refs
+    // References
     private RenderComponent renderer;
+    
+    // Config
+    public ObjectData Data;
+    
+    // State
+    private Side rotation;
 
+    // Properties
     protected override Type[] Dependencies => new[] { typeof(RenderComponent) };
 
     public TileObjectComponent(Entity entity) : base(entity) {

@@ -10,9 +10,7 @@ public enum UIEvent {
 }
 
 public class UIManager {
-    public UIEvent   CurrentEvent      { get; private set; }
-    public Rectangle CurrentDrawBounds { get; private set; }
-
+    // State
     private List<Window>               windowStack      = new();
     private Dictionary<string, Window> openWindowMap    = new();
     private List<Window>               windowsToOpen    = new();
@@ -22,6 +20,10 @@ public class UIManager {
     private MouseCursor cursor;
     private string      hoveredWindowId;
     private string      currentWindowId;
+    
+    // Properties
+    public UIEvent   CurrentEvent      { get; private set; }
+    public Rectangle CurrentDrawBounds { get; private set; }
 
     public UIManager() {
         CurrentEvent = UIEvent.Draw;

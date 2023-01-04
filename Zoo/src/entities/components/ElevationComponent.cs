@@ -1,8 +1,10 @@
 ﻿namespace Zoo.entities; 
 
 public class ElevationComponent : Component {
+    // References
     private RenderComponent renderer;
 
+    // Properties 
     protected override Type[] Dependencies => new Type[] { typeof(RenderComponent) };
 
     public ElevationComponent(Entity entity) : base(entity) {}

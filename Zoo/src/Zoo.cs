@@ -12,6 +12,7 @@ public static class DebugSettings {
 }
 
 public class Zoo : ISerialisable {
+    // State
     public World World { get; }
     public ToolManager Tools;
     

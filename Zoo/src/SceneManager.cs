@@ -3,6 +3,7 @@ using Raylib_cs;
 namespace Zoo; 
 
 public class SceneManager {
+    // State
     private Scene currentScene;
     
     // TODO: Add progress callback

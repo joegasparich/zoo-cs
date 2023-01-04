@@ -1,11 +1,14 @@
 ﻿namespace Zoo.entities; 
 
 public class MoveComponent : Component {
+    // References
     private InputComponent   input;
     private PhysicsComponent physics;
 
+    // Config
     public float Acceleration = 0.5f;
 
+    // Properties
     protected override Type[] Dependencies => new Type[] { typeof(InputComponent), typeof(PhysicsComponent) };
 
     public MoveComponent(Entity entity) : base(entity) {}

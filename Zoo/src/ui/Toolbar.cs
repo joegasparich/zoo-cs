@@ -4,12 +4,15 @@ using Zoo.tools;
 namespace Zoo.ui; 
 
 public class Toolbar : Window {
+    // Constants
     private const int ButtonWidth = 70;
     private const int ButtonHeight = 25;
-
-    private string debugPanelId;
-
+    
+    // References
     private ToolManager toolManager;
+
+    // State
+    private string debugPanelId;
 
     public Toolbar(ToolManager toolManager) : base(new Rectangle(0, 0, Game.ScreenWidth, 45)) {
         this.toolManager = toolManager;

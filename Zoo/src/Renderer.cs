@@ -25,10 +25,12 @@ public class Renderer {
     private const float MinZoom        = 0.5f;
     private const float MaxZoom        = 10f;
     
-    private Camera3D camera;
+    // References
     private Shader   discardAlphaShader;
+    
+    // State
+    private Camera3D camera;
     private float    zoom = 1;
-
     private Vector2? dragStart;
     private Vector2? dragCameraOrigin;
     

@@ -3,6 +3,7 @@
 namespace Zoo.ui; 
 
 public class DebugPanel : Window {
+    // Constants
     private const           int       ButtonWidth   = 100;
     private const           int       ButtonHeight  = 25;
     private const           int       PanelWidth    = ButtonWidth + GUI.GapSmall * 2;

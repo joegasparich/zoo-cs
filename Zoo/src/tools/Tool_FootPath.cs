@@ -7,16 +7,21 @@ using Zoo.world;
 namespace Zoo.tools; 
 
 public class Tool_FootPath : Tool {
+    // Constants
     private const int ButtonSize = 30;
     
+    // References
+    private List<FootPathData> allFootPaths;
+
+    // Virtual Properties
+    public override string   Name => "Path Tool";
+    public override ToolType Type => ToolType.FootPath;
+    
+    // State
     private          FootPathData       currentFootPath;
-    private          List<FootPathData> allFootPaths;
     private          bool               isDragging;
     private          IntVec2            dragTile;
     private readonly List<ToolGhost>    ghosts = new();
-
-    public override string   Name => "Path Tool";
-    public override ToolType Type => ToolType.FootPath;
 
     public Tool_FootPath(ToolManager tm) : base(tm) {
         allFootPaths = Find.Registry.GetAllFootPaths();

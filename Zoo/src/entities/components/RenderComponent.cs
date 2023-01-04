@@ -6,10 +6,13 @@ using Zoo.world;
 namespace Zoo.entities;
 
 public class RenderComponent : Component {
+    // Config
     public GraphicData Graphics;
-    public Vector2     Offset         = Vector2.Zero;
-    public Color       OverrideColour = Color.WHITE;
-    public int         SpriteIndex    = 0;
+    
+    // State
+    public Vector2 Offset         = Vector2.Zero;
+    public Color   OverrideColour = Color.WHITE;
+    public int     SpriteIndex    = 0;
 
     public RenderComponent(Entity entity) : base(entity) {
         Graphics = new GraphicData();

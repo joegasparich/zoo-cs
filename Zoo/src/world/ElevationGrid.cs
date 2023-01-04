@@ -21,10 +21,14 @@ public enum SlopeVariant {
 };
 
 public class ElevationGrid : ISerialisable {
+    // Constants
     private static readonly Color WaterColour = new Color(0, 76, 255, 204);
     
+    // Config
     private int             rows;
     private int             cols;
+    
+    // State
     private Elevation[][]?  grid;
     private List<Vector2[]> waterPolygons = new ();
     private bool            isSetup       = false;

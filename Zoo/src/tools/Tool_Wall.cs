@@ -8,17 +8,22 @@ using Zoo.world;
 namespace Zoo.tools; 
 
 public class Tool_Wall : Tool {
+    // Constants
     private const int ButtonSize = 30;
     
+    // References
+    private List<WallData> allWalls;
+    
+    // Virtual Properties
+    public override string   Name => "Wall Tool";
+    public override ToolType Type => ToolType.Wall;
+    
+    // State
     private          WallData        currentWall;
-    private          List<WallData>  allWalls;
     private          bool            isDragging;
     private          IntVec2         dragTile;
     private          Side            dragQuadrant;
     private readonly List<ToolGhost> ghosts = new();
-    
-    public override string   Name => "Wall Tool";
-    public override ToolType Type => ToolType.Wall;
 
     public Tool_Wall(ToolManager tm) : base(tm) {
         allWalls = Find.Registry.GetAllWalls();

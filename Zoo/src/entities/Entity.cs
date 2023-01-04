@@ -4,10 +4,12 @@ using Raylib_cs;
 namespace Zoo.entities; 
 
 public class Entity : ISerialisable {
-    public int     Id;
-    public Vector2 Pos;
-
+    // Config
+    public  int                         Id;
     private Dictionary<Type, Component> components = new();
+    
+    // State
+    public Vector2 Pos;
 
     public Entity() {}
     public Entity(Vector2 pos) {

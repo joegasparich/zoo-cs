@@ -12,20 +12,16 @@ public enum SerialiseMode {
     Loading
 }
 
-public class CustomEncoder : TextEncoderSettings {
-    public override void AllowCharacter(char character) {
-        base.AllowCharacter(character);
-    }
-}
-
 public class SaveManager {
+    // Constants
     private readonly JsonSerializerOptions serializeOptions = new() {
         IncludeFields = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
     
-    public JsonObject CurrentSaveNode { get; set; }
-    public SerialiseMode Mode { get; set; }
+    // State
+    public JsonObject    CurrentSaveNode;
+    public SerialiseMode Mode;
     
     public void NewGame() {
         Debug.Log("Starting new game");

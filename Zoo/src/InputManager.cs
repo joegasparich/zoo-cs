@@ -33,10 +33,12 @@ public class InputEvent {
 }
 
 public class InputManager {
+    // Constants
     private static readonly int MouseButtonNull = -1;
     private static readonly int MouseButtonMax  = (int)MouseButton.MOUSE_BUTTON_BACK;
     private static readonly int KeyMax          = (int)KeyboardKey.KEY_KB_MENU;
 
+    // State
     private InputEvent currentEvent;
 
     public void ProcessInput() {
