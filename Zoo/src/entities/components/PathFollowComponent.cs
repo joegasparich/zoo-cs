@@ -15,6 +15,8 @@ public class PathFollowComponent : InputComponent {
     public PathFollowComponent(Entity entity) : base(entity) {}
 
     public override void Start() {
+        base.Start();
+        
         placeSolidHandle = Messenger.On(EventType.PlaceSolid, OnSolidPlaced);
     }
 

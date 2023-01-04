@@ -2,12 +2,17 @@ namespace Zoo.entities;
 
 public abstract class Component : ISerialisable {
     protected Entity entity;
+    protected virtual Type[] Dependencies => Array.Empty<Type>();
     
     public Component(Entity entity) {
         this.entity = entity;
     }
-    
-    public virtual void Start() {}
+
+    public virtual void Start() {
+        foreach (var dependency in Dependencies) {
+            Debug.Assert(entity.HasComponent(dependency), $"Entity {entity} does not have dependency {dependency}");
+        }
+    }
     public virtual void PreUpdate() {}
     public virtual void Update() {}
     public virtual void PostUpdate() {}

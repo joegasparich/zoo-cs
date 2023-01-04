@@ -6,10 +6,13 @@ public class MoveComponent : Component {
 
     public float Acceleration = 0.5f;
 
+    protected override Type[] Dependencies => new Type[] { typeof(InputComponent), typeof(PhysicsComponent) };
+
     public MoveComponent(Entity entity) : base(entity) {}
 
     public override void Start() {
-        // TODO: add back required components
+        base.Start();
+        
         input = entity.GetComponent<InputComponent>();
         physics = entity.GetComponent<PhysicsComponent>();
     }

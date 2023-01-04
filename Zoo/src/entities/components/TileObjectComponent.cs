@@ -9,7 +9,9 @@ public class TileObjectComponent : Component {
     
     // Component refs
     private RenderComponent renderer;
-    
+
+    protected override Type[] Dependencies => new[] { typeof(RenderComponent) };
+
     public TileObjectComponent(Entity entity) : base(entity) {
         renderer = entity.GetComponent<RenderComponent>();
     }

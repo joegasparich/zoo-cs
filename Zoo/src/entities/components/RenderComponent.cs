@@ -17,6 +17,8 @@ public class RenderComponent : Component {
     }
 
     public override void Start() {
+        base.Start();
+        
         Debug.Assert(!Graphics.Sprite.Empty());
     }
 
