@@ -121,12 +121,12 @@ public class FootPathGrid : ISerialisable {
     }
 
     public void Serialise() {
-        if (Find.SaveManager.mode == SerialiseMode.Loading)
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
             Reset();
         
-        Find.SaveManager.SerialiseValue("cols", ref cols);
-        Find.SaveManager.SerialiseValue("rows", ref rows);
-        Find.SaveManager.SerialiseValue("data", 
+        Find.SaveManager.ArchiveValue("cols", ref cols);
+        Find.SaveManager.ArchiveValue("rows", ref rows);
+        Find.SaveManager.ArchiveValue("data", 
             () => grid.Select(row => row.Select(path => path.Data?.AssetPath).ToArray()).ToArray(),
             data => Setup(data)
         );

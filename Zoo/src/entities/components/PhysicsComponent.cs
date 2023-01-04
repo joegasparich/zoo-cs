@@ -31,9 +31,9 @@ public class PhysicsComponent : Component {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.SerialiseValue("velocity", ref velocity);
-        Find.SaveManager.SerialiseValue("force", ref force);
-        Find.SaveManager.SerialiseValue("mass", ref Mass);
-        Find.SaveManager.SerialiseValue("friction", ref Friction);
+        Find.SaveManager.ArchiveValue("velocity", ref velocity);
+        Find.SaveManager.ArchiveValue("force", ref force);
+        Find.SaveManager.ArchiveValue("mass", ref Mass);
+        Find.SaveManager.ArchiveValue("friction", ref Friction);
     }
 }

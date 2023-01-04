@@ -15,6 +15,6 @@ public abstract class Component : ISerialisable {
     public virtual void End() {}
 
     public virtual void Serialise() {
-        Find.SaveManager.SerialiseValue("type", () => GetType().ToString(), null);
+        Find.SaveManager.ArchiveValue("type", () => GetType().ToString(), null);
     }
 }

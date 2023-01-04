@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using System.Text.Json.Nodes;
+using Raylib_cs;
 using Zoo.ui;
 using Zoo.world;
 
@@ -8,8 +9,9 @@ public class Tool_Elevation : Tool {
     private const float     DefaultRadius      = 0.65f;
     private const int       PlaceIntervalTicks = 5;
     
-    private Elevation currentElevation = Elevation.Hill;
-    private bool      isDragging;
+    private Elevation  currentElevation = Elevation.Hill;
+    private bool       isDragging;
+    private JsonObject oldElevationData;
 
     public Tool_Elevation(ToolManager tm) : base(tm) {}
 
@@ -34,12 +36,26 @@ public class Tool_Elevation : Tool {
         // Only listen to down and up events so that we can't start dragging from UI
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = true;
+
+            oldElevationData = Find.SaveManager.SerialiseToNode(Find.World.Elevation);
+            
             evt.Consume();
         }
         if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             if (!isDragging) return;
-
             isDragging = false;
+
+            toolManager.PushAction(new ToolAction() {
+                Name = "Elevation brush",
+                Data = oldElevationData,
+                Undo = data => {
+                    Find.SaveManager.DeserialiseFromNode(Find.World.Elevation, (JsonObject)data);
+                    
+                    // TODO: (optimisation) Only regenerate affected chunks
+                    Find.World.Biomes.RegenerateAllChunks();
+                }
+            });
+            
             evt.Consume();
         }
     }

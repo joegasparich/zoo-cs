@@ -20,10 +20,10 @@ public static class EntityUtility {
         return saveData;
     }
 
-    public static void LoadEntities(JsonNode data) {
+    public static void LoadEntities(JsonArray data) {
         var parent = Find.SaveManager.CurrentSaveNode;
         
-        foreach (JsonObject entityData in data.AsArray()) {
+        foreach (JsonObject entityData in data) {
             Find.SaveManager.CurrentSaveNode = entityData;
             var entity = new Entity(Find.SaveManager.Parse<Vector2>(entityData["pos"]));
             entity.Serialise();

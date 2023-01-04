@@ -1,13 +1,21 @@
-﻿using Raylib_cs;
+﻿using System.Text.Json.Nodes;
+using Raylib_cs;
 using Zoo.ui;
 
-namespace Zoo.tools; 
+namespace Zoo.tools;
+
+public class ToolAction {
+    public string         Name;
+    public object         Data;
+    public Action<object> Undo;
+}
 
 public class ToolManager {
     public  ToolGhost Ghost { get;}
 
-    private Tool   activeTool;
-    private string toolbarHandle;
+    private Tool              activeTool;
+    private Stack<ToolAction> actionStack = new();
+    private string            toolbarHandle;
     
     public ToolManager() {
         Ghost      = new ToolGhost(this);
@@ -51,6 +59,12 @@ public class ToolManager {
 
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT) {
             SetTool(ToolType.None);
+            evt.Consume();
+        }
+        
+        // TODO: Ctrl/Cmd + Z
+        if (evt.keyDown == KeyboardKey.KEY_Z) {
+            Undo();
             evt.Consume();
         }
     }
@@ -97,5 +111,16 @@ public class ToolManager {
 
     public Tool GetActiveTool() {
         return activeTool;
+    }
+    
+    public void PushAction(ToolAction action) {
+        actionStack.Push(action);
+    }
+
+    public void Undo() {
+        if (actionStack.Count == 0) return;
+        
+        var action = actionStack.Pop();
+        action.Undo(action.Data);
     }
 }

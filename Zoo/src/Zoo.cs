@@ -63,6 +63,6 @@ public class Zoo : ISerialisable {
     }
 
     public void Serialise() {
-        Find.SaveManager.SerialiseDeep("world", World);
+        Find.SaveManager.ArchiveDeep("world", World);
     }
 }

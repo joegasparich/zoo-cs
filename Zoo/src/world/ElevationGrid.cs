@@ -40,7 +40,7 @@ public class ElevationGrid : ISerialisable {
             return;
         }
         
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
+        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up elevation grid");
 
         grid = data;
         if (grid == null) {
@@ -332,12 +332,12 @@ public class ElevationGrid : ISerialisable {
     }
 
     public void Serialise() {
-        if (Find.SaveManager.mode == SerialiseMode.Loading)
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
             Reset();
         
-        Find.SaveManager.SerialiseValue("cols", ref cols);
-        Find.SaveManager.SerialiseValue("rows", ref rows);
-        Find.SaveManager.SerialiseValue("data", 
+        Find.SaveManager.ArchiveValue("cols", ref cols);
+        Find.SaveManager.ArchiveValue("rows", ref rows);
+        Find.SaveManager.ArchiveValue("data", 
             () => grid,
             data => Setup(data)
         );

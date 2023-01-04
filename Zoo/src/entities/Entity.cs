@@ -9,6 +9,7 @@ public class Entity : ISerialisable {
 
     private Dictionary<Type, Component> components = new();
 
+    public Entity() {}
     public Entity(Vector2 pos) {
         Pos = pos;
     }
@@ -85,10 +86,10 @@ public class Entity : ISerialisable {
     }
 
     public void Serialise() {
-        Find.SaveManager.SerialiseValue("id", ref Id);
-        Find.SaveManager.SerialiseValue("pos", ref Pos);
+        Find.SaveManager.ArchiveValue("id", ref Id);
+        Find.SaveManager.ArchiveValue("pos", ref Pos);
         
-        Find.SaveManager.SerialiseCustom("components",
+        Find.SaveManager.ArchiveCustom("components",
             () => EntityUtility.SaveComponents(components.Values),
             data => EntityUtility.LoadComponents(this, data)
         );

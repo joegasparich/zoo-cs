@@ -111,12 +111,12 @@ public class BiomeGrid : ISerialisable {
         return col >= 0 && col < cols / (float)ChunkSize && row >= 0 && row < rows / (float)ChunkSize;
     }
     
-    private BiomeChunk GetChunk(int col, int row) {
+    public BiomeChunk GetChunk(int col, int row) {
         if (!IsChunkInGrid(col, row)) return null;
         return chunkGrid[col][row];
     }
 
-    private IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
+    public IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
         var floorX = (pos.X / ChunkSize).FloorToInt();
         var floorY = (pos.Y / ChunkSize).FloorToInt();
 
@@ -185,20 +185,20 @@ public class BiomeGrid : ISerialisable {
     }
 
     public void Serialise() {
-        if (Find.SaveManager.mode == SerialiseMode.Loading)
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
             Reset();
         
-        Find.SaveManager.SerialiseValue("cols", ref cols);
-        Find.SaveManager.SerialiseValue("rows", ref rows);
+        Find.SaveManager.ArchiveValue("cols", ref cols);
+        Find.SaveManager.ArchiveValue("rows", ref rows);
 
-        Find.SaveManager.SerialiseValue("data", 
+        Find.SaveManager.ArchiveValue("data", 
             () => chunkGrid.Select(row => row.Select(chunk => chunk.Save()).ToArray()).ToArray(), 
             chunkData => Setup(chunkData)
         );
     }
 }
 
-internal class BiomeChunk : IDisposable {
+public class BiomeChunk : IDisposable {
     private Mesh          chunkMesh;
     private BiomeCell[][] grid;
     private bool          isSetup = false;
@@ -361,8 +361,18 @@ internal class BiomeChunk : IDisposable {
         return pos.X >= 0 && pos.X < Cols && pos.Y >= 0 && pos.Y < Rows;
     }
 
-    internal Biome[][][] Save() {
-        return grid.Select(row => row.Select(cell => cell.Quadrants).ToArray()).ToArray();
+    public Biome[][][] Save() {
+        return grid.Select(row => row.Select(cell => cell.Quadrants.ToArray()).ToArray()).ToArray();
+    }
+    
+    public void Load(Biome[][][] data) {
+        for (var i = 0; i < Cols; ++i) {
+            for (var j = 0; j < Rows; ++j) {
+                grid[i][j].Quadrants = data[i][j];
+            }
+        }
+        
+        RegenerateMesh();
     }
 }
 

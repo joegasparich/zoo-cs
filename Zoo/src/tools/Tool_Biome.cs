@@ -1,5 +1,7 @@
-﻿using Raylib_cs;
+﻿using System.Text.Json.Nodes;
+using Raylib_cs;
 using Zoo.ui;
+using Zoo.util;
 using Zoo.world;
 
 namespace Zoo.tools; 
@@ -9,9 +11,10 @@ public class Tool_Biome : Tool {
     private const int   PlaceIntervalTicks = 5;
     private const int   ButtonSize         = 30;
     
-    private Biome currentBiome;
-    private bool  isDragging;
-    
+    private Biome                           currentBiome;
+    private bool                            isDragging;
+    private Dictionary<string, Biome[][][]> oldChunkData = new();
+
     public override string   Name => "Biome Tool";
     public override ToolType Type => ToolType.Biome;
 
@@ -27,8 +30,19 @@ public class Tool_Biome : Tool {
 
     public override void Update() {
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
+
+        var pos    = Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale;
+        var radius = Ghost.Radius * BiomeGrid.BiomeScale;
         
-        Find.World.Biomes.SetBiomeInRadius(Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale, Ghost.Radius * BiomeGrid.BiomeScale, currentBiome);
+        // Save backups for undo
+        foreach (var chunk in Find.World.Biomes.GetChunksInRadius(pos, radius)) {
+            var key = new IntVec2(chunk.X, chunk.Y).ToString();
+            if (!oldChunkData.ContainsKey(key))
+                oldChunkData.Add(key, chunk.Save());
+        }
+        
+        // Set biome in a circle
+        Find.World.Biomes.SetBiomeInRadius(pos, radius, currentBiome);
     }
 
     public override void OnInput(InputEvent evt) {
@@ -39,8 +53,21 @@ public class Tool_Biome : Tool {
         }
         if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             if (!isDragging) return;
-
             isDragging = false;
+
+            toolManager.PushAction(new ToolAction() {
+                Name = "Biome brush",
+                Data = oldChunkData.ToDictionary(entry => entry.Key, entry => entry.Value),
+                Undo = data => {
+                    foreach (var (key, value) in (Dictionary<string, Biome[][][]>)data) {
+                        var pos   = IntVec2.FromString(key);
+                        var chunk = Find.World.Biomes.GetChunk(pos.X, pos.Y);
+                        chunk.Load(value);
+                    }
+                }
+            });
+            oldChunkData.Clear();
+            
             evt.Consume();
         }
     }

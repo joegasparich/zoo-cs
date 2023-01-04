@@ -10,6 +10,6 @@ public class InputComponent : Component {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.SerialiseValue("inputVector", ref InputVector);
+        Find.SaveManager.ArchiveValue("inputVector", ref InputVector);
     }
 }

@@ -34,10 +34,15 @@ public class Tool_TileObject : Tool {
             if (!Ghost.CanPlace) return;
 
             var obj = GenEntity.CreateTileObject(currentObject.AssetPath, Ghost.Pos);
-
             if (obj == null) return;
 
             Game.RegisterEntity(obj);
+            
+            toolManager.PushAction(new ToolAction() {
+                Name = $"Place {currentObject.Name}",
+                Data = obj.Id,
+                Undo = data => Game.GetEntityById((int)data).Destroy(),
+            });
             
             evt.Consume();
         }

@@ -211,22 +211,22 @@ public class World : ISerialisable {
 
     public void Serialise() {
         // TODO: We're gonna need to properly reset and setup here
-        if (Find.SaveManager.mode == SerialiseMode.Loading) {
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             tileObjects.Clear();
             tileObjectMap.Clear();
             
             Areas.Reset();
         }
             
-        Find.SaveManager.SerialiseValue("width", ref Width);
-        Find.SaveManager.SerialiseValue("height", ref Height);
+        Find.SaveManager.ArchiveValue("width", ref Width);
+        Find.SaveManager.ArchiveValue("height", ref Height);
         
-        Find.SaveManager.SerialiseDeep("elevation", Elevation);
-        Find.SaveManager.SerialiseDeep("biomes", Biomes);
-        Find.SaveManager.SerialiseDeep("walls", Walls);
-        Find.SaveManager.SerialiseDeep("footpaths", FootPaths);
+        Find.SaveManager.ArchiveDeep("elevation", Elevation);
+        Find.SaveManager.ArchiveDeep("biomes", Biomes);
+        Find.SaveManager.ArchiveDeep("walls", Walls);
+        Find.SaveManager.ArchiveDeep("footpaths", FootPaths);
 
-        if (Find.SaveManager.mode == SerialiseMode.Loading) {
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             Areas.Setup();
         }
     }

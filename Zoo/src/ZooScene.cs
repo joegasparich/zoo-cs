@@ -77,6 +77,6 @@ public class ZooScene : Scene, ISerialisable {
     }
     
     public override void Serialise() {
-        Find.SaveManager.SerialiseDeep("zoo", Zoo);
+        Find.SaveManager.ArchiveDeep("zoo", Zoo);
     }
 }

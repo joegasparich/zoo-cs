@@ -41,12 +41,12 @@ public class RenderComponent : Component {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.SerialiseValue("spritePath", ref spritePath);
-        Find.SaveManager.SerialiseValue("source", ref source);
-        Find.SaveManager.SerialiseValue("origin", ref Origin);
-        Find.SaveManager.SerialiseValue("offset", ref Offset);
+        Find.SaveManager.ArchiveValue("spritePath", ref spritePath);
+        Find.SaveManager.ArchiveValue("source", ref source);
+        Find.SaveManager.ArchiveValue("origin", ref Origin);
+        Find.SaveManager.ArchiveValue("offset", ref Offset);
         
-        if (Find.SaveManager.mode == SerialiseMode.Loading)
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
             SetSprite(spritePath);
     }
 }

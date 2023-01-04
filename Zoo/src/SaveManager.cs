@@ -25,7 +25,7 @@ public class SaveManager {
     };
     
     public JsonObject CurrentSaveNode { get; set; }
-    public  SerialiseMode mode { get; private set; }
+    public SerialiseMode Mode { get; set; }
     
     public void NewGame() {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Starting new game");
@@ -36,7 +36,7 @@ public class SaveManager {
         Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Saving game");
         
         JsonObject saveData = new JsonObject();
-        mode            = SerialiseMode.Saving;
+        Mode            = SerialiseMode.Saving;
         CurrentSaveNode = saveData;
         Game.Serialise();
         
@@ -51,7 +51,7 @@ public class SaveManager {
         var json = File.ReadAllText(filePath);
         var saveData = JsonSerializer.Deserialize<JsonObject>(json, serializeOptions);
 
-        mode            = SerialiseMode.Loading;
+        Mode            = SerialiseMode.Loading;
         CurrentSaveNode = saveData;
         Game.Serialise();
     }
@@ -60,8 +60,8 @@ public class SaveManager {
         return node.Deserialize<T>(serializeOptions);
     }
     
-    public void SerialiseValue<T>(string label, ref T? value) {
-        switch (mode) {
+    public void ArchiveValue<T>(string label, ref T? value) {
+        switch (Mode) {
             case SerialiseMode.Saving:
                 CurrentSaveNode.Add(label, JsonSerializer.SerializeToNode(value, serializeOptions));
                 break;
@@ -74,26 +74,26 @@ public class SaveManager {
         }
     }
 
-    public void SerialiseValue<T>(string label, Func<T> get, Action<T?>? set) {
-        switch (mode) {
+    public void ArchiveValue<T>(string label, Func<T> get, Action<T?>? set) {
+        switch (Mode) {
             case SerialiseMode.Saving: {
                 var value = get();
-                SerialiseValue(label, ref value);
+                ArchiveValue(label, ref value);
                 break;
             }
             case SerialiseMode.Loading: {
                 if (set == null) break;
                 
                 var value = default(T);
-                SerialiseValue(label, ref value);
+                ArchiveValue(label, ref value);
                 set(value);
                 break;
             }
         }
     }
     
-    public void SerialiseCustom(string label, Func<JsonNode> get, Action<JsonNode> set) {
-        switch (mode) {
+    public void ArchiveCustom(string label, Func<JsonNode> get, Action<JsonNode> set) {
+        switch (Mode) {
             case SerialiseMode.Saving: {
                 CurrentSaveNode[label] = get();
                 break;
@@ -105,9 +105,9 @@ public class SaveManager {
         }
     }
     
-    public void SerialiseDeep(string label, ISerialisable value) {
+    public void ArchiveDeep(string label, ISerialisable value) {
         var parent = CurrentSaveNode;
-        switch (mode) {
+        switch (Mode) {
             case SerialiseMode.Saving:
                 CurrentSaveNode = new JsonObject();
                 value.Serialise();
@@ -119,5 +119,47 @@ public class SaveManager {
                 break;
         }
         CurrentSaveNode = parent;
+    }
+
+    public void ArchiveListDeep<T>(string label, List<T> list) where T : ISerialisable, new() {
+        var parent = CurrentSaveNode;
+
+        switch (Mode) {
+            case SerialiseMode.Saving:
+                var saveData  = new JsonArray();
+                
+                foreach (var item in list) {
+                    var node = new JsonObject();
+                    CurrentSaveNode = node;
+                    item.Serialise();
+                    saveData.Add(node);
+                }
+                parent[label] = saveData;
+                break;
+            case SerialiseMode.Loading:
+                foreach (var item in parent[label].AsArray()) {
+                    var newItem = new T();
+                    CurrentSaveNode = (JsonObject)item;
+                    newItem.Serialise();
+                    list.Add(newItem);
+                }
+                break;
+        }
+        CurrentSaveNode = parent;
+    }
+
+    public JsonObject SerialiseToNode(ISerialisable value) {
+        var node = new JsonObject();
+        Find.SaveManager.CurrentSaveNode = node;
+        Find.SaveManager.Mode            = SerialiseMode.Saving;
+        Find.SaveManager.ArchiveDeep("key", value);
+
+        return node;
+    }
+
+    public void DeserialiseFromNode(ISerialisable value, JsonObject node) {
+        Find.SaveManager.CurrentSaveNode = node;
+        Find.SaveManager.Mode            = SerialiseMode.Loading;
+        Find.SaveManager.ArchiveDeep("key", value);
     }
 }

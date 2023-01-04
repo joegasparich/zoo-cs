@@ -109,9 +109,9 @@ public class PathFollowComponent : InputComponent {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.SerialiseValue("destination", ref destination);
+        Find.SaveManager.ArchiveValue("destination", ref destination);
         
-        if (Find.SaveManager.mode == SerialiseMode.Loading && destination.HasValue)
+        if (Find.SaveManager.Mode == SerialiseMode.Loading && destination.HasValue)
             PathTo(destination.Value);
     }
 }

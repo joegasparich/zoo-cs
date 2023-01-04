@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Text.Json.Nodes;
 using Raylib_cs;
 using Zoo.world;
 using Zoo.entities;
@@ -33,6 +34,15 @@ public class Tool_Delete : Tool {
         
         if (isDragging && evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             var tileObjects = GetHighlightedTileObjects();
+
+            // TODO: (optimisation) only archive affected paths and walls
+            var undoData = new JsonObject();
+            Find.SaveManager.CurrentSaveNode = undoData;
+            Find.SaveManager.Mode            = SerialiseMode.Saving;
+            // TODO: Don't use archive list deep here
+            Find.SaveManager.ArchiveListDeep("tileObjects", tileObjects.ToList());
+            Find.SaveManager.ArchiveDeep("paths", Find.World.FootPaths);
+            Find.SaveManager.ArchiveDeep("walls", Find.World.Walls);
             
             // Delete tile objects
             foreach(var t in tileObjects) {
@@ -46,6 +56,19 @@ public class Tool_Delete : Tool {
             foreach(var w in GetHighlightedWalls()) {
                 Find.World.Walls.RemoveWall(w);
             }
+            
+            toolManager.PushAction(new ToolAction() {
+                Name = "Delete",
+                Data = undoData,
+                Undo = data => {
+                    var json = (JsonObject)data;
+                    Find.SaveManager.CurrentSaveNode = undoData;
+                    Find.SaveManager.Mode            = SerialiseMode.Loading;
+                    EntityUtility.LoadEntities(json["tileObjects"].AsArray());
+                    Find.SaveManager.ArchiveDeep("paths", Find.World.FootPaths);
+                    Find.SaveManager.ArchiveDeep("walls", Find.World.Walls);
+                }
+            });
 
             Ghost.Follow = true;
             Ghost.Scale  = IntVec2.One;
@@ -85,8 +108,8 @@ public class Tool_Delete : Tool {
         return new Rectangle(upperLeft.X, upperLeft.Y, width, height);
     }
 
-    private List<Entity> highlightedTileObjects = new ();
-    private List<Entity> GetHighlightedTileObjects() {
+    private HashSet<Entity> highlightedTileObjects = new ();
+    private HashSet<Entity> GetHighlightedTileObjects() {
         highlightedTileObjects.Clear();
         
         var dragRect = GetDragRect();
@@ -105,8 +128,8 @@ public class Tool_Delete : Tool {
         return highlightedTileObjects;
     }
     
-    private List<FootPath> highlightedFootPaths = new ();
-    private List<FootPath> GetHighlightedFootPaths() {
+    private HashSet<FootPath> highlightedFootPaths = new ();
+    private HashSet<FootPath> GetHighlightedFootPaths() {
         highlightedFootPaths.Clear();
         
         var dragRect = GetDragRect();
@@ -125,8 +148,8 @@ public class Tool_Delete : Tool {
         return highlightedFootPaths;
     }
     
-    private List<Wall> highlightedWalls = new ();
-    private List<Wall> GetHighlightedWalls() {
+    private HashSet<Wall> highlightedWalls = new ();
+    private HashSet<Wall> GetHighlightedWalls() {
         highlightedWalls.Clear();
         
         var dragRect = GetDragRect();

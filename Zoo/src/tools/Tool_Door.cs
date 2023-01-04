@@ -25,6 +25,12 @@ public class Tool_Door : Tool {
             if (Ghost.CanPlace) {
                 var wall = Find.World.Walls.GetWallAtTile(evt.mouseWorldPos.Floor(), mouseQuadrant);
                 Find.World.Walls.PlaceDoor(wall!);
+                
+                toolManager.PushAction(new ToolAction() {
+                    Name = "Place door",
+                    Data = wall,
+                    Undo = w => Find.World.Walls.RemoveDoor((Wall)w),
+                });
             }
             
             evt.Consume();

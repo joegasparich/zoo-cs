@@ -43,12 +43,25 @@ public class Tool_FootPath : Tool {
         if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = false;
 
+            List<IntVec2> undoData = new();
+
             while (ghosts.Any()) {
                 var ghost = ghosts.Pop();
                 if (ghost.CanPlace) {
                     Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor());
+                    undoData.Add(ghost.Pos.Floor());
                 }
             }
+            
+            toolManager.PushAction(new ToolAction() {
+                Name = "Place paths",
+                Data = undoData,
+                Undo = (data) => {
+                    foreach (var tile in (List<IntVec2>) data) {
+                        Find.World.FootPaths.RemovePathAtTile(tile);
+                    }
+                }
+            });
 
             evt.Consume();
         }

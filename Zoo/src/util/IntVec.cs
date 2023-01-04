@@ -65,6 +65,14 @@ public struct IntVec2 : IEquatable<IntVec2> {
     public string ToString() {
         return $"{X}, {Y}";
     }
+    public static IntVec2 FromString(string s) {
+        if (s.NullOrEmpty()) return Zero;
+        var split = s.Split(',');
+        if (split.Length != 2) return Zero;
+        if (!int.TryParse(split[0], out var x)) return Zero;
+        if (!int.TryParse(split[1], out var y)) return Zero;
+        return new IntVec2(x, y);
+    }
 }
 
 public struct IntVec3 : IEquatable<IntVec3> {

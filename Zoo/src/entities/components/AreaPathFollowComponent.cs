@@ -117,10 +117,10 @@ public class AreaPathFollowComponent : PathFollowComponent {
     public override void Serialise() {
         base.Serialise();
 
-        Find.SaveManager.SerialiseValue("areaDestination", ref destination);
-        Find.SaveManager.SerialiseValue("enterDoorPos", ref enterDoorPos);
+        Find.SaveManager.ArchiveValue("areaDestination", ref destination);
+        Find.SaveManager.ArchiveValue("enterDoorPos", ref enterDoorPos);
 
-        if (Find.SaveManager.mode == SerialiseMode.Loading) {
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             if (enterDoorPos.HasValue) {
                 deferredTargetPos = destination;
             } else if (destination.HasValue)

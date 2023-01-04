@@ -21,6 +21,6 @@ public class MoveComponent : Component {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.SerialiseValue("acceleration", ref Acceleration);
+        Find.SaveManager.ArchiveValue("acceleration", ref Acceleration);
     }
 }

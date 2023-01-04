@@ -48,13 +48,26 @@ public class Tool_Wall : Tool {
 
             // Reverse so we are going from drag start to drag end
             ghosts.Reverse();
+            
+            List<(IntVec2, Side)> undoData = new();
 
             while (ghosts.Any()) {
                 var ghost = ghosts.Pop();
                 if (ghost.CanPlace) {
                     Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
+                    undoData.Add((ghost.Pos.Floor(), dragQuadrant));
                 }
             }
+            
+            toolManager.PushAction(new ToolAction() {
+                Name = "Place walls",
+                Data = undoData,
+                Undo = (data) => {
+                    foreach (var (tile, side) in (List<(IntVec2, Side)>) data) {
+                        Find.World.Walls.RemoveWallAtTile(tile, side);
+                    }
+                }
+            });
 
             evt.Consume();
         }

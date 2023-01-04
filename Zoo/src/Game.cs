@@ -171,19 +171,19 @@ public static class Game {
     }
 
     public static void Serialise() {
-        SaveManager.SerialiseValue("ticksSinceGameStart",  ref ticksSinceGameStart);
-        SaveManager.SerialiseValue("framesSinceGameStart", ref framesSinceGameStart);
-        SaveManager.SerialiseValue("nextEntityId",         ref nextEntityId);
+        SaveManager.ArchiveValue("ticksSinceGameStart",  ref ticksSinceGameStart);
+        SaveManager.ArchiveValue("framesSinceGameStart", ref framesSinceGameStart);
+        SaveManager.ArchiveValue("nextEntityId",         ref nextEntityId);
         
         // TODO: probably need to clear temp entity lists
-        if (SaveManager.mode == SerialiseMode.Loading)
+        if (SaveManager.Mode == SerialiseMode.Loading)
             entities.Clear();
             // TODO: do we need to reset entities and components? Probably not
             
-        SaveManager.SerialiseDeep("scene", SceneManager.GetCurrentScene());
-        SaveManager.SerialiseCustom("entities", 
+        SaveManager.ArchiveDeep("scene", SceneManager.GetCurrentScene());
+        SaveManager.ArchiveCustom("entities", 
             () => EntityUtility.SaveEntities(entities.Values),
-            data => EntityUtility.LoadEntities(data)
+            data => EntityUtility.LoadEntities(data.AsArray())
         );
     }
 }
