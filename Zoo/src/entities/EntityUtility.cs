@@ -26,7 +26,9 @@ public static class EntityUtility {
         
         foreach (JsonObject entityData in data) {
             Find.SaveManager.CurrentSaveNode = entityData;
-            var entity = new Entity(Find.SaveManager.Deserialise<Vector2>(entityData["pos"]));
+            var pos = Find.SaveManager.Deserialise<Vector2>(entityData["pos"]);
+            Debug.Assert(pos != null);
+            var entity    = new Entity();
             entity.Serialise();
             Game.RegisterEntity(entity, entity.Id);
         }

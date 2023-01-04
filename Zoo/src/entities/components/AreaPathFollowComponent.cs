@@ -90,6 +90,9 @@ public class AreaPathFollowComponent : PathFollowComponent {
         var curArea = Find.World.Areas.GetAreaAtTile(entity.Pos.Floor());
         var targetArea = Find.World.Areas.GetAreaAtTile(target.Floor());
 
+        Debug.Assert(curArea != null);
+        Debug.Assert(targetArea != null);
+
         if (curArea != targetArea) {
             areaPath = Find.World.Areas.BFS(curArea, targetArea);
             if (areaPath.Any()) {

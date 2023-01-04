@@ -16,6 +16,9 @@ public class PhysicsComponent : Component {
     }
 
     public override void PostUpdate() {
+        Debug.Assert(Mass     > 0);
+        Debug.Assert(Friction > 0);
+        
         // Add force
         velocity += force / Mass;
         // Apply dampening

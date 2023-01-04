@@ -45,11 +45,11 @@ public class BiomeGrid : ISerialisable {
 
     public void Setup(Biome[][][][][]? data = null) {
         if (isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup BiomeGrid which was already setup");
+            Debug.Warn("Tried to setup BiomeGrid which was already setup");
             return;
         }
         
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up biome grid");
+        Debug.Log("Setting up biome grid");
         
         var chunkCols = cols / ChunkSize + Convert.ToInt32(cols % ChunkSize != 0);
         var chunkRows = rows / ChunkSize + Convert.ToInt32(rows % ChunkSize != 0);
@@ -77,7 +77,7 @@ public class BiomeGrid : ISerialisable {
 
     public void Reset() {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to reset when BiomeGrid wasn't setup");
+            Debug.Warn("Tried to reset when BiomeGrid wasn't setup");
             return;
         }
         

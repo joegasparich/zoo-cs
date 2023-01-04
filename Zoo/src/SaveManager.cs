@@ -28,12 +28,12 @@ public class SaveManager {
     public SerialiseMode Mode { get; set; }
     
     public void NewGame() {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Starting new game");
+        Debug.Log("Starting new game");
         Find.SceneManager.LoadScene(new ZooScene());
     }
 
     public void SaveGame(string filePath) {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Saving game");
+        Debug.Log("Saving game");
         
         JsonObject saveData = new JsonObject();
         Mode            = SerialiseMode.Saving;
@@ -46,7 +46,7 @@ public class SaveManager {
     }
     
     public void LoadGame(string filePath) {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Loading game");
+        Debug.Log("Loading game");
         
         var json = File.ReadAllText(filePath);
         var saveData = JsonSerializer.Deserialize<JsonObject>(json, serializeOptions);

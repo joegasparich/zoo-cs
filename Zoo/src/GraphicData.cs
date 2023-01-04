@@ -63,7 +63,7 @@ public class GraphicData {
         var yFrac = CellHeight    / (float)Sprite.height;
 
         if (col >= cols || row >= rows) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, $"Spritesheet cell out of bounds ({col}, {row})");
+            Debug.Warn($"Spritesheet cell out of bounds ({col}, {row})");
             return new Rectangle();
         }
 

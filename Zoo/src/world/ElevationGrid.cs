@@ -36,11 +36,11 @@ public class ElevationGrid : ISerialisable {
 
     public void Setup(Elevation[][]? data = null) {
         if (isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup ElevationGrid which was already setup");
+            Debug.Warn("Tried to setup ElevationGrid which was already setup");
             return;
         }
         
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up elevation grid");
+        Debug.Log("Setting up elevation grid");
 
         grid = data;
         if (grid == null) {
@@ -62,7 +62,7 @@ public class ElevationGrid : ISerialisable {
 
     public void Reset() {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to reset when ElevationGrid wasn't setup");
+            Debug.Warn("Tried to reset when ElevationGrid wasn't setup");
             return;
         }
         
@@ -80,7 +80,7 @@ public class ElevationGrid : ISerialisable {
 
     public bool CanElevate(IntVec2 gridPos, Elevation elevation) {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
+            Debug.Warn("Elevation grid not setup");
             return false;
         }
         
@@ -121,7 +121,7 @@ public class ElevationGrid : ISerialisable {
     private readonly Dictionary<IntVec2, Elevation> oldPoints = new(); // For undo
     private bool SetElevation(IntVec2 gridPos, Elevation elevation) {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
+            Debug.Warn("Elevation grid not setup");
             return false;
         }
         
@@ -162,7 +162,7 @@ public class ElevationGrid : ISerialisable {
         oldPointsInCircle.Clear();
         
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
+            Debug.Warn("Elevation grid not setup");
             return oldPointsInCircle;
         }
         if (!Find.World.IsPositionInMap(pos)) return oldPointsInCircle;
@@ -273,7 +273,7 @@ public class ElevationGrid : ISerialisable {
 
     private Elevation GetElevationAtGridPos(IntVec2 gridPos) {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
+            Debug.Warn("Elevation grid not setup");
             return Elevation.Flat;
         }
         if (!IsGridPosInGrid(gridPos)) return Elevation.Flat;

@@ -33,7 +33,7 @@ public class Renderer {
     private Vector2? dragCameraOrigin;
     
     public Renderer() {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Initialising Renderer");
+        Debug.Log("Initialising Renderer");
         Raylib.SetTargetFPS(60);
 
         discardAlphaShader = Raylib.LoadShader(null, "assets/shaders/discard_alpha.fs");

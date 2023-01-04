@@ -73,8 +73,8 @@ public class PathFollowComponent : InputComponent {
     }
 
     private void CheckPathRequest() {
-        if (!pathRequest.IsCompleted) return;
-        
+        if (pathRequest is not { IsCompleted: true }) return;
+
         path        = pathRequest.Result;
         pathRequest = null;
         
@@ -99,6 +99,7 @@ public class PathFollowComponent : InputComponent {
     
     private Vector2? GetCurrentNode() {
         if (path.NullOrEmpty()) return null; 
+        
         return path![0] + new Vector2(0.5f, 0.5f);
     }
 

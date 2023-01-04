@@ -39,7 +39,7 @@ public class FootPathGrid : ISerialisable {
     }
 
     public void Setup(string[][]? data = null) {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up path grid");
+        Debug.Log("Setting up path grid");
         
         grid = new FootPath[cols][];
         
@@ -67,7 +67,7 @@ public class FootPathGrid : ISerialisable {
 
     public void Render() {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Path grid not setup");
+            Debug.Warn("Path grid not setup");
             return;
         }
         

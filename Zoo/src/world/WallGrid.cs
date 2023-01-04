@@ -54,11 +54,11 @@ public class WallGrid : ISerialisable {
 
     public void Setup(WallSaveData?[][]? data = null) {
         if (isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to setup WallGrid which was already setup");
+            Debug.Warn("Tried to setup WallGrid which was already setup");
             return;
         }
         
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up wall grid");
+        Debug.Log("Setting up wall grid");
         
         grid = new Wall[cols * 2 + 1][];
         
@@ -85,7 +85,7 @@ public class WallGrid : ISerialisable {
 
     public void Reset() {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Tried to reset when WallGrid wasn't setup");
+            Debug.Warn("Tried to reset when WallGrid wasn't setup");
             return;
         }
         

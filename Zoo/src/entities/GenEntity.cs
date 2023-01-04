@@ -12,6 +12,7 @@ public static class GenEntity {
 
         // Renderer
         var renderer = entity.AddComponent<RenderComponent>();
+        Debug.Assert(data.GraphicData != null);
         renderer.Graphics = data.GraphicData;
         
         // Tile object

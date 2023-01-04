@@ -13,10 +13,10 @@ public class AreaManager {
     private bool isSetup = false;
 
     public void Setup() {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Setting up areas");
+        Debug.Log("Setting up areas");
         
         if (isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Areas already setup");
+            Debug.Warn("Areas already setup");
             return;
         }
 
@@ -27,7 +27,7 @@ public class AreaManager {
 
     public void Reset() {
         if (!isSetup) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Areas not setup");
+            Debug.Warn("Areas not setup");
             return;
         }
         
@@ -98,7 +98,7 @@ public class AreaManager {
         
         // Return if areas weren't formed properly (false positive in loop check)
         if (areaATiles.Count + areaBTiles.Count > oldArea.Tiles.Count) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "False positive in loop check");
+            Debug.Warn("False positive in loop check");
             return;
         }
         
@@ -117,7 +117,7 @@ public class AreaManager {
             tileAreaMap[tile.ToString()] = newArea;
         }
         
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered new area with size {newArea.Tiles.Count}");
+        Debug.Log($"Registered new area with size {newArea.Tiles.Count}");
         
         areas.Add(newArea.Id, newArea);
     }

@@ -9,6 +9,7 @@ public class RenderComponent : Component {
     public GraphicData Graphics;
     public Vector2     Offset         = Vector2.Zero;
     public Color       OverrideColour = Color.WHITE;
+    public int         SpriteIndex    = 0;
 
     public RenderComponent(Entity entity) : base(entity) {
         Graphics = new GraphicData();
@@ -16,16 +17,15 @@ public class RenderComponent : Component {
     }
 
     public override void Start() {
-        if (Graphics.Sprite.Empty()) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, $"Entity {entity.Id} graphic data hasn't been set up");
-        }
+        Debug.Assert(!Graphics.Sprite.Empty());
     }
 
     public override void Render() {
         Graphics.Blit(
             pos: (entity.Pos + Offset) * World.WorldScale,
             depth: Find.Renderer.GetDepth(entity.Pos.Y),
-            colour: OverrideColour
+            colour: OverrideColour,
+            index: SpriteIndex
         );
         
         OverrideColour = Color.WHITE;

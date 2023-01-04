@@ -16,18 +16,19 @@ public class ObjectData {
     public string      Name;
     public string      Type; // TODO: Translate this to ObjectType
     public GraphicData GraphicData;
-    public Vector2     Size;
-    public bool        Solid;
-    public bool        CanPlaceOnSlopes;
-    public bool        CanPlaceInWater;
+    public Vector2     Size             = Vector2.One;
+    public bool        Solid            = true;
+    public bool        CanPlaceOnSlopes = false;
+    public bool        CanPlaceInWater  = false;
+    public bool        CanRotate        = false;
 }
 
 public class WallData {
     public string      Id;
     public string      Name;
-    public string      Type;
-    public bool        Solid;
+    public string      Type; // TODO
     public GraphicData GraphicData;
+    public bool        Solid = true;
 }
 
 public class FootPathData {
@@ -37,21 +38,21 @@ public class FootPathData {
 }
 
 public class Registry {
-    private readonly Dictionary<string, ObjectData>   objectRegistry = new ();
-    private readonly Dictionary<string, WallData>     wallRegistry   = new ();
+    private readonly Dictionary<string, ObjectData>   objectRegistry = new();
+    private readonly Dictionary<string, WallData>     wallRegistry   = new();
     private readonly Dictionary<string, FootPathData> pathRegistry   = new();
 
     public void RegisterObject(ObjectData data) {
         objectRegistry.Add(data.Id, data);
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered object {data.Name}");
+        Debug.Log($"Registered object {data.Name}");
     }
     public void RegisterWall(WallData data) {
         wallRegistry.Add(data.Id, data);
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered wall {data.Name}");
+        Debug.Log($"Registered wall {data.Name}");
     }
     public void RegisterPath(FootPathData data) {
         pathRegistry.Add(data.Id, data);
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered path {data.Name}");
+        Debug.Log($"Registered path {data.Name}");
     }
     
     // TODO: Automate loading assets similar to DefOf?

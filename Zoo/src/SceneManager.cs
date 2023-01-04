@@ -8,7 +8,7 @@ public class SceneManager {
     // TODO: Add progress callback
     public void LoadScene(Scene scene) {
         if (currentScene != null) {
-            Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Stopping scene: {currentScene.Name}");
+            Debug.Log($"Stopping scene: {currentScene.Name}");
             currentScene.Stop();
         }
         

@@ -34,13 +34,13 @@ public static class Game {
     public static int Ticks => ticksSinceGameStart;
     
     public static void Run() {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Started");
+        Debug.Log("Application Started");
         Init();
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Loaded");
+        Debug.Log("Application Loaded");
         DoLoop();
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Cleaning Up");
+        Debug.Log("Application Cleaning Up");
         Cleanup();
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Application Ended");
+        Debug.Log("Application Ended");
     }
 
     private static void Init() {
@@ -157,7 +157,7 @@ public static class Game {
         entity.Id = id;
         entitiesToAdd.Add(entity);
         
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Registered entity {entity.Id}");
+        Debug.Log($"Registered entity {entity.Id}");
 
         return id;
     }

@@ -125,7 +125,7 @@ public class Pathfinder {
             }
         }
 
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, $"Failed to find route from {from} to {to}");
+        Debug.Log($"Failed to find route from {from} to {to}");
         return null;
     }
 

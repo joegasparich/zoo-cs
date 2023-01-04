@@ -58,7 +58,7 @@ public class World : ISerialisable {
 
         isSetup = true;
 
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "World setup complete");
+        Debug.Log("World setup complete");
     }
     
     public void Reset() {

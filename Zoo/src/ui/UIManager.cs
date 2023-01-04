@@ -29,7 +29,7 @@ public class UIManager {
     }
 
     public void Init() {
-        Raylib.TraceLog(TraceLogLevel.LOG_TRACE, "Initializing UI");
+        Debug.Log("Initializing UI");
     }
 
     public void OnInput(InputEvent evt) {
@@ -141,7 +141,7 @@ public class UIManager {
 
     public void DoImmediateWindow(string id, Rectangle initialRect, Action<Rectangle> onUI, bool doBackground = true) {
         if (CurrentEvent == UIEvent.None) {
-            Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Immediate windows must be called in OnGUI");
+            Debug.Warn("Immediate windows must be called in OnGUI");
             return;
         }
         
