@@ -35,5 +35,8 @@ public class TileObjectComponent : Component {
             () => Data.Id,
             path => Data = Find.Registry.GetObject(path)
         );
+
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
+            entity.GetComponent<RenderComponent>().Graphics = Data.GraphicData;
     }
 }

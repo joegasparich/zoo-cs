@@ -116,6 +116,12 @@ public class BiomeGrid : ISerialisable {
         return chunkGrid[col][row];
     }
 
+    public BiomeChunk GetChunkAtTile(IntVec2 pos) {
+        var col = pos.X * BiomeScale / ChunkSize;
+        var row = pos.Y * BiomeScale / ChunkSize;
+        return GetChunk(col, row);
+    }
+
     public IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
         var floorX = (pos.X / ChunkSize).FloorToInt();
         var floorY = (pos.Y / ChunkSize).FloorToInt();
@@ -150,14 +156,14 @@ public class BiomeGrid : ISerialisable {
 
     public void RegenerateChunksInRadius(Vector2 pos, float radius) {
         foreach (var chunk in GetChunksInRadius(pos, radius)) {
-            chunk.ShouldRegenerate = true;
+            chunk.Regenerate();
         }
     }
 
     public void RegenerateAllChunks() {
         foreach (var row in chunkGrid) {
             foreach (var chunk in row) {
-                chunk.ShouldRegenerate = true;
+                chunk.Regenerate();
             }
         }
     }
@@ -201,9 +207,9 @@ public class BiomeGrid : ISerialisable {
 public class BiomeChunk : IDisposable {
     private Mesh          chunkMesh;
     private BiomeCell[][] grid;
-    private bool          isSetup = false;
+    private bool          isSetup          = false;
+    private bool          shouldRegenerate = false;
     
-    public bool ShouldRegenerate { get; set; } = false;
     public int  X                { get; }
     public int  Y                { get; }
     public int  Rows             { get; }
@@ -253,11 +259,15 @@ public class BiomeChunk : IDisposable {
     }
     
     public void PostUpdate() {
-        if (ShouldRegenerate) {
+        if (shouldRegenerate) {
             // TODO (optimisation): Investigate drawing one chunk per frame or something
             RegenerateMesh();
-            ShouldRegenerate = false;
+            shouldRegenerate = false;
         }
+    }
+
+    public void Regenerate() {
+        shouldRegenerate = true;
     }
 
     private void RegenerateMesh() {

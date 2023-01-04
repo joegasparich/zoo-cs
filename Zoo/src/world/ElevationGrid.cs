@@ -57,7 +57,7 @@ public class ElevationGrid : ISerialisable {
 
         isSetup = true;
 
-        GenerateWaterMesh();
+        RegenerateWaterMesh();
     }
 
     public void Reset() {
@@ -97,7 +97,7 @@ public class ElevationGrid : ISerialisable {
                 var entity = Find.World.GetTileObjectAtTile(tile);
                 if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceInWater: false }) return false;
                 // Check for paths
-                if (Find.World.FootPaths.GetPathAtTile(tile) is { Exists: true }) return false;
+                if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;
             }
         }
 
@@ -111,18 +111,21 @@ public class ElevationGrid : ISerialisable {
                 if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceOnSlopes: false }) return false;
                 // Check for paths
                 // TODO (fix): Figure out if points are being elevated in a way where this is valid
-                if (Find.World.FootPaths.GetPathAtTile(tile) is { Exists: true }) return false;
+                if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;
             }
         }
 
         return true;
     }
 
+    private readonly Dictionary<IntVec2, Elevation> oldPoints = new(); // For undo
     private bool SetElevation(IntVec2 gridPos, Elevation elevation) {
         if (!isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
             return false;
         }
+        
+        oldPoints.Clear();
         
         if (!CanElevate(gridPos, elevation)) return false;
         
@@ -130,9 +133,12 @@ public class ElevationGrid : ISerialisable {
         if (elevation != Elevation.Flat) {
             var failedToFlatten = false;
             foreach (var pos in Find.World.GetAdjacentTiles(gridPos, true)) {
-                if (GetElevationAtGridPos(pos).ToInt() != -elevation.ToInt())
+                var elevationAtFlattenPoint = GetElevationAtGridPos(pos);
+                if (elevationAtFlattenPoint.ToInt() != -elevation.ToInt())
                     continue;
                     
+                oldPoints.TryAdd(pos, elevationAtFlattenPoint);
+                
                 if (!SetElevation(pos, Elevation.Flat))
                     failedToFlatten = true;
             }
@@ -141,22 +147,27 @@ public class ElevationGrid : ISerialisable {
                 return false;
         }
         
+        oldPoints.TryAdd(gridPos, GetElevationAtGridPos(gridPos));
+        
         grid[gridPos.X][gridPos.Y] = elevation;
         return true;
     }
     
-    private readonly List<IntVec2> pointsToElevate = new ();
-    private readonly List<IntVec2> affectedCells   = new();
-    public void SetElevationInCircle(Vector2 pos, float radius, Elevation elevation) {
+    private readonly List<IntVec2>                  pointsToElevate   = new(); // Why did I do this?
+    private readonly List<IntVec2>                  affectedCells     = new(); // So we can notify pathfinders about water
+    private readonly Dictionary<IntVec2, Elevation> oldPointsInCircle = new(); // For undo
+    public Dictionary<IntVec2, Elevation> SetElevationInCircle(Vector2 pos, float radius, Elevation elevation) {
+        pointsToElevate.Clear();
+        affectedCells.Clear();
+        oldPointsInCircle.Clear();
+        
         if (!isSetup) {
             Raylib.TraceLog(TraceLogLevel.LOG_WARNING, "Elevation grid not setup");
-            return;
+            return oldPointsInCircle;
         }
-        if (!Find.World.IsPositionInMap(pos)) return;
+        if (!Find.World.IsPositionInMap(pos)) return oldPointsInCircle;
 
         var changed = false;
-        
-        pointsToElevate.Clear();
 
         for (var i = pos.X - radius; i <= pos.X + radius; i++) {
             for (var j = pos.Y - radius; j <= pos.Y + radius; j++) {
@@ -187,24 +198,53 @@ public class ElevationGrid : ISerialisable {
 
         // This might be more complex than its worth tbh
         
-        if (!changed) return;
-        
-        affectedCells.Clear();
+        if (!changed) return oldPointsInCircle;
         
         foreach(var gridPos in pointsToElevate) {
             SetElevation(gridPos, elevation);
+            
+            foreach (var (gp, e) in oldPoints) {
+                oldPointsInCircle.TryAdd(gp, e);
+            }
             
             foreach (var tile in GetSurroundingTiles(gridPos)) {
                 affectedCells.Add(tile);
             }
         }
 
-        GenerateWaterMesh();
+        RegenerateWaterMesh();
 
+        // Notify Biome Grid
         Messenger.Fire(EventType.ElevationUpdated, (pos, radius));
+        
+        // Notify Pathfinders
+        if (elevation == Elevation.Water) {
+            Messenger.Fire(EventType.PlaceSolid, affectedCells);
+        }
+
+        return oldPointsInCircle;
     }
 
-    private void GenerateWaterMesh() {
+    private HashSet<BiomeChunk> affectedBiomeChunks = new();
+    public void SetElevationFromUndoData(Dictionary<IntVec2, Elevation> undoData) {
+        affectedBiomeChunks.Clear();
+        
+        foreach (var (gp, e) in undoData) {
+            grid[gp.X][gp.Y] = e;
+
+            foreach (var tile in GetSurroundingTiles(gp)) {
+                affectedBiomeChunks.Add(Find.World.Biomes.GetChunkAtTile(tile));
+            }
+        }
+        
+        RegenerateWaterMesh();
+
+        foreach (var chunk in affectedBiomeChunks) {
+            chunk.Regenerate();
+        }
+    }
+
+    private void RegenerateWaterMesh() {
         waterPolygons.Clear();
 
 

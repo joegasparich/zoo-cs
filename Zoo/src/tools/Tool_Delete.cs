@@ -9,6 +9,9 @@ namespace Zoo.tools;
 
 public class Tool_Delete : Tool {
     private static readonly Color GhostColour = new (255, 102, 26, 255);
+    private const string TileObjectsSaveKey = "tileObjects";
+    private const string WallsSaveKey = "walls";
+    private const string PathsSaveKey = "paths";
     
     private bool    isDragging;
     private IntVec2 dragStartTile;
@@ -34,40 +37,28 @@ public class Tool_Delete : Tool {
         
         if (isDragging && evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             var tileObjects = GetHighlightedTileObjects();
+            var walls       = GetHighlightedWalls();
+            var paths       = GetHighlightedFootPaths();
 
-            // TODO (optimisation): only archive affected paths and walls
-            var undoData = new JsonObject();
-            Find.SaveManager.CurrentSaveNode = undoData;
-            Find.SaveManager.Mode            = SerialiseMode.Saving;
-            // TODO (fix): Don't use archive list deep here
-            Find.SaveManager.ArchiveListDeep("tileObjects", tileObjects.ToList());
-            Find.SaveManager.ArchiveDeep("paths", Find.World.FootPaths);
-            Find.SaveManager.ArchiveDeep("walls", Find.World.Walls);
-            
+            var undoData = GetUndoData(tileObjects, walls, paths);
+
             // Delete tile objects
             foreach(var t in tileObjects) {
                 t.Destroy();
             }
             // Delete paths
-            foreach(var p in GetHighlightedFootPaths()) {
+            foreach(var p in paths) {
                 Find.World.FootPaths.RemovePathAtTile(p.Pos);
             }
             // Delete walls
-            foreach(var w in GetHighlightedWalls()) {
+            foreach(var w in walls) {
                 Find.World.Walls.RemoveWall(w);
             }
             
             toolManager.PushAction(new ToolAction() {
                 Name = "Delete",
                 Data = undoData,
-                Undo = data => {
-                    var json = (JsonObject)data;
-                    Find.SaveManager.CurrentSaveNode = undoData;
-                    Find.SaveManager.Mode            = SerialiseMode.Loading;
-                    EntityUtility.LoadEntities(json["tileObjects"].AsArray());
-                    Find.SaveManager.ArchiveDeep("paths", Find.World.FootPaths);
-                    Find.SaveManager.ArchiveDeep("walls", Find.World.Walls);
-                }
+                Undo = Undo
             });
 
             Ghost.Follow = true;
@@ -97,7 +88,7 @@ public class Tool_Delete : Tool {
             } 
         }
     }
-
+    
     private Rectangle GetDragRect() {
         var dragEndTile = Find.Input.GetMouseWorldPos().Floor();
         var upperLeft = new IntVec2(Math.Min(dragStartTile.X, dragEndTile.X), Math.Min(dragStartTile.Y, dragEndTile.Y));
@@ -139,7 +130,7 @@ public class Tool_Delete : Tool {
                 var tile = new IntVec2(i.FloorToInt(), j.FloorToInt());
                 if (!Find.World.IsPositionInMap(tile)) continue;
 
-                var footpath = Find.World.FootPaths.GetPathAtTile(tile);
+                var footpath = Find.World.FootPaths.GetFootPathAtTile(tile);
                 if (footpath is not { Exists: true }) continue;
                 highlightedFootPaths.Add(footpath);
             }
@@ -171,5 +162,56 @@ public class Tool_Delete : Tool {
         }
 
         return highlightedWalls;
+    }
+    
+    private JsonObject GetUndoData(IEnumerable<Entity> tileObjects, IEnumerable<Wall> walls, IEnumerable<FootPath> paths) {
+        var undoData = new JsonObject();
+            
+        // Tile objects
+        var tileObjectData = new JsonArray();
+        foreach (var tileObject in tileObjects) {
+            tileObjectData.Add(Find.SaveManager.Serialise(tileObject));
+        }
+        undoData.Add(TileObjectsSaveKey, tileObjectData);
+            
+        // Walls
+        var wallData = new JsonArray();
+        foreach (var wall in walls) {
+            wallData.Add(Find.SaveManager.Serialise(wall));
+        }
+        undoData.Add(WallsSaveKey, wallData);
+           
+        // Paths
+        var pathData = new JsonArray();
+        foreach (var path in paths) {
+            pathData.Add(Find.SaveManager.Serialise(path));
+        }
+        undoData.Add(PathsSaveKey, pathData);
+
+        return undoData;
+    }
+    
+    private void Undo(object json) {
+        var undoData    = (JsonObject)json;
+        
+        // Tile objects
+        var tileObjects = undoData[TileObjectsSaveKey].AsArray();
+        EntityUtility.LoadEntities(tileObjects);
+        
+        // Walls
+        var walls = undoData[WallsSaveKey].AsArray();
+        var i = 0;
+        foreach (var value in walls.Select(wallData => Find.World.Walls.GetWallByGridPos(Find.SaveManager.Deserialise<IntVec2>(wallData["gridPos"])))) {
+            Find.SaveManager.CurrentSaveNode = walls[i++].AsObject(); 
+            value.Serialise();
+        }
+        
+        // Paths
+        var paths = undoData[PathsSaveKey].AsArray();
+        i = 0;
+        foreach (var value in paths.Select(pathData => Find.World.FootPaths.GetFootPathAtTile(Find.SaveManager.Deserialise<IntVec2>(pathData["pos"])))) {
+            Find.SaveManager.CurrentSaveNode = paths[i++].AsObject(); 
+            value.Serialise();
+        }
     }
 }

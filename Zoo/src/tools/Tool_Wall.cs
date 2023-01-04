@@ -47,6 +47,7 @@ public class Tool_Wall : Tool {
             isDragging = false;
 
             // Reverse so we are going from drag start to drag end
+            // This is to make sure we don't constantly check for loops (From memory?)
             ghosts.Reverse();
             
             List<(IntVec2, Side)> undoData = new();

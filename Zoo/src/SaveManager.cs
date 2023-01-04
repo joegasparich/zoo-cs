@@ -56,7 +56,18 @@ public class SaveManager {
         Game.Serialise();
     }
 
-    public T? Parse<T>(JsonNode node) {
+    // TODO: Allow serialising regular values
+    public JsonObject Serialise(ISerialisable value) {
+        var node = new JsonObject();
+        
+        Mode            = SerialiseMode.Saving;
+        CurrentSaveNode = node;
+        
+        value.Serialise();
+        return node;
+    }
+
+    public T? Deserialise<T>(JsonNode node) {
         return node.Deserialize<T>(serializeOptions);
     }
     
@@ -121,32 +132,58 @@ public class SaveManager {
         CurrentSaveNode = parent;
     }
 
-    public void ArchiveListDeep<T>(string label, List<T> list) where T : ISerialisable, new() {
+    public void ArchiveCollection(string label, IEnumerable<ISerialisable> collection, Func<JsonArray, IEnumerable<ISerialisable>> select) {
         var parent = CurrentSaveNode;
-
         switch (Mode) {
-            case SerialiseMode.Saving:
-                var saveData  = new JsonArray();
-                
-                foreach (var item in list) {
-                    var node = new JsonObject();
-                    CurrentSaveNode = node;
-                    item.Serialise();
-                    saveData.Add(node);
+            case SerialiseMode.Saving: {
+                var array = new JsonArray();
+                foreach (var value in collection) {
+                    CurrentSaveNode = new JsonObject();
+                    value.Serialise();
+                    array.Add(CurrentSaveNode);
                 }
-                parent[label] = saveData;
+                parent[label] = array;
                 break;
-            case SerialiseMode.Loading:
-                foreach (var item in parent[label].AsArray()) {
-                    var newItem = new T();
-                    CurrentSaveNode = (JsonObject)item;
-                    newItem.Serialise();
-                    list.Add(newItem);
+            }
+            case SerialiseMode.Loading: {
+                var array = parent[label]!.AsArray();
+                var i = 0;
+                foreach (var value in select(array)) {
+                    CurrentSaveNode = array[i++].AsObject(); 
+                    value.Serialise();
                 }
                 break;
+            }
         }
         CurrentSaveNode = parent;
     }
+
+    // public void ArchiveListDeep<T>(string label, List<T> list) where T : ISerialisable, new() {
+    //     var parent = CurrentSaveNode;
+    //
+    //     switch (Mode) {
+    //         case SerialiseMode.Saving:
+    //             var saveData  = new JsonArray();
+    //             
+    //             foreach (var item in list) {
+    //                 var node = new JsonObject();
+    //                 CurrentSaveNode = node;
+    //                 item.Serialise();
+    //                 saveData.Add(node);
+    //             }
+    //             parent[label] = saveData;
+    //             break;
+    //         case SerialiseMode.Loading:
+    //             foreach (var item in parent[label].AsArray()) {
+    //                 var newItem = new T();
+    //                 CurrentSaveNode = (JsonObject)item;
+    //                 newItem.Serialise();
+    //                 list.Add(newItem);
+    //             }
+    //             break;
+    //     }
+    //     CurrentSaveNode = parent;
+    // }
 
     public JsonObject SerialiseToNode(ISerialisable value) {
         var node = new JsonObject();

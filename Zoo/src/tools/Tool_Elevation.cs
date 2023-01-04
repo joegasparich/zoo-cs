@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using Raylib_cs;
 using Zoo.ui;
+using Zoo.util;
 using Zoo.world;
 
 namespace Zoo.tools; 
@@ -9,9 +10,9 @@ public class Tool_Elevation : Tool {
     private const float     DefaultRadius      = 0.65f;
     private const int       PlaceIntervalTicks = 5;
     
-    private Elevation  currentElevation = Elevation.Hill;
-    private bool       isDragging;
-    private JsonObject oldElevationData;
+    private Elevation                      currentElevation = Elevation.Hill;
+    private bool                           isDragging;
+    private Dictionary<IntVec2, Elevation> oldElevationData = new();
 
     public Tool_Elevation(ToolManager tm) : base(tm) {}
 
@@ -26,18 +27,12 @@ public class Tool_Elevation : Tool {
         Ghost.Elevate = true;
     }
 
-    public override void Update() {
-        if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
-        
-        Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), Ghost.Radius, currentElevation);
-    }
-
     public override void OnInput(InputEvent evt) {
         // Only listen to down and up events so that we can't start dragging from UI
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = true;
 
-            oldElevationData = Find.SaveManager.SerialiseToNode(Find.World.Elevation);
+            oldElevationData.Clear();
             
             evt.Consume();
         }
@@ -47,16 +42,24 @@ public class Tool_Elevation : Tool {
 
             toolManager.PushAction(new ToolAction() {
                 Name = "Elevation brush",
-                Data = oldElevationData,
+                // Copy here so we don't lose the data when clearing
+                Data = oldElevationData.ToDictionary(entry => entry.Key, entry => entry.Value),
                 Undo = data => {
-                    Find.SaveManager.DeserialiseFromNode(Find.World.Elevation, (JsonObject)data);
-                    
-                    // TODO (optimisation): Only regenerate affected chunks same as biome tool
-                    Find.World.Biomes.RegenerateAllChunks();
+                    Find.World.Elevation.SetElevationFromUndoData((Dictionary<IntVec2, Elevation>)data);
                 }
             });
             
             evt.Consume();
+        }
+    }
+
+    public override void Update() {
+        if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
+        
+        var oldPoints = Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), Ghost.Radius, currentElevation);
+
+        foreach (var (p, e) in oldPoints) {
+            oldElevationData.TryAdd(p, e);
         }
     }
 

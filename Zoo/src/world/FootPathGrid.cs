@@ -12,13 +12,19 @@ public enum FootPathSpriteIndex {
     HillSouth = 4
 }
 
-public class FootPath {
+public class FootPath : ISerialisable {
     public FootPathData? Data           = null;
     public IntVec2       Pos            = default;
-    public bool          Exists         = false;
     public bool          Indestructable = false;
     public Color         OverrideColour = Color.WHITE;
-    public FootPath() {}
+
+    public bool Exists => Data != null;
+
+    public void Serialise() {
+        Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.Registry.GetFootPath(id));
+        Find.SaveManager.ArchiveValue("pos",            ref Pos);
+        Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
+    }
 }
 
 public class FootPathGrid : ISerialisable {
@@ -44,7 +50,6 @@ public class FootPathGrid : ISerialisable {
                 grid[i][j] = new FootPath() {
                     Data = pathData,
                     Pos = new IntVec2(i, j),
-                    Exists = pathData != null
                 };
             }
         }
@@ -90,12 +95,11 @@ public class FootPathGrid : ISerialisable {
 
     public FootPath? PlacePathAtTile(FootPathData data, IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
-        if (GetPathAtTile(tile)!.Exists) return null;
+        if (GetFootPathAtTile(tile)!.Exists) return null;
         
         grid[tile.X][tile.Y] = new FootPath() {
             Data = data,
             Pos = tile,
-            Exists = true
         };
         
         // TODO (optimisation): update pathfinding once using walkability grid
@@ -105,7 +109,7 @@ public class FootPathGrid : ISerialisable {
 
     public void RemovePathAtTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return;
-        if (!GetPathAtTile(tile)!.Exists) return;
+        if (!GetFootPathAtTile(tile)!.Exists) return;
         
         grid[tile.X][tile.Y] = new FootPath() {
             Pos = tile
@@ -113,8 +117,18 @@ public class FootPathGrid : ISerialisable {
 
         // TODO (optimisation): update pathfinding once using walkability grid
     }
+    
+    public IEnumerable<FootPath> GetAllFootPaths() {
+        for (var i = 0; i < cols; i++) {
+            for (var j = 0; j < rows; j++) {
+                var path = grid[i][j];
+                if (path.Exists)
+                    yield return path;
+            }
+        }
+    }
 
-    public FootPath? GetPathAtTile(IntVec2 tile) {
+    public FootPath? GetFootPathAtTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
         return grid[tile.X][tile.Y];
     }
@@ -125,9 +139,14 @@ public class FootPathGrid : ISerialisable {
         
         Find.SaveManager.ArchiveValue("cols", ref cols);
         Find.SaveManager.ArchiveValue("rows", ref rows);
-        Find.SaveManager.ArchiveValue("data", 
-            () => grid.Select(row => row.Select(path => path.Data?.Id).ToArray()).ToArray(),
-            data => Setup(data)
+        
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
+            Setup();
+        
+        Find.SaveManager.ArchiveCollection("walls",
+            GetAllFootPaths(),
+            paths => paths.Select(pathData => 
+                GetFootPathAtTile(Find.SaveManager.Deserialise<IntVec2>(pathData["pos"])))
         );
     }
 }

@@ -124,7 +124,7 @@ public class World : ISerialisable {
         if (!IsPositionInMap(tile)) return 0;
         if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
         if (Elevation.IsTileWater(tile)) return 0;
-        if (FootPaths.GetPathAtTile(tile)!.Exists) return 1;
+        if (FootPaths.GetFootPathAtTile(tile)!.Exists) return 1;
 
         return 30;
     }

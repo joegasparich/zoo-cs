@@ -140,7 +140,7 @@ public class Tool_FootPath : Tool {
     }
 
     public override bool CanPlace(ToolGhost ghost) {
-        var path = Find.World.FootPaths.GetPathAtTile(ghost.Pos.Floor());
+        var path = Find.World.FootPaths.GetFootPathAtTile(ghost.Pos.Floor());
 
         if (path == null) return false;
         if (path.Exists) return false;
@@ -151,7 +151,7 @@ public class Tool_FootPath : Tool {
     }
 
     private void UpdateGhostSprite(ToolGhost ghost) {
-        var path = Find.World.FootPaths.GetPathAtTile(ghost.Pos.Floor());
+        var path = Find.World.FootPaths.GetFootPathAtTile(ghost.Pos.Floor());
 
         ghost.Visible = path != null;
         if (!ghost.Visible || !ghost.CanPlace) return;

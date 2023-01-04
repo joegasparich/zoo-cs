@@ -20,15 +20,23 @@ public enum WallSpriteIndex {
     HillSouth = 7,
 };
 
-public class Wall {
+public class Wall : ISerialisable {
     public WallData?   Data           = null;
-    public Orientation Orientation    = Orientation.Vertical;
-    public Vector2     WorldPos       = default;
     public IntVec2     GridPos        = default;
-    public bool        Exists         = false;
     public bool        Indestructable = false;
     public bool        IsDoor         = false;
     public Color       OverrideColour = Color.WHITE;
+    
+    public Orientation Orientation => (Orientation)(GridPos.X % 2);
+    public Vector2     WorldPos    => WallUtility.WallToWorldPosition(GridPos, Orientation);
+    public bool        Exists      => Data != null;
+
+    public void Serialise() {
+        Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.Registry.GetWall(id));
+        Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
+        Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
+        Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
+    }
 }
 
 public record WallSaveData(string? id, bool isDoor, bool indestructable);
@@ -63,10 +71,7 @@ public class WallGrid : ISerialisable {
                 var wallData = data?[i][j]?.id != null ? Find.Registry.GetWall(data[i][j]!.id!) : null;
                 grid[i][j] = new Wall {
                     Data           = wallData,
-                    Orientation    = orientation,
-                    WorldPos       = worldPos,
                     GridPos        = new IntVec2(i, j),
-                    Exists         = wallData != null,
                     IsDoor         = data?[i][j]?.isDoor ?? false,
                     Indestructable = data?[i][j]?.indestructable ?? false
                 };
@@ -123,10 +128,7 @@ public class WallGrid : ISerialisable {
 
         grid[x][y] = new Wall() {
             Data           = data,
-            Orientation    = orientation,
-            WorldPos       = WallUtility.WallToWorldPosition(new IntVec2(x, y), orientation),
             GridPos        = new IntVec2(x, y),
-            Exists         = true,
             Indestructable = false,
         };
         
@@ -155,10 +157,7 @@ public class WallGrid : ISerialisable {
         // Set to empty wall
         grid[x][y] = new Wall() {
             Data           = null,
-            Orientation    = orientation,
-            WorldPos       = WallUtility.WallToWorldPosition(new IntVec2(x, y), orientation),
             GridPos        = new IntVec2(x, y),
-            Exists         = false,
             Indestructable = false,
         };
         
@@ -381,9 +380,14 @@ public class WallGrid : ISerialisable {
         
         Find.SaveManager.ArchiveValue("cols", ref cols);
         Find.SaveManager.ArchiveValue("rows", ref rows);
-        Find.SaveManager.ArchiveValue("data", 
-            () => grid.Select(row => row.Select(wall => wall.Exists ? new WallSaveData(wall.Data?.Id, wall.IsDoor, wall.Indestructable) : null).ToArray()).ToArray(),
-            data => Setup(data)
+        
+        if (Find.SaveManager.Mode == SerialiseMode.Loading)
+            Setup();
+
+        Find.SaveManager.ArchiveCollection("walls",
+            GetAllWalls(),
+            walls => walls.Select(wallData => 
+                GetWallByGridPos(Find.SaveManager.Deserialise<IntVec2>(wallData["gridPos"])))
         );
     }
 }

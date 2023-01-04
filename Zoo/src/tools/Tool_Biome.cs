@@ -28,6 +28,35 @@ public class Tool_Biome : Tool {
         Ghost.Elevate = true;
     }
 
+    public override void OnInput(InputEvent evt) {
+        // Only listen to down and up events so that we can't start dragging from UI
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
+            isDragging = true;
+            oldChunkData.Clear();
+            
+            evt.Consume();
+        }
+        if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            toolManager.PushAction(new ToolAction() {
+                Name = "Biome brush",
+                // Copy here so we don't lose the data when clearing
+                Data = oldChunkData.ToDictionary(entry => entry.Key, entry => entry.Value),
+                Undo = data => {
+                    foreach (var (key, value) in (Dictionary<string, Biome[][][]>)data) {
+                        var pos   = IntVec2.FromString(key);
+                        var chunk = Find.World.Biomes.GetChunk(pos.X, pos.Y);
+                        chunk.Load(value);
+                    }
+                }
+            });
+            
+            evt.Consume();
+        }
+    }
+
     public override void Update() {
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
 
@@ -43,33 +72,6 @@ public class Tool_Biome : Tool {
         
         // Set biome in a circle
         Find.World.Biomes.SetBiomeInRadius(pos, radius, currentBiome);
-    }
-
-    public override void OnInput(InputEvent evt) {
-        // Only listen to down and up events so that we can't start dragging from UI
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
-            isDragging = true;
-            evt.Consume();
-        }
-        if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
-            if (!isDragging) return;
-            isDragging = false;
-
-            toolManager.PushAction(new ToolAction() {
-                Name = "Biome brush",
-                Data = oldChunkData.ToDictionary(entry => entry.Key, entry => entry.Value),
-                Undo = data => {
-                    foreach (var (key, value) in (Dictionary<string, Biome[][][]>)data) {
-                        var pos   = IntVec2.FromString(key);
-                        var chunk = Find.World.Biomes.GetChunk(pos.X, pos.Y);
-                        chunk.Load(value);
-                    }
-                }
-            });
-            oldChunkData.Clear();
-            
-            evt.Consume();
-        }
     }
 
     public override void OnGUI() {

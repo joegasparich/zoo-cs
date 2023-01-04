@@ -22,10 +22,11 @@ public static class EntityUtility {
 
     public static void LoadEntities(JsonArray data) {
         var parent = Find.SaveManager.CurrentSaveNode;
+        Find.SaveManager.Mode = SerialiseMode.Loading;
         
         foreach (JsonObject entityData in data) {
             Find.SaveManager.CurrentSaveNode = entityData;
-            var entity = new Entity(Find.SaveManager.Parse<Vector2>(entityData["pos"]));
+            var entity = new Entity(Find.SaveManager.Deserialise<Vector2>(entityData["pos"]));
             entity.Serialise();
             Game.RegisterEntity(entity, entity.Id);
         }
