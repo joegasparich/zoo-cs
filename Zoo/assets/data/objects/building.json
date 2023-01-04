@@ -9,6 +9,7 @@
     "rotations": 4,
     "canPlaceOnSlopes": false,
     "canPlaceInWater": false,
+    "canRotate": true,
     "type": "building",
     "graphicData": {
         "spritePath": "assets/data/objects/building.png",

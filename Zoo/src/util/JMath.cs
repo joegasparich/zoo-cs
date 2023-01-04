@@ -10,6 +10,7 @@ public static class JMath {
     public static float Clamp(float val,  float min, float max) =>  Math.Max(min, Math.Min(max, val));
     public static float Min(params float[] vals) => vals.Min();
     public static float Max(params float[] vals) => vals.Max();
+    public static int PositiveMod(int x, int m) => (x % m + m) % m;
     
     // Trig
     public static float DegToRad(float deg) => deg * (float)Math.PI / 180f;

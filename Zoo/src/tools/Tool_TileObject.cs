@@ -3,6 +3,7 @@ using Raylib_cs;
 using Zoo.entities;
 using Zoo.ui;
 using Zoo.util;
+using Zoo.world;
 
 namespace Zoo.tools; 
 
@@ -11,6 +12,8 @@ public class Tool_TileObject : Tool {
 
     private ObjectData       currentObject;
     private List<ObjectData> allObjects;
+
+    private Side rotation;
 
     public override string   Name => "Object Tool";
     public override ToolType Type => ToolType.TileObject;
@@ -35,6 +38,8 @@ public class Tool_TileObject : Tool {
 
             var obj = GenEntity.CreateTileObject(currentObject.Id, Ghost.Pos);
             if (obj == null) return;
+            
+            obj.GetComponent<TileObjectComponent>().SetRotation(rotation);
 
             Game.RegisterEntity(obj);
             
@@ -45,6 +50,18 @@ public class Tool_TileObject : Tool {
             });
             
             evt.Consume();
+        }
+
+        if (currentObject.CanRotate) {
+            if (evt.keyDown == KeyboardKey.KEY_Q) {
+                rotation = (Side)JMath.PositiveMod(rotation.ToInt() - 1, 4);
+                Ghost.SpriteIndex = rotation.ToInt();
+            }
+
+            if (evt.keyDown == KeyboardKey.KEY_E) {
+                rotation = (Side)JMath.PositiveMod(rotation.ToInt() + 1, 4);
+                Ghost.SpriteIndex = rotation.ToInt();
+            }
         }
     }
 

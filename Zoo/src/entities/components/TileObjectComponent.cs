@@ -1,11 +1,18 @@
 ﻿using Zoo.util;
+using Zoo.world;
 
 namespace Zoo.entities; 
 
 public class TileObjectComponent : Component {
-    public ObjectData Data;
+    public  ObjectData Data;
+    private Side       rotation;
     
-    public TileObjectComponent(Entity entity) : base(entity) {}
+    // Component refs
+    private RenderComponent renderer;
+    
+    public TileObjectComponent(Entity entity) : base(entity) {
+        renderer = entity.GetComponent<RenderComponent>();
+    }
 
     public override void Start() {
         base.Start();
@@ -17,6 +24,13 @@ public class TileObjectComponent : Component {
         base.End();
         
         Find.World.UnregisterTileObject(entity);
+    }
+
+    public void SetRotation(Side rotation) {
+        if (!Data.CanRotate) return;
+        
+        this.rotation = rotation;
+        renderer.SpriteIndex = rotation.ToInt();
     }
 
     public IEnumerable<IntVec2> GetOccupiedTiles() {
@@ -35,8 +49,11 @@ public class TileObjectComponent : Component {
             () => Data.Id,
             path => Data = Find.Registry.GetObject(path)
         );
+        Find.SaveManager.ArchiveValue("rotation", ref rotation);
 
-        if (Find.SaveManager.Mode == SerialiseMode.Loading)
-            entity.GetComponent<RenderComponent>().Graphics = Data.GraphicData;
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
+            renderer.Graphics    = Data.GraphicData;
+            renderer.SpriteIndex = rotation.ToInt();
+        }
     }
 }
