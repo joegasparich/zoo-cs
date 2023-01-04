@@ -51,7 +51,7 @@ public class Tool_Elevation : Tool {
                 Undo = data => {
                     Find.SaveManager.DeserialiseFromNode(Find.World.Elevation, (JsonObject)data);
                     
-                    // TODO: (optimisation) Only regenerate affected chunks
+                    // TODO (optimisation): Only regenerate affected chunks same as biome tool
                     Find.World.Biomes.RegenerateAllChunks();
                 }
             });

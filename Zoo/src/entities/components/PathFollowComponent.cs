@@ -21,8 +21,8 @@ public class PathFollowComponent : InputComponent {
     private void OnSolidPlaced(object data) {
         if (path.NullOrEmpty()) return;
 
-        // TODO: check performance on this, seems pretty brute force
-        // TODO: Avoid allocating every time this event goes off
+        // TODO (optimisation): check performance on this, seems pretty brute force
+        // TODO (optimisation): Avoid allocating every time this event goes off
         var affectedTiles = (List<IntVec2>)data;
 
         if (path.Any(tile => affectedTiles.Contains(tile))) {

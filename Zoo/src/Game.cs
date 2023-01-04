@@ -175,7 +175,7 @@ public static class Game {
         SaveManager.ArchiveValue("framesSinceGameStart", ref framesSinceGameStart);
         SaveManager.ArchiveValue("nextEntityId",         ref nextEntityId);
         
-        // TODO: probably need to clear temp entity lists
+        // TODO (fix): probably need to clear temp entity lists
         if (SaveManager.Mode == SerialiseMode.Loading)
             entities.Clear();
             // TODO: do we need to reset entities and components? Probably not

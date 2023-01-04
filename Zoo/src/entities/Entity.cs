@@ -72,7 +72,7 @@ public class Entity : ISerialisable {
     public T? GetComponent<T>() where T : Component {
         if (HasComponent(typeof(T))) return (T)components[typeof(T)];
         
-        // TODO: Is there a faster way to do this?
+        // TODO (optimisation): Is there a faster way to do this?
         foreach (var type in components.Keys) {
             if (type.IsSubclassOf(typeof(T))) {
                 return (T)components[type];

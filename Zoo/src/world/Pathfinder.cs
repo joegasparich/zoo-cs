@@ -104,7 +104,7 @@ public class Pathfinder {
                 // If the successor is already on the closed list then ignore it
                 if (closedList[nx, ny]) continue;
 
-                // TODO: use walkability grid instead
+                // TODO (optimisation): use walkability grid instead
                 var gNew = cellDetails[x, y].gCost + Find.World.GetTileWalkability(new IntVec2(x, y));
                 var hNew = CalculateHValue(neighbour, to);
                 var fNew = gNew + hNew;

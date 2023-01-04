@@ -99,7 +99,7 @@ public class FootPathGrid : ISerialisable {
             Exists = true
         };
         
-        // TODO: update pathfinding once using walkability grid
+        // TODO (optimisation): update pathfinding once using walkability grid
         
         return grid[tile.X][tile.Y];
     }
@@ -112,7 +112,7 @@ public class FootPathGrid : ISerialisable {
             Pos = tile
         };
 
-        // TODO: update pathfinding once using walkability grid
+        // TODO (optimisation): update pathfinding once using walkability grid
     }
 
     public FootPath? GetPathAtTile(IntVec2 tile) {

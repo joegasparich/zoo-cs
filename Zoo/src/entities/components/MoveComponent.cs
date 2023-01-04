@@ -9,7 +9,7 @@ public class MoveComponent : Component {
     public MoveComponent(Entity entity) : base(entity) {}
 
     public override void Start() {
-        // TODO: add back requried components
+        // TODO: add back required components
         input = entity.GetComponent<InputComponent>();
         physics = entity.GetComponent<PhysicsComponent>();
     }

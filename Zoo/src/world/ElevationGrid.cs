@@ -110,7 +110,7 @@ public class ElevationGrid : ISerialisable {
                 var entity = Find.World.GetTileObjectAtTile(tile);
                 if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceOnSlopes: false }) return false;
                 // Check for paths
-                // TODO: Figure out if points are being elevated in a way where this is valid
+                // TODO (fix): Figure out if points are being elevated in a way where this is valid
                 if (Find.World.FootPaths.GetPathAtTile(tile) is { Exists: true }) return false;
             }
         }
@@ -166,7 +166,7 @@ public class ElevationGrid : ISerialisable {
                 if (GetElevationAtGridPos(gridPos) == elevation) continue;
 
                 pointsToElevate.Add(gridPos);
-                changed = true; // TODO: Check canElevate to avoid heaps of mesh regeneration
+                changed = true; // TODO (optimisation): Check canElevate to avoid heaps of mesh regeneration
             }
         }
         

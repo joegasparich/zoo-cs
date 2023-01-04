@@ -12,7 +12,7 @@ public enum Biome : byte {
     Snow
 }
 
-// TODO: this is weird
+// TODO (fix): this is weird
 public class BiomeInfo {
     public string Name;
     public Color Colour;
@@ -120,7 +120,7 @@ public class BiomeGrid : ISerialisable {
         var floorX = (pos.X / ChunkSize).FloorToInt();
         var floorY = (pos.Y / ChunkSize).FloorToInt();
 
-        // TODO: Only handles 3x3 around the pos. Change this to calculate required area based on radius
+        // TODO (fix): Only handles 3x3 around the pos. Change this to calculate required area based on radius
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (IsChunkInGrid(floorX + i, floorY + j)
@@ -254,7 +254,7 @@ public class BiomeChunk : IDisposable {
     
     public void PostUpdate() {
         if (ShouldRegenerate) {
-            // TODO: Investigate drawing one chunk per frame or something
+            // TODO (optimisation): Investigate drawing one chunk per frame or something
             RegenerateMesh();
             ShouldRegenerate = false;
         }

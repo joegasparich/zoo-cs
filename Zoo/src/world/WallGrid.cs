@@ -240,7 +240,7 @@ public class WallGrid : ISerialisable {
         }
     }
 
-    // TODO: use cached accessibility grids instead
+    // TODO (optimisation): use cached accessibility grids instead
     // This is expensive as fuck so only use it on load
     private void UpdatePathfinding() {
         for (var i = 0; i < cols * 2 + 1; i++) {
@@ -335,7 +335,7 @@ public class WallGrid : ISerialisable {
         return !Find.World.Elevation.GetElevationAtPos(v1).NearlyEquals(Find.World.Elevation.GetElevationAtPos(v2));     
     }
 
-    // TODO: See if we can optimise these two function
+    // TODO (optimisation): See if we can optimise these two functions
     private bool ShouldCheckForLoop(Wall wall) {
         var adjacent = wall.GetAdjacentWalls();
         if (adjacent.Length < 2) return false;

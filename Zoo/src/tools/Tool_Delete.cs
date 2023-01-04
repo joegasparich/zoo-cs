@@ -35,11 +35,11 @@ public class Tool_Delete : Tool {
         if (isDragging && evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             var tileObjects = GetHighlightedTileObjects();
 
-            // TODO: (optimisation) only archive affected paths and walls
+            // TODO (optimisation): only archive affected paths and walls
             var undoData = new JsonObject();
             Find.SaveManager.CurrentSaveNode = undoData;
             Find.SaveManager.Mode            = SerialiseMode.Saving;
-            // TODO: Don't use archive list deep here
+            // TODO (fix): Don't use archive list deep here
             Find.SaveManager.ArchiveListDeep("tileObjects", tileObjects.ToList());
             Find.SaveManager.ArchiveDeep("paths", Find.World.FootPaths);
             Find.SaveManager.ArchiveDeep("walls", Find.World.Walls);
