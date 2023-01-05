@@ -12,16 +12,21 @@ public static class DebugSettings {
 }
 
 public class Zoo : ISerialisable {
+    // Config
+    public int Width = 10;
+    public int Height = 10;
+    
     // State
-    public World World { get; }
+    public World       World;
     public ToolManager Tools;
     
     public Zoo() {
-        World = new World(10, 10);
         Tools = new ToolManager();
     }
 
     public void Setup() {
+        World = new World(Width, Height);
+        
         World.Setup();
         Tools.Setup();
     }

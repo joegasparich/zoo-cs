@@ -40,7 +40,7 @@ public class Dialog : Window {
         var headerRect = new Rectangle(0, 0, GetWidth(), WindowHeaderHeight);
         if (!Title.NullOrEmpty()) {
             GUI.TextAlign = AlignMode.MiddleCenter;
-            GUI.DrawText(headerRect, Title);
+            GUI.Label(headerRect, Title);
             GUI.TextAlign = AlignMode.TopLeft;
         }
         

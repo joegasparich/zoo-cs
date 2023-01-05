@@ -18,14 +18,22 @@ public enum AlignMode {
 
 public static class GUI {
     // Constants
-    public const            int   GapSmall       = 10;
-    private static readonly Color HighlightColor = new Color(255, 255, 255, 150);
-    public static readonly  Color UIButtonColour = new Color(230, 230, 230, 255);
+    public const            int   GapTiny         = 6;
+    public const            int   GapSmall        = 10;
+    public const            int   DefaultFontSize = 10;
+    private static readonly Color HighlightColor  = new Color(255, 255, 255, 150);
+    public static readonly  Color UIButtonColour  = new Color(230, 230, 230, 255);
 
     // Config
     public static Color     TextColour = Color.BLACK;
     public static AlignMode TextAlign  = AlignMode.TopLeft;
-    public static int       FontSize   = 10;
+    public static int       FontSize   = DefaultFontSize;
+
+    public static void Reset() {
+        TextColour = Color.BLACK;
+        TextAlign  = AlignMode.TopLeft;
+        FontSize   = DefaultFontSize;
+    }
 
     private static Rectangle MaintainAspectRatio(Rectangle rect, Texture2D texture, Rectangle? source = null) {
         source ??= new Rectangle(0, 0, 1, 1);
@@ -43,6 +51,20 @@ public static class GUI {
         }
 
         return rect;
+    }
+
+    private static Vector2 GetTextAlignPos(Rectangle rect, int textWidth) {
+        return TextAlign switch {
+            AlignMode.TopLeft => new Vector2(rect.x, rect.y),
+            AlignMode.TopCenter => new Vector2(rect.x + (rect.width - textWidth) / 2, rect.y),
+            AlignMode.TopRight => new Vector2(rect.x + (rect.width - textWidth), rect.y),
+            AlignMode.MiddleLeft => new Vector2(rect.x, rect.y + (rect.height - FontSize) / 2),
+            AlignMode.MiddleCenter => new Vector2(rect.x + (rect.width - textWidth) / 2, rect.y + (rect.height - FontSize) / 2),
+            AlignMode.MiddleRight => new Vector2(rect.x + (rect.width - textWidth), rect.y + (rect.height - FontSize) / 2),
+            AlignMode.BottomLeft => new Vector2(rect.x, rect.y + (rect.height - FontSize)),
+            AlignMode.BottomCenter => new Vector2(rect.x + (rect.width - textWidth) / 2, rect.y + (rect.height - FontSize)),
+            AlignMode.BottomRight => new Vector2(rect.x + (rect.width - textWidth), rect.y + (rect.height - FontSize))
+        };
     }
     
     // Draw functions
@@ -115,25 +137,20 @@ public static class GUI {
         );
     }
 
-    public static void DrawText(Rectangle rect, string text) {
+    public static void Label(Rectangle rect, string text) {
         if (Find.UI.CurrentEvent != UIEvent.Draw) return;
 
         var absRect   = Find.UI.GetAbsRect(rect);
         var textWidth = Raylib.MeasureText(text, FontSize);
 
-        Vector2 drawPos = TextAlign switch {
-            AlignMode.TopLeft => new Vector2(absRect.x, absRect.y),
-            AlignMode.TopCenter => new Vector2(absRect.x + (absRect.width - textWidth) / 2, absRect.y),
-            AlignMode.TopRight => new Vector2(absRect.x + (absRect.width - textWidth), absRect.y),
-            AlignMode.MiddleLeft => new Vector2(absRect.x, absRect.y + (absRect.height - FontSize) / 2),
-            AlignMode.MiddleCenter => new Vector2(absRect.x + (absRect.width - textWidth) / 2, absRect.y + (absRect.height - FontSize) / 2),
-            AlignMode.MiddleRight => new Vector2(absRect.x + (absRect.width - textWidth), absRect.y + (absRect.height - FontSize) / 2),
-            AlignMode.BottomLeft => new Vector2(absRect.x, absRect.y + (absRect.height - FontSize)),
-            AlignMode.BottomCenter => new Vector2(absRect.x + (absRect.width - textWidth) / 2, absRect.y + (absRect.height - FontSize)),
-            AlignMode.BottomRight => new Vector2(absRect.x + (absRect.width - textWidth), absRect.y + (absRect.height - FontSize))
-        };
+        Vector2 drawPos = GetTextAlignPos(absRect, textWidth);
         
         Raylib.DrawText(text, drawPos.X.RoundToInt(), drawPos.Y.RoundToInt(), FontSize, TextColour);
+    }
+    
+    private static void DrawCaret(Rectangle rect, int textWidth) {
+        var pos = GetTextAlignPos(rect, textWidth);
+        DrawRect(new Rectangle(pos.X + textWidth + 2, pos.Y, 1, FontSize), TextColour);
     }
     
     // Input functions
@@ -148,6 +165,15 @@ public static class GUI {
     }
     
     // Widgets
+    public static void Header(Rectangle rect, string text) {
+        var prevAlign = TextAlign;
+        TextAlign = AlignMode.TopCenter;
+        FontSize  = 20;
+        Label(rect, text);
+        FontSize  = DefaultFontSize;
+        TextAlign = prevAlign;
+    }
+    
     public static bool ButtonText(Rectangle rect, string text) {
         return ButtonText(rect, text, UIButtonColour);
     }
@@ -155,13 +181,43 @@ public static class GUI {
     public static bool ButtonText(Rectangle rect, string text, Color col) {
         DrawRect(rect, col);
         HighlightMouseover(rect);
-        DrawText(rect, text);
+        Label(rect, text);
 
         if (HoverableArea(rect)) {
             Find.UI.SetCursor(MouseCursor.MOUSE_CURSOR_POINTING_HAND);
         }
 
         return ClickableArea(rect);
+    }
+    
+    public static void TextInput(Rectangle rect, ref string text, string focusId) {
+        DrawRect(rect, Color.WHITE);
+        DrawBorder(rect, 1, Color.BLACK);
+        Label(rect.ContractedBy(GapTiny), text);
+
+        if (HoverableArea(rect))
+            Find.UI.SetCursor(MouseCursor.MOUSE_CURSOR_IBEAM);
+        if (ClickableArea(rect))
+            Find.UI.SetFocus(focusId);
+
+        if (Find.UI.IsFocused(focusId)) {
+            if (Game.Ticks % 120 < 60)
+                DrawCaret(rect.ContractedBy(GapTiny), Raylib.MeasureText(text, FontSize));
+
+            if (Find.UI.CurrentEvent == UIEvent.Input && Find.Input.GetCurrentEvent().type == InputEventType.Key) {
+                var evt = Find.Input.GetCurrentEvent();
+                if (evt.consumed) return;
+                evt.Consume();
+
+                if (evt.keyDown.HasValue && evt.keyDown.Value.IsAlphanumeric()) {
+                    var character = ((char)evt.keyDown.Value).ToString().ToLower();
+                    text += character;
+                }
+                if (evt.keyHeld == KeyboardKey.KEY_BACKSPACE && text.Length > 0 && Game.Frames % 5 == 0) {
+                    text = text.Substring(0, text.Length - 1);
+                }
+            }
+        }
     }
 
     public static void HighlightMouseover(Rectangle rect) {

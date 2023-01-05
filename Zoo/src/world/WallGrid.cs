@@ -394,5 +394,7 @@ public class WallGrid : ISerialisable {
             walls => walls.Select(wallData => 
                 GetWallByGridPos(Find.SaveManager.Deserialise<IntVec2>(wallData["gridPos"])))
         );
+        
+        UpdatePathfinding();
     }
 }

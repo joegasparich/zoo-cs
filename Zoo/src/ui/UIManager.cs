@@ -20,6 +20,7 @@ public class UIManager {
     private MouseCursor cursor;
     private string      hoveredWindowId;
     private string      currentWindowId;
+    private string?     currentFocusId = null;
     
     // Properties
     public UIEvent   CurrentEvent      { get; private set; }
@@ -36,6 +37,12 @@ public class UIManager {
 
     public void OnInput(InputEvent evt) {
         CurrentEvent = UIEvent.Input;
+        
+        // Lose focus
+        if (evt.keyDown is KeyboardKey.KEY_ESCAPE || evt.mouseDown is MouseButton.MOUSE_LEFT_BUTTON) {
+            currentFocusId = null;
+        }
+        
         Game.OnGUI();
         
         // Clear closed immediate windows
@@ -166,6 +173,14 @@ public class UIManager {
 
     public void SetCursor(MouseCursor c) {
         cursor = c;
+    }
+    
+    public void SetFocus(string focusId) {
+        currentFocusId = focusId;
+    }
+    
+    public bool IsFocused(string focusId) {
+        return currentFocusId == focusId;
     }
 
     public Rectangle GetAbsRect(Rectangle rect) {

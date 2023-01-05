@@ -9,17 +9,20 @@ public class Scene_Zoo : Scene {
     // Constants
     private const string SceneName = "Zoo";
     
+    // Config
+    
     // State
     public Zoo Zoo;
     
     // Test
     // private Entity man;
 
-    public Scene_Zoo() : base(SceneName) {}
+    public Scene_Zoo() : base(SceneName) {
+        Zoo = new Zoo();
+    }
 
     public override void Start() {
         Debug.Log("Creating new zoo");
-        Zoo = new Zoo();
         Zoo.Setup();
         
         // TODO: move this into controllable component

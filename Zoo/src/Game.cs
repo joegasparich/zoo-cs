@@ -34,6 +34,7 @@ public static class Game {
 
     // Properties
     public static int Ticks => ticksSinceGameStart;
+    public static int Frames => framesSinceGameStart;
     
     public static void Run() {
         Debug.Log("Application Started");
@@ -47,6 +48,7 @@ public static class Game {
 
     private static void Init() {
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Zoo");
+        Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
         AssetManager.LoadAssets();
         UI.Init();

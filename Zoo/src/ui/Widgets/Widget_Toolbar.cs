@@ -13,6 +13,7 @@ public class Widget_Toolbar : Window {
 
     // State
     private string debugPanelId;
+    private string savePanelId;
 
     public Widget_Toolbar(ToolManager toolManager) : base(new Rectangle(0, 0, Game.ScreenWidth, 45)) {
         this.toolManager = toolManager;
@@ -67,18 +68,12 @@ public class Widget_Toolbar : Window {
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "New")) {
-            Find.SaveManager.NewGame();
-        }
-        curX += ButtonWidth + GUI.GapSmall;
-
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Save")) {
-            Find.SaveManager.SaveGame("New Save");
-        }
-        curX += ButtonWidth + GUI.GapSmall;
-
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Load")) {
-            Find.SaveManager.LoadGame("save.json");
+            if (!Find.UI.IsWindowOpen(savePanelId)) {
+                savePanelId = Find.UI.PushWindow(new Dialog_Save());
+            } else {
+                Find.UI.CloseWindow(savePanelId);
+            }
         }
         curX += ButtonWidth + GUI.GapSmall;
 
@@ -91,6 +86,6 @@ public class Widget_Toolbar : Window {
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        GUI.TextAlign = AlignMode.TopLeft;
+        GUI.Reset();
     }
 }

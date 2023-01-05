@@ -31,9 +31,13 @@ public class SaveManager {
     public JsonObject    CurrentSaveNode;
     public SerialiseMode Mode;
     
-    public void NewGame() {
+    public void NewGame(int width, int height) {
         Debug.Log("Starting new game");
-        Find.SceneManager.LoadScene(new Scene_Zoo());
+        var scene = new Scene_Zoo();
+        scene.Zoo.Width  = width;
+        scene.Zoo.Height = height;
+        
+        Find.SceneManager.LoadScene(scene);
     }
 
     public void SaveGame(string name = DefaultSaveName) {
@@ -60,10 +64,10 @@ public class SaveManager {
     public void LoadGame(string filePath) {
         Debug.Log("Loading game");
         
-        Find.SceneManager.LoadScene(new Scene_Zoo());
-        
         var json = File.ReadAllText(filePath);
         var saveData = JsonSerializer.Deserialize<JsonObject>(json, serializeOptions);
+        
+        Find.SceneManager.LoadScene(new Scene_Zoo());
 
         Mode            = SerialiseMode.Loading;
         CurrentSaveNode = saveData;

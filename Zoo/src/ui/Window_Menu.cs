@@ -24,7 +24,9 @@ public class Window_Menu : Window {
         GUI.TextAlign = AlignMode.MiddleCenter;
 
         if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "New Game")) {
-            Find.SaveManager.NewGame();
+            // TODO: ensure multiple of these can't be created
+            // Maybe add a way for a dialog to consume all events 
+            Find.UI.PushWindow(new Dialog_NewZoo());
         }
         curY += ButtonHeight + GUI.GapSmall;
         if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "Load")) {

@@ -30,12 +30,12 @@ public class World : ISerialisable {
     private readonly Dictionary<string, Entity> tileObjectMap = new();
 
     // Grids
-    public ElevationGrid Elevation  { get; }
-    public BiomeGrid     Biomes     { get; }
-    public WallGrid      Walls      { get; }
-    public FootPathGrid  FootPaths  { get; }
-    public AreaManager   Areas      { get; }
-    public Pathfinder    Pathfinder { get; }
+    public ElevationGrid Elevation  { get; private set; }
+    public BiomeGrid     Biomes     { get; private set; }
+    public WallGrid      Walls      { get; private set; }
+    public FootPathGrid  FootPaths  { get; private set; }
+    public AreaManager   Areas      { get; private set; }
+    public Pathfinder    Pathfinder { get; private set; }
 
     private bool isSetup = false;
 
@@ -48,7 +48,6 @@ public class World : ISerialisable {
         Walls      = new WallGrid(Width, Height);
         FootPaths  = new FootPathGrid(Width, Height);
         Areas      = new AreaManager();
-        Pathfinder = new Pathfinder(Width, Height);
     }
 
     public void Setup() {
@@ -59,6 +58,7 @@ public class World : ISerialisable {
         Walls.Setup();
         FootPaths.Setup();
         Areas.Setup();
+        Pathfinder = new Pathfinder(Width, Height);
 
         isSetup = true;
 
@@ -214,7 +214,7 @@ public class World : ISerialisable {
     }
 
     public void Serialise() {
-        // TODO: We're gonna need to properly reset and setup here
+        // TODO Do we need to properly reset and setup here
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             tileObjects.Clear();
             tileObjectMap.Clear();
@@ -224,6 +224,11 @@ public class World : ISerialisable {
             
         Find.SaveManager.ArchiveValue("width", ref Width);
         Find.SaveManager.ArchiveValue("height", ref Height);
+        
+        // Re setup pathfinding grid with new width & height
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
+            Pathfinder = new Pathfinder(Width, Height);
+        }
         
         Find.SaveManager.ArchiveDeep("elevation", Elevation);
         Find.SaveManager.ArchiveDeep("biomes", Biomes);
