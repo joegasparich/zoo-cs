@@ -7,14 +7,14 @@ namespace Zoo.ui;
 public class Dialog : Window {
     // Constants
     private const string WindowNPatchPath       = "assets/textures/ui/window.png";
-    private const string WindowHeaderNPatchPath = "assets/textures/ui/window_header.png";
+    // private const string WindowHeaderNPatchPath = "assets/textures/ui/window_header.png";
     public const  int    WindowHeaderHeight     = 18;
     
     // Config
     public    bool   Draggable { get; protected set; }
     public    string Title     { get; protected set; }
     private   bool   doBackground     = true;
-    protected Color  backgroundColour = Color.WHITE;
+    protected Color  backgroundColour = Color.WHITE.WithAlpha(0.7f);
     
     // State
     protected bool    headerHovered;
@@ -33,8 +33,8 @@ public class Dialog : Window {
         }
         
         if (doBackground) {
-            var backgroundTexture = !Title.NullOrEmpty() || Draggable ? WindowHeaderNPatchPath : WindowNPatchPath;
-            GUI.DrawTextureNPatch(GetRect(), Find.AssetManager.GetTexture(backgroundTexture), 20, backgroundColour);
+            // var backgroundTexture = !Title.NullOrEmpty() || Draggable ? WindowHeaderNPatchPath : WindowNPatchPath;
+            GUI.DrawTextureNPatch(GetRect(), Find.AssetManager.GetTexture(WindowNPatchPath), 20, backgroundColour);
         }
         
         var headerRect = new Rectangle(0, 0, GetWidth(), WindowHeaderHeight);

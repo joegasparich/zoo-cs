@@ -9,6 +9,7 @@ public static class Draw {
     // Draw a line  (Vector version)
     public static void DrawLineV3D(Vector2 startPos, Vector2 endPos, Color color, float zPos)
     {
+        Rlgl.rlCheckRenderBatchLimit(10);
         Rlgl.rlBegin(DrawMode.LINES);
         Rlgl.rlColor4ub(color.r, color.g, color.b, color.a);
         Rlgl.rlVertex3f(startPos.X, startPos.Y, zPos);
@@ -21,6 +22,7 @@ public static class Draw {
     {
         if (points.Length >= 2)
         {
+            Rlgl.rlCheckRenderBatchLimit(points.Length);
             Rlgl.rlBegin(DrawMode.LINES);
             Rlgl.rlColor4ub(color.r, color.g, color.b, color.a);
 
@@ -44,8 +46,8 @@ public static class Draw {
         // Only calculate rotation if needed
         if (rotation == 0.0f)
         {
-            float x = rec.x - origin.X;
-            float y = rec.y - origin.Y;
+            var x = rec.x - origin.X;
+            var y = rec.y - origin.Y;
             topLeft = new Vector2( x, y );
             topRight = new Vector2( x + rec.width, y );
             bottomLeft = new Vector2( x, y + rec.height );
@@ -53,12 +55,12 @@ public static class Draw {
         }
         else
         {
-            float sinRotation = MathF.Sin(JMath.DegToRad(rotation));
-            float cosRotation = MathF.Cos(JMath.DegToRad(rotation));
-            float x = rec.x;
-            float y = rec.y;
-            float dx = -origin.X;
-            float dy = -origin.Y;
+            var sinRotation = MathF.Sin(JMath.DegToRad(rotation));
+            var cosRotation = MathF.Cos(JMath.DegToRad(rotation));
+            var x = rec.x;
+            var y = rec.y;
+            var dx = -origin.X;
+            var dy = -origin.Y;
 
             topLeft.X = x + dx*cosRotation - dy*sinRotation;
             topLeft.Y = y + dx*sinRotation + dy*cosRotation;
@@ -73,6 +75,7 @@ public static class Draw {
             bottomRight.Y = y + (dx + rec.width)*sinRotation + (dy + rec.height)*cosRotation;
         }
 
+        Rlgl.rlCheckRenderBatchLimit(10);
         Rlgl.rlBegin(DrawMode.TRIANGLES);
 
         Rlgl.rlColor4ub(color.r, color.g, color.b, color.a);
@@ -101,6 +104,8 @@ public static class Draw {
     {
         if (points.Length >= 3)
         {
+            Rlgl.rlCheckRenderBatchLimit((points.Length - 2)*4);
+            
             Rlgl.rlBegin(DrawMode.QUADS);
             Rlgl.rlColor4ub(color.r, color.g, color.b, color.a);
 
@@ -131,6 +136,8 @@ public static class Draw {
         
         if (sourceRect.width < 0) { flipX = true; sourceRect.width *= -1; }
         if (sourceRect.height < 0) sourceRect.y -= sourceRect.height;
+        
+        Rlgl.rlCheckRenderBatchLimit(4);
         
         Rlgl.rlSetTexture(texture.id);
         Rlgl.rlPushMatrix();

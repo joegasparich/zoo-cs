@@ -91,6 +91,9 @@ public class SaveManager {
     }
 
     public IEnumerable<SaveFile> GetSaveFiles() {
+        if (!Directory.Exists(SaveDir))
+            Directory.CreateDirectory(SaveDir);
+        
         var files = Directory.GetFiles(SaveDir, "*.json");
         return files.ToList()
             .OrderByDescending(File.GetLastWriteTime)
