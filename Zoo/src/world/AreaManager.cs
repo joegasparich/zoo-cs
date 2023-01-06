@@ -237,11 +237,15 @@ public class AreaManager {
     public void RenderDebugAreaGrid() {
         foreach (var (_, area) in areas) {
             foreach (var tile in area.Tiles) {
+                if (!Find.Renderer.IsWorldPosOnScreen(tile)) continue;
+                
                 Debug.DrawRect(tile, IntVec2.One, area.Colour.WithAlpha(0.5f), true);
             }
 
             foreach (var (_, doors) in area.ConnectedAreas) {
                 foreach (var door in doors) {
+                    if (!Find.Renderer.IsWorldPosOnScreen(door.WorldPos)) continue;
+                    
                     var tiles = door.GetAdjacentTiles();
                     Debug.DrawLine(tiles[0] + new Vector2(0.5f, 0.5f), tiles[1] + new Vector2(0.5f, 0.5f), Color.BLACK, true);
                 }

@@ -112,7 +112,7 @@ public class Renderer {
     }
 
     public void Blit(
-        Texture2D texture,
+        Texture2D  texture,
         Vector2    pos,
         float      depth  = 0,
         Vector2?   scale  = null,
@@ -120,6 +120,10 @@ public class Renderer {
         Rectangle? source = null,
         Color?     color  = null
     ) {
+        // Cull offscreen blits
+        // TODO: Calculate margin
+        if (!IsPosOnScreen(pos, 100)) return;
+        
         scale  ??= new Vector2(1, 1);
         origin ??= new Vector2(0, 0);
         source ??= new Rectangle(0, 0, 1, 1);
@@ -154,16 +158,22 @@ public class Renderer {
         return worldPos * (World.WorldScale * zoom) - (camera.position * zoom).XY() + new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
     }
 
-    public bool IsPositionOnScreen(Vector2 worldPos, float margin) {
-        var topLeft = ScreenToWorldPos(new Vector2(0, 0));
-        var bottomRight = ScreenToWorldPos(new Vector2(Game.ScreenWidth, Game.ScreenHeight));
+    public bool IsPosOnScreen(Vector2 pos, float margin = 0) {
+        return pos.X > camera.position.X - Game.ScreenWidth/2  - margin && pos.X < camera.position.X + Game.ScreenWidth/2 + margin 
+            && pos.Y > camera.position.Y - Game.ScreenHeight/2 - margin && pos.Y < camera.position.Y + Game.ScreenHeight/2 + margin;
+    }
+
+    // TODO: move these to a util class
+    public bool IsWorldPosOnScreen(Vector2 worldPos, float margin = 32) {
+        var topLeft = ScreenToWorldPos(new Vector2(0, 0) - new Vector2(margin, margin));
+        var bottomRight = ScreenToWorldPos(new Vector2(Game.ScreenWidth, Game.ScreenHeight) + new Vector2(margin, margin));
         
         return worldPos.X > topLeft.X && worldPos.X < bottomRight.X 
             && worldPos.Y > topLeft.Y && worldPos.Y < bottomRight.Y;
     }
 
     public bool IsRectangleOnScreen(Rectangle rect) {
-        var topLeft     = ScreenToWorldPos(new Vector2(0,                0));
+        var topLeft     = ScreenToWorldPos(new Vector2(0, 0));
         var bottomRight = ScreenToWorldPos(new Vector2(Game.ScreenWidth, Game.ScreenHeight));
 
         return rect.x + rect.width > topLeft.X     &&

@@ -30,7 +30,7 @@ public class BiomeInfo {
 public class BiomeGrid : ISerialisable {
     // Constants
     public static readonly int   BiomeScale          = 2;
-    internal const         int   ChunkSize           = 6;
+    internal const         int   ChunkSize           = 20;
     internal const         float SlopeColourStrength = 0.3f;
 
     // Config

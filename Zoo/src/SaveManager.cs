@@ -47,7 +47,15 @@ public class SaveManager {
         saveData.Add("saveName", name);
         Mode            = SerialiseMode.Saving;
         CurrentSaveNode = saveData;
-        Game.Serialise();
+
+        try {
+            Game.Serialise();
+        }
+        catch (Exception e) {
+            Debug.Error("Error saving game: " + e);
+
+            return;
+        }
 
         var fileName = name.ToSnakeCase();
         var postFix = 1;
@@ -71,7 +79,15 @@ public class SaveManager {
 
         Mode            = SerialiseMode.Loading;
         CurrentSaveNode = saveData;
-        Game.Serialise();
+        
+        try {
+            Game.Serialise();
+        }
+        catch (Exception e) {
+            Find.SceneManager.LoadScene(new Scene_Menu());
+            
+            Debug.Error("Error loading game: " + e);
+        }
     }
 
     public IEnumerable<SaveFile> GetSaveFiles() {

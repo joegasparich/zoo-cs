@@ -78,7 +78,9 @@ public class ElevationGrid : ISerialisable {
 
     public void Render() {
         foreach (var polygon in waterPolygons) {
-            Draw.DrawTriangleFan3D(polygon, WaterColour, (int)Depth.Water);
+            if (Find.Renderer.IsWorldPosOnScreen(polygon[0], World.WorldScale)) {
+                Draw.DrawTriangleFan3D(polygon, WaterColour, (int)Depth.Water);
+            }
         }
     }
 
@@ -354,6 +356,8 @@ public class ElevationGrid : ISerialisable {
 
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
+                if (!Find.Renderer.IsWorldPosOnScreen(new Vector2(i, j))) continue;
+                
                 if (i < cols - 1) {
                     Debug.DrawLine(
                         new Vector2(i, j - (int)grid[i][j] * ElevationUtility.ElevationHeight),

@@ -218,6 +218,7 @@ public class Pathfinder {
     public void DrawDebugGrid() {
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
+                if (!Find.Renderer.IsWorldPosOnScreen(new Vector2(i, j))) continue;
                 if (!IsAccessible(new IntVec2(i, j))) continue;
 
                 foreach(var neighbour in GetNeighbours(new IntVec2(i, j))) {
