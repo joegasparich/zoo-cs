@@ -10,6 +10,7 @@ public class Window {
     public  Rectangle         AbsRect { get; protected set; }
     public  bool              Immediate = false;
     private Action<Rectangle> OnUI;
+    public  bool              DismissOnRightClick { get; protected set; } = false;
 
     public Window(Rectangle rect) {
         Id = Guid.NewGuid().ToString();

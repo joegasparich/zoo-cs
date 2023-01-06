@@ -214,9 +214,9 @@ public class Renderer {
         );
     }
     
-    public int GetPickIdAtPos(IntVec2 screenPos) {
+    public int GetPickIdAtPos(Vector2 screenPos) {
         var image = Raylib.LoadImageFromTexture(pickBuffer.texture);
-        var pixel = Raylib.GetImageColor(image, screenPos.X, Game.ScreenHeight - screenPos.Y);
+        var pixel = Raylib.GetImageColor(image, screenPos.X.FloorToInt(), Game.ScreenHeight - screenPos.Y.FloorToInt());
         return Colour.ColourToInt(pixel);
     }
     

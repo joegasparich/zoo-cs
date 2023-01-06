@@ -19,7 +19,7 @@ public class Dialog_DebugPanel : Dialog {
     public override void DoWindowContents() {
         base.DoWindowContents();
 
-        var curY = WindowHeaderHeight + 10;
+        var curY = DefaultWindowHeaderHeight + 10;
         
         GUI.TextColour = Color.WHITE;
         GUI.TextAlign  = AlignMode.MiddleCenter;

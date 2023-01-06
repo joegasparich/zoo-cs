@@ -12,8 +12,8 @@ public class Widget_Toolbar : Window {
     private ToolManager toolManager;
 
     // State
-    private string debugPanelId;
-    private string savePanelId;
+    private string debugDialogId;
+    private string saveDialogId;
 
     public Widget_Toolbar(ToolManager toolManager) : base(new Rectangle(0, 0, Game.ScreenWidth, 45)) {
         this.toolManager = toolManager;
@@ -69,19 +69,19 @@ public class Widget_Toolbar : Window {
         curX += ButtonWidth + GUI.GapSmall;
 
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Save")) {
-            if (!Find.UI.IsWindowOpen(savePanelId)) {
-                savePanelId = Find.UI.PushWindow(new Dialog_Save());
+            if (!Find.UI.IsWindowOpen(saveDialogId)) {
+                saveDialogId = Find.UI.PushWindow(new Dialog_Save());
             } else {
-                Find.UI.CloseWindow(savePanelId);
+                Find.UI.CloseWindow(saveDialogId);
             }
         }
         curX += ButtonWidth + GUI.GapSmall;
 
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Debug")) {
-            if (!Find.UI.IsWindowOpen(debugPanelId)) {
-                debugPanelId = Find.UI.PushWindow(new Dialog_DebugPanel());
+            if (!Find.UI.IsWindowOpen(debugDialogId)) {
+                debugDialogId = Find.UI.PushWindow(new Dialog_DebugPanel());
             } else {
-                Find.UI.CloseWindow(debugPanelId);
+                Find.UI.CloseWindow(debugDialogId);
             }
         }
         curX += ButtonWidth + GUI.GapSmall;

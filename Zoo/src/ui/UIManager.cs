@@ -77,6 +77,18 @@ public class UIManager {
         CurrentEvent      = UIEvent.None;
     }
 
+    public void PostInput(InputEvent evt) {
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT) {
+            foreach (var window in windowStack) {
+                if (window.DismissOnRightClick) {
+                    CloseWindow(window.Id);
+                    evt.Consume();
+                    break;
+                }
+            }
+        }
+    }
+
     public void PreRender() {
         Raylib.SetMouseCursor(cursor);
         SetCursor(MouseCursor.MOUSE_CURSOR_DEFAULT);

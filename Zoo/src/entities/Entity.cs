@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Zoo.ui;
 
 namespace Zoo.entities; 
 
@@ -10,6 +11,10 @@ public class Entity : ISerialisable {
     
     // State
     public Vector2 Pos;
+    private string infoDialogId;
+    
+    // Properties
+    public IEnumerable<Component> Components => components.Values;
 
     public Entity() {}
     public Entity(Vector2 pos) {
@@ -58,6 +63,16 @@ public class Entity : ISerialisable {
         
         Game.UnregisterEntity(this);
     }
+
+    public void OnInput(InputEvent evt) {
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT && Find.Renderer.GetPickIdAtPos(evt.mousePos) == Id) {
+            if (!Find.UI.IsWindowOpen(infoDialogId)) {
+                infoDialogId = Find.UI.PushWindow(new Dialog_Info(this));
+            }
+                
+            evt.Consume();
+        }
+    }
     
     public T AddComponent<T>(params object?[]? args) where T : Component {
         args ??= Array.Empty<object>();
@@ -83,6 +98,7 @@ public class Entity : ISerialisable {
         
         return null;
     }
+
     public bool HasComponent(Type type) {
         return components.ContainsKey(type);
     }

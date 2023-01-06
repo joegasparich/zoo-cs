@@ -1,4 +1,5 @@
-﻿using Zoo.util;
+﻿using Zoo.ui;
+using Zoo.util;
 using Zoo.world;
 
 namespace Zoo.entities; 
@@ -61,5 +62,14 @@ public class TileObjectComponent : Component {
             renderer.Graphics    = Data.GraphicData;
             renderer.SpriteIndex = (int)rotation;
         }
+    }
+
+    public override InfoTab GetInfoTab() {
+        return new InfoTab(Data.Name, rect => {
+            var listing = new Listing(rect);
+            listing.Header(Data.Name.Capitalise());
+            listing.Label($"Type: {Data.Type.Capitalise()}");
+            listing.Label($"Solid: {Data.Solid.ToString().Capitalise()}");
+        });
     }
 }

@@ -59,7 +59,7 @@ public class ToolManager {
         activeTool.OnInput(evt);
         if (evt.consumed) return;
 
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT) {
+        if (activeTool.Type != ToolType.None && evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT) {
             SetTool(ToolType.None);
             evt.Consume();
         }

@@ -1,5 +1,3 @@
-using System.Numerics;
-using System.Text.Json.Nodes;
 using Raylib_cs;
 using Zoo.entities;
 using Zoo.ui;
@@ -30,7 +28,7 @@ public static class Game {
     // State
     private static int ticksSinceGameStart;
     private static int framesSinceGameStart;
-    private static int nextEntityId;
+    private static int nextEntityId = 1;
 
     // Properties
     public static int Ticks => ticksSinceGameStart;
@@ -140,7 +138,14 @@ public static class Game {
 
     public static void OnInput(InputEvent evt) {
         if (!evt.consumed) UI.OnInput(evt);
+        
         if (!evt.consumed) SceneManager.GetCurrentScene().OnInput(evt);
+        
+        foreach (var entity in entities.Values) {
+            if (!evt.consumed) entity.OnInput(evt);
+        }
+        
+        if (!evt.consumed) UI.PostInput(evt);
     }
 
     public static void OnGUI() {

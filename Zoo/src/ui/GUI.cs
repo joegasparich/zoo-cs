@@ -21,6 +21,7 @@ public static class GUI {
     public const            int   GapTiny         = 6;
     public const            int   GapSmall        = 10;
     public const            int   DefaultFontSize = 10;
+    public const            int   HeaderFontSize  = 20;
     private static readonly Color HighlightColor  = new Color(255, 255, 255, 150);
     public static readonly  Color UIButtonColour  = new Color(230, 230, 230, 255);
 
@@ -182,6 +183,16 @@ public static class GUI {
         DrawRect(rect, col);
         HighlightMouseover(rect);
         Label(rect, text);
+
+        if (HoverableArea(rect)) {
+            Find.UI.SetCursor(MouseCursor.MOUSE_CURSOR_POINTING_HAND);
+        }
+
+        return ClickableArea(rect);
+    }
+
+    public static bool ButtonIcon(Rectangle rect, Texture2D icon, Color? colour = null) {
+        DrawTexture(rect, icon, colour);
 
         if (HoverableArea(rect)) {
             Find.UI.SetCursor(MouseCursor.MOUSE_CURSOR_POINTING_HAND);
