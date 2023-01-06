@@ -83,7 +83,7 @@ public static class Game {
             // Do Render
             UI.PreRender();
             Input.ProcessInput();
-            Render();
+            Renderer.Render();
             UI.PostRender();
         }
     }
@@ -122,26 +122,20 @@ public static class Game {
         entitiesToRemove.Clear();
     }
 
-    private static void Render() {
-        Renderer.BeginDrawing();
-        {
-            Renderer.Begin3D();
-            {
-                SceneManager.GetCurrentScene().Render();
-                
-                foreach (var entity in entities.Values) {
-                    entity.Render();
-                }
-                
-                SceneManager.GetCurrentScene().RenderLate();
-            }
-            Renderer.End3D();
-            
-            UI.Render();
+    public static void Render3D() {
+        SceneManager.GetCurrentScene().Render();
+        
+        foreach (var entity in entities.Values) {
+            entity.Render();
         }
-        Renderer.EndDrawing();
+        
+        SceneManager.GetCurrentScene().RenderLate();
 
         framesSinceGameStart++;
+    }
+
+    public static void Render2D() {
+        UI.Render();
     }
 
     public static void OnInput(InputEvent evt) {

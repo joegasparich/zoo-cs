@@ -4,6 +4,19 @@ using Raylib_cs;
 namespace Zoo.util; 
 
 public static class Colour {
+    public static Color IntToColour(int number) {
+        return new Color(
+            (number >>  0) & 255,
+            (number >>  8) & 255,
+            (number >> 16) & 255,
+            255
+        );
+    }
+
+    public static int ColourToInt(Color colour) {
+        return ( colour.r << 0 ) | ( colour.g << 8 ) | ( colour.b << 16 );
+    }
+    
     public static Vector3 Rgb2Hsv(Vector3 rgb) {
         var   hsv = new Vector3();
 

@@ -17,6 +17,17 @@ public enum Depth
     Camera = -10
 }
 
+internal class Blit {
+    public Texture2D Texture;
+    public Rectangle SourceRect; 
+    public Rectangle DestRect; 
+    public Vector3   Origin; 
+    public float     Rotation; 
+    public float     PosZ;
+    public Color     Tint;
+    public int       PickId;
+}
+
 public class Renderer {
     // Constants
     public const  int   PixelScale     = 2;
@@ -25,20 +36,24 @@ public class Renderer {
     private const float MinZoom        = 0.5f;
     private const float MaxZoom        = 10f;
     
-    // References
-    private Shader   discardAlphaShader;
+    // Resources
+    private static Shader discardAlphaShader = Raylib.LoadShader(null, "assets/shaders/discard_alpha.fsh");
+    private static Shader pickShader         = Raylib.LoadShader(null, "assets/shaders/pick.fsh");
+    private static int    pickColourLoc      = Raylib.GetShaderLocation(pickShader, "pickColor");
+    
+    // Collections
+    private List<Blit> blits = new();
     
     // State
-    private Camera3D camera;
-    private float    zoom = 1;
-    private Vector2? dragStart;
-    private Vector2? dragCameraOrigin;
+    private Camera3D        camera;
+    private float           zoom = 1;
+    private Vector2?        dragStart;
+    private Vector2?        dragCameraOrigin;
+    private RenderTexture2D pickBuffer;
     
     public Renderer() {
         Debug.Log("Initialising Renderer");
         Raylib.SetTargetFPS(60);
-
-        discardAlphaShader = Raylib.LoadShader(null, "assets/shaders/discard_alpha.fs");
 
         camera.projection = CameraProjection.CAMERA_ORTHOGRAPHIC;
         camera.fovy       = Game.ScreenHeight / zoom;
@@ -47,6 +62,8 @@ public class Renderer {
         
         dragStart        = Find.Input.GetMousePos();
         dragCameraOrigin = camera.target.XY();
+
+        pickBuffer = Raylib.LoadRenderTexture(Game.ScreenWidth, Game.ScreenHeight);
         
         Rlgl.rlEnableDepthTest();
     }
@@ -87,24 +104,32 @@ public class Renderer {
         camera.fovy = Game.ScreenHeight / zoom;
     }
 
-    public void BeginDrawing() {
+    public void Render() {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.DARKBLUE);
         
-        Raylib.BeginShaderMode(discardAlphaShader);
-    }
-
-    public void EndDrawing() {
-        Raylib.EndShaderMode();
-        Raylib.EndDrawing();
-    }
-    
-    public void Begin3D() {
         Raylib.BeginMode3D(camera);
-    }
-    
-    public void End3D() {
+        {
+            Game.Render3D();
+            
+            Raylib.BeginShaderMode(discardAlphaShader);
+            // Draw blits
+            foreach (var blit in blits) {
+                DoBlit(blit);
+            }
+
+            Raylib.EndShaderMode();
+        }
         Raylib.EndMode3D();
+        
+        RenderPickIdsToBuffer();
+        // TODO: Toggleable
+        RenderPickBuffer();
+        
+        Game.Render2D();
+        Raylib.EndDrawing();
+        
+        blits.Clear();
     }
 
     public float GetDepth(float yPos) {
@@ -130,22 +155,50 @@ public class Renderer {
         color  ??= Color.WHITE;
         
         var src = new Rectangle(
-            source.Value.x * texture.width,
-            source.Value.y * texture.height,
-            source.Value.width * texture.width,
+            source.Value.x      * texture.width,
+            source.Value.y      * texture.height,
+            source.Value.width  * texture.width,
             source.Value.height * texture.height
         );
         var scaledOrigin = origin.Value * scale.Value;
         
+        blits.Add(new Blit {
+            Texture = texture,
+            SourceRect = src,
+            DestRect = new Rectangle(pos.X, pos.Y, scale.Value.X, scale.Value.Y),
+            Origin = new Vector3(scaledOrigin.X, scaledOrigin.Y, 0),
+            Rotation = 0,
+            PosZ = depth,
+            Tint = color.Value
+        });
+    }
+
+    private void DoBlit(Blit blit) {
         Draw.DrawTexturePro3D(
-            texture,
-            src,
-            new Rectangle(pos.X, pos.Y, scale.Value.X, scale.Value.Y),
-            new Vector3(scaledOrigin.X, scaledOrigin.Y, 0),
-            0,
-            depth,
-            color.Value
+            blit.Texture,
+            blit.SourceRect,
+            blit.DestRect,
+            blit.Origin,
+            blit.Rotation,
+            blit.PosZ,
+            blit.Tint
         );
+    }
+
+    private void RenderPickIdsToBuffer() {
+        Raylib.BeginTextureMode(pickBuffer);
+        Raylib.ClearBackground(Color.WHITE);
+        Raylib.BeginMode3D(camera);
+        Raylib.BeginShaderMode(pickShader);
+        {
+            foreach (var blit in blits) {
+                Raylib.SetShaderValue(pickShader, pickColourLoc, Colour.IntToColour(blit.PickId).ToVector3(), ShaderUniformDataType.SHADER_UNIFORM_VEC3);
+                DoBlit(blit);
+            }
+        }
+        Raylib.EndShaderMode();
+        Raylib.EndMode3D();
+        Raylib.EndTextureMode();
     }
     
     public Vector2 ScreenToWorldPos(Vector2 screenPos) {
@@ -180,5 +233,16 @@ public class Renderer {
             rect.x                 < bottomRight.X &&
             rect.y + rect.height   > topLeft.Y     &&
             rect.y                 < bottomRight.Y;
+    }
+
+    public void RenderPickBuffer() {
+        Raylib.DrawTexturePro(
+            pickBuffer.texture,
+            new Rectangle(0, 0, pickBuffer.texture.width, -pickBuffer.texture.height),
+            new Rectangle(0, Game.ScreenHeight - 112, 173, 112),
+            new Vector2(0, 0),
+            0,
+            Color.WHITE
+        );
     }
 }
