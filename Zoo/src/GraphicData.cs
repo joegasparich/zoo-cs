@@ -30,7 +30,7 @@ public class GraphicData {
         this.cellHeight = cellHeight;
     }
 
-    public void Blit(Vector2 pos, float depth, Color colour, int index = 0) {
+    public void Blit(Vector2 pos, float depth, Color colour, int index = 0, int pickId = 0) {
         var source = GetCellBounds(index);
         
         Find.Renderer.Blit(
@@ -40,7 +40,8 @@ public class GraphicData {
             scale: new Vector2(Sprite.width * source.width, Sprite.height * source.height) * Renderer.PixelScale,
             origin: Origin,
             source: source,
-            color: colour
+            color: colour,
+            pickId: pickId
         );
     }
     

@@ -30,7 +30,8 @@ public class RenderComponent : Component {
             pos: (entity.Pos + Offset) * World.WorldScale,
             depth: Find.Renderer.GetDepth(entity.Pos.Y),
             colour: OverrideColour,
-            index: SpriteIndex
+            index: SpriteIndex,
+            pickId: entity.Id
         );
         
         OverrideColour = Color.WHITE;

@@ -10,7 +10,6 @@ public enum Depth
     Ground = -1,
     GroundCover = -2,
     Water = -3,
-    Overlay = -4,
     YSorting = - 5,
     Debug = -8,
     UI = -9,
@@ -113,7 +112,6 @@ public class Renderer {
             Game.Render3D();
             
             Raylib.BeginShaderMode(discardAlphaShader);
-            // Draw blits
             foreach (var blit in blits) {
                 DoBlit(blit);
             }
@@ -143,7 +141,8 @@ public class Renderer {
         Vector2?   scale  = null,
         Vector2?   origin = null,
         Rectangle? source = null,
-        Color?     color  = null
+        Color?     color  = null,
+        int        pickId = 0
     ) {
         // Cull offscreen blits
         // TODO: Calculate margin
@@ -169,7 +168,8 @@ public class Renderer {
             Origin = new Vector3(scaledOrigin.X, scaledOrigin.Y, 0),
             Rotation = 0,
             PosZ = depth,
-            Tint = color.Value
+            Tint = color.Value,
+            PickId = pickId
         });
     }
 
@@ -184,22 +184,43 @@ public class Renderer {
             blit.Tint
         );
     }
+    
+    // Picking //
 
     private void RenderPickIdsToBuffer() {
         Raylib.BeginTextureMode(pickBuffer);
         Raylib.ClearBackground(Color.WHITE);
         Raylib.BeginMode3D(camera);
-        Raylib.BeginShaderMode(pickShader);
         {
             foreach (var blit in blits) {
+                Raylib.BeginShaderMode(pickShader);
                 Raylib.SetShaderValue(pickShader, pickColourLoc, Colour.IntToColour(blit.PickId).ToVector3(), ShaderUniformDataType.SHADER_UNIFORM_VEC3);
                 DoBlit(blit);
+                Raylib.EndShaderMode();
             }
         }
-        Raylib.EndShaderMode();
         Raylib.EndMode3D();
         Raylib.EndTextureMode();
     }
+
+    public void RenderPickBuffer() {
+        Raylib.DrawTexturePro(
+            pickBuffer.texture,
+            new Rectangle(0, 0,                       pickBuffer.texture.width, -pickBuffer.texture.height),
+            new Rectangle(0, Game.ScreenHeight - 112, 173,                      112),
+            new Vector2(0, 0),
+            0,
+            Color.WHITE
+        );
+    }
+    
+    public int GetPickIdAtPos(IntVec2 screenPos) {
+        var image = Raylib.LoadImageFromTexture(pickBuffer.texture);
+        var pixel = Raylib.GetImageColor(image, screenPos.X, Game.ScreenHeight - screenPos.Y);
+        return Colour.ColourToInt(pixel);
+    }
+    
+    // Utility //
     
     public Vector2 ScreenToWorldPos(Vector2 screenPos) {
         var cameraCenter = (camera.position * zoom).XY() - new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
@@ -233,16 +254,5 @@ public class Renderer {
             rect.x                 < bottomRight.X &&
             rect.y + rect.height   > topLeft.Y     &&
             rect.y                 < bottomRight.Y;
-    }
-
-    public void RenderPickBuffer() {
-        Raylib.DrawTexturePro(
-            pickBuffer.texture,
-            new Rectangle(0, 0, pickBuffer.texture.width, -pickBuffer.texture.height),
-            new Rectangle(0, Game.ScreenHeight - 112, 173, 112),
-            new Vector2(0, 0),
-            0,
-            Color.WHITE
-        );
     }
 }
