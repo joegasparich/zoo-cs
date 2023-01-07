@@ -47,8 +47,9 @@ public class ToolManager {
     }
 
     public void Render() {
-        Ghost.Render();
+        Ghost.UpdatePos();
         activeTool.Render();
+        Ghost.Render();
     }
     
     public void OnGUI() {

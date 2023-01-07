@@ -38,7 +38,7 @@ public class Tool_Door : Tool {
         }
     }
 
-    public override void Update() {
+    public override void Render() {
         var wall = Find.World.Walls.GetWallAtTile(Ghost.Pos.Floor(), Ghost.Side);
         
         Ghost.Visible = wall is { Exists: true };

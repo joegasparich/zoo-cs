@@ -65,8 +65,8 @@ public class ToolGhost {
         Radius = 1;
         Offset = Vector2.Zero;
     }
-    
-    public void Render() {
+
+    public void UpdatePos() {
         if (Follow) {
             Pos  = Find.Input.GetMouseWorldPos();
             Side = World.GetQuadrantAtPos(Pos);
@@ -74,7 +74,9 @@ public class ToolGhost {
         if (Snap) {
             Pos = Pos.Floor();
         }
-
+    }
+    
+    public void Render() {
         if (!Visible) return;
 
         switch (Type) {

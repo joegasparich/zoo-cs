@@ -78,7 +78,7 @@ public class Tool_Biome : Tool {
     public override void Update() {
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
 
-        var pos    = Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale;
+        var pos = Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale;
         
         // Save backups for undo
         foreach (var chunk in Find.World.Biomes.GetChunksInRadius(pos, radius * BiomeGrid.BiomeScale)) {
