@@ -16,6 +16,20 @@ public enum Direction {
     N, NE, E, SE, S, SW, W, NW
 };
 
+public enum AccessibilityType {
+    NoSolid,
+    NoWater,
+    NoSolidIgnorePaths,
+    NoWaterIgnorePaths,
+    PathsOnly,
+}
+
+public enum TileCost {
+    None = 0,
+    Preferred = 1,
+    Normal = 30,
+}
+
 public class World : ISerialisable {
     // Constants
     public const int WorldScale      = 32;
@@ -26,8 +40,9 @@ public class World : ISerialisable {
     public int Height;
 
     // Collections
-    private readonly Dictionary<int, Entity>    tileObjects   = new();
-    private readonly Dictionary<string, Entity> tileObjectMap = new();
+    private readonly Dictionary<int, Entity>                tileObjects        = new();
+    private readonly Dictionary<string, Entity>             tileObjectMap      = new();
+    private readonly Dictionary<AccessibilityType, int[][]> accessibilityGrids = new();
 
     // Grids
     public ElevationGrid Elevation  { get; private set; }
@@ -60,6 +75,8 @@ public class World : ISerialisable {
         Areas.Setup();
         Pathfinder = new Pathfinder(Width, Height);
 
+        PopulateAccessibilityGrids();
+
         isSetup = true;
 
         Debug.Log("World setup complete");
@@ -74,6 +91,7 @@ public class World : ISerialisable {
 
         tileObjects.Clear();
         tileObjectMap.Clear();
+        accessibilityGrids.Clear();
         
         isSetup = false;
     }
@@ -108,6 +126,10 @@ public class World : ISerialisable {
         }
 
         if (component.Data.Solid) {
+            foreach (var tile in component.GetOccupiedTiles()) {
+                UpdateAccessibilityGrids(tile);
+            }
+
             Messenger.Fire(EventType.PlaceSolid, component.GetOccupiedTiles().ToList());
         }
     }
@@ -119,20 +141,77 @@ public class World : ISerialisable {
         foreach (var tile in component.GetOccupiedTiles()) {
             tileObjectMap.Remove(tile.ToString());
         }
+        
+        if (component.Data.Solid) {
+            foreach (var tile in component.GetOccupiedTiles()) {
+                UpdateAccessibilityGrids(tile);
+            }
+        }
+    }
+
+    private void PopulateAccessibilityGrids() {
+        foreach(var type in Enum.GetValues(typeof(AccessibilityType))) {
+            var grid = new int[Width][];
+            for (var x = 0; x < Width; x++) {
+                grid[x] = new int[Height];
+            }
+
+            accessibilityGrids.Add((AccessibilityType) type, grid);
+        }
+        
+        for (var i = 0; i < Width; i++) {
+            for (var j = 0; j < Height; j++) {
+                UpdateAccessibilityGrids(new IntVec2(i, j));
+            }
+        }
+    }
+
+    public void UpdateAccessibilityGrids(IntVec2 tile) {
+        foreach(var (type, grid) in accessibilityGrids) {
+            grid[tile.X][tile.Y] = (int)CalculateTileCost(tile, type);
+        }
+    }
+
+    private TileCost CalculateTileCost(IntVec2 tile, AccessibilityType type) {
+        Debug.Assert(IsPositionInMap(tile));
+
+        // Solid
+        if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) {
+            return TileCost.None;
+        }
+        
+        // Water
+        if (Elevation.IsTileWater(tile)) {
+            return type switch {
+                AccessibilityType.NoWater => TileCost.None,
+                AccessibilityType.NoWaterIgnorePaths => TileCost.None,
+                AccessibilityType.PathsOnly => TileCost.None,
+                _ => TileCost.Normal
+            };
+        }
+
+        // Path
+        if (FootPaths.GetFootPathAtTile(tile)!.Exists) {
+            return type switch {
+                AccessibilityType.PathsOnly          => TileCost.Normal,
+                AccessibilityType.NoSolidIgnorePaths => TileCost.Normal,
+                AccessibilityType.NoWaterIgnorePaths => TileCost.Normal,
+                _                                    => TileCost.Preferred
+            };
+        }
+
+        return type switch {
+            AccessibilityType.PathsOnly => TileCost.None,
+            _                           => TileCost.Normal
+        };
+    }
+
+    public int GetTileCost(IntVec2 tile, AccessibilityType type) {
+        Debug.Assert(isSetup);
+        
+        return accessibilityGrids[type][tile.X][tile.Y];
     }
     
-    // TODO (optimisation): cache tile cost grids (paths, no water, etc.)
-    // TODO: Set up consts for tile costs
-    public int GetTileWalkability(IntVec2 tile) {
-        if (!isSetup) return 0;
-        if (!IsPositionInMap(tile)) return 0;
-        if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) return 0;
-        if (Elevation.IsTileWater(tile)) return 0;
-        if (FootPaths.GetFootPathAtTile(tile)!.Exists) return 1;
-
-        return 30;
-    }
-
     public bool IsPositionInMap(Vector2 pos) {
         return pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
     }

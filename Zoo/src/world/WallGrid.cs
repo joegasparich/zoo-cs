@@ -242,7 +242,6 @@ public class WallGrid : ISerialisable {
         }
     }
 
-    // TODO (optimisation): use cached accessibility grids instead
     // This is expensive as fuck so only use it on load
     private void UpdatePathfinding() {
         for (var i = 0; i < cols * 2 + 1; i++) {

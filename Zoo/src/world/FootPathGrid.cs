@@ -107,7 +107,7 @@ public class FootPathGrid : ISerialisable {
             Pos = tile,
         };
         
-        // TODO (optimisation): update pathfinding once using walkability grid
+        Find.World.UpdateAccessibilityGrids(tile);
         
         return grid[tile.X][tile.Y];
     }
@@ -120,7 +120,7 @@ public class FootPathGrid : ISerialisable {
             Pos = tile
         };
 
-        // TODO (optimisation): update pathfinding once using walkability grid
+        Find.World.UpdateAccessibilityGrids(tile);
     }
     
     public IEnumerable<FootPath> GetAllFootPaths() {

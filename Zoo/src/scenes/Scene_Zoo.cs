@@ -2,6 +2,7 @@ using System.Numerics;
 using Raylib_cs;
 using Zoo.entities;
 using Zoo.util;
+using Zoo.world;
 
 namespace Zoo; 
 
@@ -23,8 +24,10 @@ public class Scene_Zoo : Scene {
         var man = new Entity(new Vector2(0, 0));
         var renderer = man.AddComponent<RenderComponent>();
         renderer.Graphics.SetSprite(TEXTURES.KEEPER);
-        man.AddComponent<AreaPathFollowComponent>();
+        var pf = man.AddComponent<AreaPathFollowComponent>();
+        pf.AccessibilityType = AccessibilityType.NoSolid;
         man.AddComponent<PhysicsComponent>();
+        man.AddComponent<ElevationComponent>();
         man.AddComponent<MoveComponent>();
         man.AddComponent<TestControllableComponent>();
         Game.RegisterEntity(man);

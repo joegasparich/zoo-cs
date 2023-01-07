@@ -156,6 +156,11 @@ public class ElevationGrid : ISerialisable {
         oldPoints.TryAdd(gridPos, GetElevationAtGridPos(gridPos));
         
         grid[gridPos.X][gridPos.Y] = elevation;
+
+        foreach (var tile in GetSurroundingTiles(gridPos)) {
+            Find.World.UpdateAccessibilityGrids(tile);
+        }
+        
         return true;
     }
     

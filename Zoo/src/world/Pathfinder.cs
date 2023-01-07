@@ -6,7 +6,6 @@ namespace Zoo.world;
 
 internal struct Tile {
     public bool[] connections = { true, true, true, true, true, true, true, true };
-    public bool   accessible  = true;
     public Tile() {}
 }
 
@@ -49,7 +48,7 @@ public class Pathfinder {
         isSetup = true;
     }
     
-    public Task<List<IntVec2>?>? RequestPath(IntVec2 start, IntVec2 end) {
+    public Task<List<IntVec2>?>? RequestPath(IntVec2 start, IntVec2 end, AccessibilityType accessibility) {
         if (!isSetup) return null;
         
         var key = $"{start.X},{start.Y},{end.X},{end.Y}";
@@ -58,7 +57,7 @@ public class Pathfinder {
         }
         
         var task = Task.Run(() => {
-            var path = GetPath(start, end);
+            var path = GetPath(start, end, accessibility);
             pathRequests.Remove(key);
             return path;
         });
@@ -67,10 +66,10 @@ public class Pathfinder {
     }
     
     // https://www.geeksforgeeks.org/a-search-algorithm/
-    private List<IntVec2>? GetPath(IntVec2 from, IntVec2 to) {
+    private List<IntVec2>? GetPath(IntVec2 from, IntVec2 to, AccessibilityType accessibility) {
         if (!isSetup) return null;
         if (!Find.World.IsPositionInMap(from) || !Find.World.IsPositionInMap(to)) return null;
-        if (!IsAccessible(from) || !IsAccessible(to)) return null;
+        if (!IsAccessible(from, accessibility) || !IsAccessible(to, accessibility)) return null;
         if (from == to) return null;
 
         var closedList  = new bool[cols, rows];
@@ -96,7 +95,7 @@ public class Pathfinder {
             (x, y) = openList.Dequeue();
             closedList[x, y] = true;
 
-            foreach(var neighbour in GetNeighbours(new IntVec2(x, y))) {
+            foreach(var neighbour in GetNeighbours(new IntVec2(x, y), accessibility)) {
                 var (nx, ny) = neighbour;
 
                 if (neighbour == to) {
@@ -108,8 +107,7 @@ public class Pathfinder {
                 // If the successor is already on the closed list then ignore it
                 if (closedList[nx, ny]) continue;
 
-                // TODO (optimisation): use walkability grid instead
-                var gNew = cellDetails[x, y].gCost + Find.World.GetTileWalkability(new IntVec2(x, y));
+                var gNew = cellDetails[x, y].gCost + Find.World.GetTileCost(new IntVec2(x, y), accessibility);
                 var hNew = CalculateHValue(neighbour, to);
                 var fNew = gNew + hNew;
 
@@ -149,26 +147,19 @@ public class Pathfinder {
         return path;
     }
 
-    public void SetAccessibility(IntVec2 tile, bool accessible) {
-        if (!isSetup) return;
-        if (!Find.World.IsPositionInMap(tile)) return;
-        tileGrid[tile.X, tile.Y].accessible = accessible;
-    }
-    
     public void SetAccessibility(IntVec2 tile, Direction direction, bool accessible) {
         if (!isSetup) return;
         if (!Find.World.IsPositionInMap(tile)) return;
         tileGrid[tile.X, tile.Y].connections[(int) direction] = accessible;
     }
 
-    private bool IsAccessible(IntVec2 tilePos) {
+    private bool IsAccessible(IntVec2 tilePos, AccessibilityType accessibility) {
         if (!isSetup) return false;
         if (!Find.World.IsPositionInMap(tilePos)) return false;
         var (x, y) = tilePos;
         var tile = tileGrid[x, y];
         
-        if (!tile.accessible) return false;
-        if (Find.World.GetTileWalkability(tilePos) <= 0) return false;
+        if (Find.World.GetTileCost(tilePos, accessibility) <= 0) return false;
         
         // Make sure at least one direction is accessible
         if (y > 0 &&                    tileGrid[x,     y - 1].connections[(int)Direction.S])  return true;
@@ -186,7 +177,7 @@ public class Pathfinder {
         return false;
     }
     
-    private List<IntVec2> GetNeighbours(IntVec2 tilePos) {
+    private List<IntVec2> GetNeighbours(IntVec2 tilePos, AccessibilityType accessibility) {
         if (!isSetup) return new List<IntVec2>();
         if (!Find.World.IsPositionInMap(tilePos)) return new List<IntVec2>();
         var (x, y) = tilePos;
@@ -196,17 +187,17 @@ public class Pathfinder {
 
         var connections = new List<IntVec2>();
 
-        if (y > 0                       && IsAccessible(new IntVec2(x, y - 1))     && tile.connections[(int)Direction.N])  connections.Add(new IntVec2(x, y - 1));
-        if (x < width-1                 && IsAccessible(new IntVec2(x + 1, y))     && tile.connections[(int)Direction.E])  connections.Add(new IntVec2(x + 1, y));
-        if (y < height-1                && IsAccessible(new IntVec2(x, y + 1))     && tile.connections[(int)Direction.S])  connections.Add(new IntVec2(x, y + 1));
-        if (x > 0                       && IsAccessible(new IntVec2(x - 1, y))     && tile.connections[(int)Direction.W])  connections.Add(new IntVec2(x - 1, y));
+        if (y > 0                       && IsAccessible(new IntVec2(x, y - 1), accessibility)     && tile.connections[(int)Direction.N])  connections.Add(new IntVec2(x, y - 1));
+        if (x < width-1                 && IsAccessible(new IntVec2(x + 1, y), accessibility)     && tile.connections[(int)Direction.E])  connections.Add(new IntVec2(x + 1, y));
+        if (y < height-1                && IsAccessible(new IntVec2(x, y + 1), accessibility)     && tile.connections[(int)Direction.S])  connections.Add(new IntVec2(x, y + 1));
+        if (x > 0                       && IsAccessible(new IntVec2(x - 1, y), accessibility)     && tile.connections[(int)Direction.W])  connections.Add(new IntVec2(x - 1, y));
 
         if (!Diagonals) return connections;
         
-        if (x < width-1 && y > 0        && IsAccessible(new IntVec2(x + 1, y - 1)) && tile.connections[(int)Direction.NE]) connections.Add(new IntVec2(x + 1, y - 1));
-        if (x < width-1 && y < height-1 && IsAccessible(new IntVec2(x + 1, y + 1)) && tile.connections[(int)Direction.SE]) connections.Add(new IntVec2(x + 1, y + 1));
-        if (x > 0 && y < height-1       && IsAccessible(new IntVec2(x - 1, y + 1)) && tile.connections[(int)Direction.SW]) connections.Add(new IntVec2(x - 1, y + 1));
-        if (x > 0 && y > 0              && IsAccessible(new IntVec2(x - 1, y - 1)) && tile.connections[(int)Direction.NW]) connections.Add(new IntVec2(x - 1, y - 1));
+        if (x < width-1 && y > 0        && IsAccessible(new IntVec2(x + 1, y - 1), accessibility) && tile.connections[(int)Direction.NE]) connections.Add(new IntVec2(x + 1, y - 1));
+        if (x < width-1 && y < height-1 && IsAccessible(new IntVec2(x + 1, y + 1), accessibility) && tile.connections[(int)Direction.SE]) connections.Add(new IntVec2(x + 1, y + 1));
+        if (x > 0 && y < height-1       && IsAccessible(new IntVec2(x - 1, y + 1), accessibility) && tile.connections[(int)Direction.SW]) connections.Add(new IntVec2(x - 1, y + 1));
+        if (x > 0 && y > 0              && IsAccessible(new IntVec2(x - 1, y - 1), accessibility) && tile.connections[(int)Direction.NW]) connections.Add(new IntVec2(x - 1, y - 1));
 
         return connections;
     }
@@ -215,13 +206,13 @@ public class Pathfinder {
         return a.DistanceSquared(b);
     }
 
-    public void DrawDebugGrid() {
+    public void DrawDebugGrid(AccessibilityType accessibility = AccessibilityType.NoWater) {
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
                 if (!Find.Renderer.IsWorldPosOnScreen(new Vector2(i, j))) continue;
-                if (!IsAccessible(new IntVec2(i, j))) continue;
+                if (!IsAccessible(new IntVec2(i, j), accessibility)) continue;
 
-                foreach(var neighbour in GetNeighbours(new IntVec2(i, j))) {
+                foreach(var neighbour in GetNeighbours(new IntVec2(i, j), accessibility)) {
                     var (nx, ny) = neighbour;
                     Debug.DrawLine(new Vector2(i + 0.5f, j + 0.5f), new Vector2(nx + 0.5f, ny + 0.5f), Color.BLUE, true);
                 }

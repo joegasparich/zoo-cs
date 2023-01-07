@@ -1,12 +1,16 @@
 ﻿using System.Numerics;
 using Raylib_cs;
 using Zoo.util;
+using Zoo.world;
 
 namespace Zoo.entities; 
 
 public class PathFollowComponent : InputComponent {
     // Constants
     protected const float NodeReachedDist = 0.2f;
+    
+    // Config
+    public AccessibilityType AccessibilityType = AccessibilityType.NoWater;
     
     // State
     private   Vector2?              destination;
@@ -74,7 +78,7 @@ public class PathFollowComponent : InputComponent {
         }
 
         destination = targetPos;
-        pathRequest    = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), targetPos.Floor());
+        pathRequest    = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), targetPos.Floor(), AccessibilityType);
     }
 
     private void CheckPathRequest() {
