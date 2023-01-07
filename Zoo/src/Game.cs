@@ -122,34 +122,21 @@ public static class Game {
             entity.PostUpdate();
         }
 
-        foreach (var entity in entitiesToAdd) {
-            try {
-                entity.Setup();
-                entities.Add(entity.Id, entity);
-            }
-            catch (Exception e) {
-                Debug.Error($"Failed to set up entity {entity.Id}:", e);
-                entity.Destroy();
-            }
-        }
-        entitiesToAdd.Clear();   
-        
-        foreach (var entity in entitiesToRemove) {
-            entities.Remove(entity.Id);
-        }
-        entitiesToRemove.Clear();
+        DoEntityReg();
     }
 
-    public static void Render3D() {
+    public static void Render() {
         SceneManager.GetCurrentScene().Render();
         
         foreach (var entity in entities.Values) {
             entity.Render();
         }
-        
-        SceneManager.GetCurrentScene().RenderLate();
 
         framesSinceGameStart++;
+    }
+
+    public static void RenderLate() {
+        SceneManager.GetCurrentScene().RenderLate();
     }
 
     public static void Render2D() {
@@ -210,6 +197,25 @@ public static class Game {
     public static void UnregisterEntity(Entity entity) {
         entitiesToRemove.Add(entity);
     }
+
+    private static void DoEntityReg() {
+        foreach (var entity in entitiesToAdd) {
+            try {
+                entity.Setup();
+                entities.Add(entity.Id, entity);
+            }
+            catch (Exception e) {
+                Debug.Error($"Failed to set up entity {entity.Id}:", e);
+                entity.Destroy();
+            }
+        }
+        entitiesToAdd.Clear();   
+        
+        foreach (var entity in entitiesToRemove) {
+            entities.Remove(entity.Id);
+        }
+        entitiesToRemove.Clear();
+    }
     
     public static Entity GetEntityById(int id) {
         return entities[id];
@@ -233,10 +239,9 @@ public static class Game {
         SaveManager.ArchiveValue("framesSinceGameStart", ref framesSinceGameStart);
         SaveManager.ArchiveValue("nextEntityId",         ref nextEntityId);
         
-        // TODO (fix): probably need to clear temp entity lists
+        DoEntityReg();
         if (SaveManager.Mode == SerialiseMode.Loading)
             entities.Clear();
-            // TODO: do we need to reset entities and components? Probably not
             
         SaveManager.ArchiveDeep("scene", SceneManager.GetCurrentScene());
         SaveManager.ArchiveCustom("entities", 

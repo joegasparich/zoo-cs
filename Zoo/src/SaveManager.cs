@@ -4,8 +4,6 @@ using System.Text.Json.Nodes;
 using Raylib_cs;
 using Zoo.util;
 
-// TODO: Use raylib file functions
-
 namespace Zoo;
 
 public enum SerialiseMode {

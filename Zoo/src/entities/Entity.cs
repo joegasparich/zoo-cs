@@ -51,9 +51,10 @@ public class Entity : ISerialisable {
         }
         
         // Debug rendering
-        // TODO: Toggleable
-        Debug.DrawLine(Pos - new Vector2(0.25f, 0.25f), Pos + new Vector2(0.25f, 0.25f), new Color(255, 0, 0, 255), true);
-        Debug.DrawLine(Pos - new Vector2(-0.25f, 0.25f), Pos + new Vector2(-0.25f, 0.25f), new Color(255, 0, 0, 255), true);
+        if (DebugSettings.EntityLocations) {
+            Debug.DrawLine(Pos - new Vector2(0.25f, 0.25f), Pos + new Vector2(0.25f, 0.25f), new Color(255, 0, 0, 255), true);
+            Debug.DrawLine(Pos - new Vector2(-0.25f, 0.25f), Pos + new Vector2(-0.25f, 0.25f), new Color(255, 0, 0, 255), true);
+        }
     }
 
     public void Destroy() {

@@ -61,20 +61,22 @@ public class Renderer {
         
         Raylib.BeginMode3D(Camera.Cam);
         {
-            Game.Render3D();
+            Game.Render();
             
             Raylib.BeginShaderMode(discardAlphaShader);
             foreach (var blit in blits) {
                 DoBlit(blit);
             }
-
             Raylib.EndShaderMode();
+            
+            
+            Game.RenderLate();
         }
         Raylib.EndMode3D();
         
         RenderPickIdsToBuffer();
-        // TODO: Toggleable
-        RenderPickBuffer();
+        if (DebugSettings.DrawPickBuffer)
+            RenderPickBuffer();
         
         Game.Render2D();
         Raylib.EndDrawing();
@@ -96,14 +98,13 @@ public class Renderer {
         Color?     color  = null,
         int        pickId = 0
     ) {
-        // Cull offscreen blits
-        // TODO: Calculate margin
-        if (!IsPosOnScreen(pos, 100)) return;
-        
-        scale  ??= new Vector2(1, 1);
+        scale  ??= new Vector2(texture.width, texture.height);
         origin ??= new Vector2(0, 0);
         source ??= new Rectangle(0, 0, 1, 1);
         color  ??= Color.WHITE;
+        
+        // Cull offscreen blits
+        if (!IsPosOnScreen(pos, MathF.Max(scale.Value.X, scale.Value.Y))) return;
         
         var src = new Rectangle(
             source.Value.x      * texture.width,
@@ -189,7 +190,6 @@ public class Renderer {
             && pos.Y > Camera.Position.Y - Game.ScreenHeight/2 - margin && pos.Y < Camera.Position.Y + Game.ScreenHeight/2 + margin;
     }
 
-    // TODO: move these to a util class
     public bool IsWorldPosOnScreen(Vector2 worldPos, float margin = 32) {
         var topLeft = ScreenToWorldPos(new Vector2(0, 0) - new Vector2(margin, margin));
         var bottomRight = ScreenToWorldPos(new Vector2(Game.ScreenWidth, Game.ScreenHeight) + new Vector2(margin, margin));

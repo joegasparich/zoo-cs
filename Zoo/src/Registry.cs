@@ -23,10 +23,14 @@ public class ObjectData {
     public bool        CanRotate        = false;
 }
 
+public enum FenceType {
+    Fence
+}
+
 public class WallData {
     public string      Id;
     public string      Name;
-    public string      Type; // TODO
+    public FenceType   Type;
     public GraphicData GraphicData;
     public bool        Solid = true;
 }
