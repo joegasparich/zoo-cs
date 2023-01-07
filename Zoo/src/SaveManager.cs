@@ -40,7 +40,7 @@ public class SaveManager {
         Find.SceneManager.LoadScene(scene);
     }
 
-    public void SaveGame(string name = DefaultSaveName) {
+    public void SaveGame(string name = DefaultSaveName, bool overwrite = false) {
         Debug.Log("Saving game");
         
         JsonObject saveData = new JsonObject();
@@ -58,10 +58,13 @@ public class SaveManager {
         }
 
         var fileName = name.ToSnakeCase();
-        var postFix = 1;
-        while (File.Exists($"{SaveDir}{fileName}.json")) {
-            fileName = $"{name.ToSnakeCase()}_{postFix}";
-            postFix++;
+
+        if (!overwrite) {
+            var postFix = 1;
+            while (File.Exists($"{SaveDir}{fileName}.json")) {
+                fileName = $"{name.ToSnakeCase()}_{postFix}";
+                postFix++;
+            }
         }
         
         // Save json object to file
@@ -79,6 +82,8 @@ public class SaveManager {
 
         Mode            = SerialiseMode.Loading;
         CurrentSaveNode = saveData;
+        
+        Game.ClearEntities();
         
         try {
             Game.Serialise();

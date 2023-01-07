@@ -76,6 +76,14 @@ public class Widget_Toolbar : Window {
             }
         }
         curX += ButtonWidth + GUI.GapSmall;
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "QuickSave")) {
+            Find.SaveManager.SaveGame("quick", true);
+        }
+        curX += ButtonWidth + GUI.GapSmall;
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "QuickLoad")) {
+            Find.SaveManager.LoadGame("saves/quick.json");
+        }
+        curX += ButtonWidth + GUI.GapSmall;
 
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Debug")) {
             if (!Find.UI.IsWindowOpen(debugDialogId)) {

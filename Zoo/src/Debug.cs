@@ -14,8 +14,9 @@ public static class Debug {
         Raylib.TraceLog(TraceLogLevel.LOG_WARNING, message);
     }
     
-    public static void Error(string message) {
+    public static void Error(string message, Exception? e = null) {
         Raylib.TraceLog(TraceLogLevel.LOG_ERROR, message);
+        if (e != null) Console.WriteLine(e);
     }
     
     public static void Assert(bool condition, string message = "") {

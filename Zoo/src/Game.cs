@@ -109,10 +109,16 @@ public static class Game {
         }
 
         foreach (var entity in entitiesToAdd) {
-            entity.Setup();
-            entities.Add(entity.Id, entity);
+            try {
+                entity.Setup();
+                entities.Add(entity.Id, entity);
+            }
+            catch (Exception e) {
+                Debug.Error($"Failed to set up entity {entity.Id}:", e);
+                entity.Destroy();
+            }
         }
-        entitiesToAdd.Clear();
+        entitiesToAdd.Clear();   
         
         foreach (var entity in entitiesToRemove) {
             entities.Remove(entity.Id);

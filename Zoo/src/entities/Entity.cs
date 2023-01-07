@@ -65,6 +65,12 @@ public class Entity : ISerialisable {
     }
 
     public void OnInput(InputEvent evt) {
+        foreach (var component in components.Values) {
+            component.OnInput(evt);
+
+            if (evt.consumed) return;
+        }
+        
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT && Find.Renderer.GetPickIdAtPos(evt.mousePos) == Id) {
             if (!Find.UI.IsWindowOpen(infoDialogId)) {
                 infoDialogId = Find.UI.PushWindow(new Dialog_Info(this));
@@ -87,7 +93,10 @@ public class Entity : ISerialisable {
     }
     
     public T? GetComponent<T>() where T : Component {
-        if (HasComponent(typeof(T))) return (T)components[typeof(T)];
+        if (!HasComponent(typeof(T))) return null;
+        
+        if (components.ContainsKey(typeof(T)))
+            return (T)components[typeof(T)];
         
         // TODO (optimisation): Is there a faster way to do this?
         foreach (var type in components.Keys) {
@@ -100,7 +109,16 @@ public class Entity : ISerialisable {
     }
 
     public bool HasComponent(Type type) {
-        return components.ContainsKey(type);
+        if (components.ContainsKey(type)) return true;
+        
+        // TODO (optimisation): Is there a faster way to do this?
+        foreach (var t in components.Keys) {
+            if (t.IsSubclassOf(type)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void Serialise() {

@@ -18,12 +18,13 @@ public abstract class Component : ISerialisable {
             Debug.Assert(entity.HasComponent(dependency), $"Entity {entity} does not have dependency {dependency}");
         }
     }
-    public virtual void     PreUpdate()  {}
-    public virtual void     Update()     {}
-    public virtual void     PostUpdate() {}
-    public virtual void     Render()     {}
-    public virtual void     End()        {}
-    public virtual InfoTab? GetInfoTab() => null;
+    public virtual void     PreUpdate()             {}
+    public virtual void     Update()                {}
+    public virtual void     PostUpdate()            {}
+    public virtual void     Render()                {}
+    public virtual void     OnInput(InputEvent evt) {}
+    public virtual void     End()                   {}
+    public virtual InfoTab? GetInfoTab()            => null;
 
     public virtual void Serialise() {
         Find.SaveManager.ArchiveValue("type", () => GetType().ToString(), null);
