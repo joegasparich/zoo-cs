@@ -78,7 +78,7 @@ public class ElevationGrid : ISerialisable {
 
     public void Render() {
         foreach (var polygon in waterPolygons) {
-            if (Find.Renderer.IsWorldPosOnScreen(polygon[0], World.WorldScale)) {
+            if (Find.Renderer.IsPosOnScreen(polygon[0], World.WorldScale)) {
                 Draw.DrawTriangleFan3D(polygon, WaterColour, (int)Depth.Water);
             }
         }
@@ -92,7 +92,7 @@ public class ElevationGrid : ISerialisable {
         
         if (elevation == Elevation.Water) {
             // Check 4 surrounding wall slots for walls
-            foreach(var wall in Find.World.Walls.GetSurroundingWalls(gridPos)) {
+            foreach(var wall in Find.World.Walls.GetWallsSurroundingPoint(gridPos)) {
                 if (wall.Exists) return false;
             }
             // Check 4 surrounding tiles

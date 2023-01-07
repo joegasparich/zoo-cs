@@ -56,7 +56,7 @@ public static class Game {
     private static void Init() {
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Zoo");
         Raylib.SetExitKey(KeyboardKey.KEY_NULL);
-
+        
         AssetManager.LoadAssets();
         UI.Init();
         Find.SceneManager.LoadScene(new Scene_Menu());

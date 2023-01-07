@@ -85,9 +85,9 @@ public class Tool_Elevation : Tool {
         Find.UI.DoImmediateWindow("immElevationPanel", new Rectangle(10, 60, 100, 100), inRect => {
             GUI.TextAlign = AlignMode.MiddleCenter;
 
-            if (GUI.ButtonText(new Rectangle(10, 10, 80, 20), "Water")) currentElevation = Elevation.Water;
-            if (GUI.ButtonText(new Rectangle(10, 40, 80, 20), "Flat"))  currentElevation = Elevation.Flat;
-            if (GUI.ButtonText(new Rectangle(10, 70, 80, 20), "Hill")) currentElevation = Elevation.Hill;
+            if (GUI.ButtonText(new Rectangle(10, 10, 80, 20), "Water", selected: currentElevation == Elevation.Water)) currentElevation = Elevation.Water;
+            if (GUI.ButtonText(new Rectangle(10, 40, 80, 20), "Flat",  selected: currentElevation == Elevation.Flat))  currentElevation = Elevation.Flat;
+            if (GUI.ButtonText(new Rectangle(10, 70, 80, 20), "Hill",  selected: currentElevation == Elevation.Hill)) currentElevation  = Elevation.Hill;
 
             GUI.TextAlign = AlignMode.TopLeft;
         });

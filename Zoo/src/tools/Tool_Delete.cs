@@ -153,7 +153,7 @@ public class Tool_Delete : Tool {
                 var tile = new IntVec2(i.FloorToInt(), j.FloorToInt());
                 if (!Find.World.IsPositionInMap(tile)) continue;
 
-                foreach(var wall in Find.World.Walls.GetSurroundingWalls(tile)) {
+                foreach(var wall in Find.World.Walls.GetWallsSurroundingTile(tile)) {
                     if (!wall.Exists) continue;
 
                     var opposite = Find.World.Walls.GetOppositeTile(wall, tile);

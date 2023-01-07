@@ -164,6 +164,10 @@ public static class GUI {
     public static bool HoverableArea(Rectangle rect) {
         return Find.UI.IsMouseOverRect(rect);
     }
+
+    public static void DrawHighlight(Rectangle rect) {
+        DrawRect(rect, HighlightColor);
+    }
     
     // Widgets
     public static void Header(Rectangle rect, string text) {
@@ -175,13 +179,11 @@ public static class GUI {
         TextAlign = prevAlign;
     }
     
-    public static bool ButtonText(Rectangle rect, string text) {
-        return ButtonText(rect, text, UIButtonColour);
-    }
 
-    public static bool ButtonText(Rectangle rect, string text, Color col) {
-        DrawRect(rect, col);
+    public static bool ButtonText(Rectangle rect, string text, Color? col = null, bool selected = false) {
+        DrawRect(rect, col ?? UIButtonColour);
         HighlightMouseover(rect);
+        if (selected) DrawBorder(rect, 2, Color.BLACK);
         Label(rect, text);
 
         if (HoverableArea(rect)) {
@@ -233,7 +235,7 @@ public static class GUI {
 
     public static void HighlightMouseover(Rectangle rect) {
         if (HoverableArea(rect)) {
-            DrawRect(rect, HighlightColor);
+            DrawHighlight(rect);
         }
     }
 }

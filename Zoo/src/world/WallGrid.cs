@@ -321,7 +321,7 @@ public class WallGrid : ISerialisable {
         return null;
     }
 
-    public Wall[] GetSurroundingWalls(IntVec2 tile) {
+    public Wall[] GetWallsSurroundingTile(IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return Array.Empty<Wall>();
 
         return new[] {
@@ -329,6 +329,17 @@ public class WallGrid : ISerialisable {
             GetWallAtTile(tile, Side.West)!,
             GetWallAtTile(tile, Side.South)!,
             GetWallAtTile(tile, Side.East)!
+        };
+    }
+
+    public Wall[] GetWallsSurroundingPoint(IntVec2 point) {
+        if (!Find.World.IsPositionInMap(point)) return Array.Empty<Wall>();
+
+        return new[] {
+            GetWallAtTile(point,               Side.North)!,
+            GetWallAtTile(point,               Side.West)!,
+            GetWallAtTile(point - IntVec2.One, Side.South)!,
+            GetWallAtTile(point - IntVec2.One, Side.East)!
         };
     }
 
