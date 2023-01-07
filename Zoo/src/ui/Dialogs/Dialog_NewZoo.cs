@@ -9,8 +9,8 @@ public class Dialog_NewZoo : Dialog {
     private static readonly Rectangle Dimensions  = new ((Game.ScreenWidth - PanelWidth) / 2, (Game.ScreenHeight - PanelHeight) / 2, PanelWidth, PanelHeight);
     
     // State
-    private string width = "10";
-    private string height = "10";
+    private string width = "100";
+    private string height = "100";
     
     public Dialog_NewZoo() : base(Dimensions) {}
 

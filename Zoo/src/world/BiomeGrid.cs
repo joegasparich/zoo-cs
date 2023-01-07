@@ -37,9 +37,12 @@ public class BiomeGrid : ISerialisable {
     private int rows;
     private int cols;
     
+    // Collections
+    private  BiomeChunk[][]    chunkGrid;
+    internal Queue<BiomeChunk> chunkRegenQueue = new();
+    
     // State
     private bool           isSetup = false;
-    private BiomeChunk[][] chunkGrid;
     private string         elevationListenerHandle;
 
     public BiomeGrid(int rows, int cols) {
@@ -96,10 +99,9 @@ public class BiomeGrid : ISerialisable {
     }
 
     public void PostUpdate() {
-        foreach (var row in chunkGrid) {
-            foreach (var chunk in row) {
-                chunk.PostUpdate();
-            }
+        if (chunkRegenQueue.Count > 0) {
+            var chunkToRegen = chunkRegenQueue.Dequeue();
+            chunkToRegen.RegenerateMeshNow();
         }
     }
 
@@ -160,14 +162,14 @@ public class BiomeGrid : ISerialisable {
 
     public void RegenerateChunksInRadius(Vector2 pos, float radius) {
         foreach (var chunk in GetChunksInRadius(pos, radius)) {
-            chunk.Regenerate();
+            chunkRegenQueue.Enqueue(chunk);
         }
     }
 
     public void RegenerateAllChunks() {
         foreach (var row in chunkGrid) {
             foreach (var chunk in row) {
-                chunk.Regenerate();
+                chunkRegenQueue.Enqueue(chunk);
             }
         }
     }
@@ -259,22 +261,14 @@ public class BiomeChunk : IDisposable {
 
         isSetup = true;
 
-        RegenerateMesh();
+        RegenerateMeshNow();
     }
     
-    public void PostUpdate() {
-        if (shouldRegenerate) {
-            // TODO (optimisation): Investigate drawing one chunk per frame or something
-            RegenerateMesh();
-            shouldRegenerate = false;
-        }
-    }
-
     public void Regenerate() {
-        shouldRegenerate = true;
+        Find.World.Biomes.chunkRegenQueue.Enqueue(this);
     }
 
-    private void RegenerateMesh() {
+    internal void RegenerateMeshNow() {
         int vertexIndex = 0;
         
         var vertices = new float[chunkMesh.vertexCount * 3];
@@ -367,7 +361,7 @@ public class BiomeChunk : IDisposable {
         }
 
         if (changed) {
-            RegenerateMesh();
+            Regenerate();
         }
     }
 
@@ -386,7 +380,7 @@ public class BiomeChunk : IDisposable {
             }
         }
         
-        RegenerateMesh();
+        RegenerateMeshNow();
     }
 }
 
