@@ -5,6 +5,13 @@ using Zoo.ui;
 namespace Zoo;
 
 public static class Game {
+    // Enums
+    private enum TickRate {
+        Normal = 1,
+        Fast = 2,
+        Faster = 4
+    }
+    
     // Constants
     // TODO: Config options
     private const int MsPerUpdate  = 10;
@@ -26,9 +33,11 @@ public static class Game {
     private static List<Entity>            entitiesToRemove = new();
     
     // State
-    private static int ticksSinceGameStart;
-    private static int framesSinceGameStart;
-    private static int nextEntityId = 1;
+    private static int      ticksSinceGameStart;
+    private static int      framesSinceGameStart;
+    private static int      nextEntityId = 1;
+    private static bool     paused;
+    private static TickRate tickRate = TickRate.Normal;
 
     // Properties
     public static int Ticks => ticksSinceGameStart;
@@ -63,20 +72,25 @@ public static class Game {
         
         while (!Raylib.WindowShouldClose()) {
             var currentTime = Raylib.GetTime() * 1000;
-            var elapsed     = currentTime - lastTime;
-            
-            lastTime =  currentTime;
-            lag      += elapsed;
 
-            while (lag >= MsPerUpdate) {
-                // Do Update
-                PreUpdate();
-                Update();
-                PostUpdate();
+            if (!paused) {
+                var elapsed = currentTime - lastTime;
+                lag += elapsed;
                 
-                lag -= MsPerUpdate;
-                ticksSinceGameStart++;
+                var msPerUpdate = MsPerUpdate / (int) tickRate;
+                
+                while (lag >= msPerUpdate) {
+                    // Do Update
+                    PreUpdate();
+                    Update();
+                    PostUpdate();
+                    
+                    lag -= msPerUpdate;
+                    ticksSinceGameStart++;
+                }
             }
+            
+            lastTime = currentTime;
             
             // Do Render
             UI.PreRender();
@@ -150,8 +164,28 @@ public static class Game {
         foreach (var entity in entities.Values) {
             if (!evt.consumed) entity.OnInput(evt);
         }
+
+        // Tick rate controls
+        if (!evt.consumed) {
+            if (evt.keyDown == KeyboardKey.KEY_SPACE) {
+                paused = !paused;
+                evt.Consume();
+            }
+            if (evt.keyDown == KeyboardKey.KEY_ONE) {
+                tickRate = TickRate.Normal;
+                evt.Consume();
+            }
+            if (evt.keyDown == KeyboardKey.KEY_TWO) {
+                tickRate = TickRate.Fast;
+                evt.Consume();
+            }
+            if (evt.keyDown == KeyboardKey.KEY_THREE) {
+                tickRate = TickRate.Faster;
+                evt.Consume();
+            }
+        }
         
-        if (!evt.consumed) UI.PostInput(evt);
+        UI.PostInput(evt);
     }
 
     public static void OnGUI() {

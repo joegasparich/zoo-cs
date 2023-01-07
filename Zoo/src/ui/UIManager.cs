@@ -78,7 +78,7 @@ public class UIManager {
     }
 
     public void PostInput(InputEvent evt) {
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT) {
+        if (!evt.consumed && evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT) {
             foreach (var window in windowStack) {
                 if (window.DismissOnRightClick) {
                     CloseWindow(window.Id);
