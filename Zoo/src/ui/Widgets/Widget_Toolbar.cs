@@ -26,37 +26,37 @@ public class Widget_Toolbar : Window {
         GUI.TextAlign = AlignMode.MiddleCenter;
         
         // TODO: Do tool buttons with a loop?
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Biome")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Biome", selected: toolManager.GetActiveTool() is Tool_Biome)) {
             toolManager.SetTool(ToolType.Biome);
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Elevation")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Elevation", selected: toolManager.GetActiveTool() is Tool_Elevation)) {
             toolManager.SetTool(ToolType.Elevation);
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Wall")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Wall", selected: toolManager.GetActiveTool() is Tool_Wall)) {
             toolManager.SetTool(ToolType.Wall);
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Door")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Door", selected: toolManager.GetActiveTool() is Tool_Door)) {
             toolManager.SetTool(ToolType.Door);
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Path")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Path", selected: toolManager.GetActiveTool() is Tool_FootPath)) {
             toolManager.SetTool(ToolType.FootPath);
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Object")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Object", selected: toolManager.GetActiveTool() is Tool_TileObject)) {
             toolManager.SetTool(ToolType.TileObject);
         }
         curX += ButtonWidth + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Delete")) {
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Delete", selected: toolManager.GetActiveTool() is Tool_Delete)) {
             toolManager.SetTool(ToolType.Delete);
         }
         curX += ButtonWidth + GUI.GapSmall;

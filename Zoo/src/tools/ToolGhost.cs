@@ -53,7 +53,7 @@ public class ToolGhost {
         Snap          = false;
         Follow        = true;
         Elevate       = false;
-        Visible       = true;
+        Visible       = false;
         Graphics      = null;
         SpriteIndex   = 0;
         GhostColour   = DefaultGhostColour;

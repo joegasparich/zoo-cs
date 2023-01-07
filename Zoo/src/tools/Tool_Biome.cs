@@ -20,7 +20,7 @@ public class Tool_Biome : Tool {
     public override ToolType Type => ToolType.Biome;
     
     // State
-    private Biome                         currentBiome;
+    private Biome?                        currentBiome;
     private bool                          isDragging;
     private Dictionary<string, int[][][]> oldChunkData = new();
     private float                         radius       = DefaultRadius;
@@ -28,15 +28,14 @@ public class Tool_Biome : Tool {
     public Tool_Biome(ToolManager tm) : base(tm) {}
 
     public override void Set() {
-        var sand = Find.Registry.GetBiome(1); // TODO: Handle no biome initially
-        SetBiome(sand);
-
         Ghost.Type    = GhostType.Circle;
         Ghost.Radius  = radius;
         Ghost.Elevate = true;
     }
 
     public override void OnInput(InputEvent evt) {
+        if (currentBiome == null) return;
+        
         // Only listen to down and up events so that we can't start dragging from UI
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = true;
@@ -77,6 +76,7 @@ public class Tool_Biome : Tool {
     }
 
     public override void Update() {
+        if (currentBiome == null) return;
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
 
         var pos = Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale;
@@ -113,7 +113,10 @@ public class Tool_Biome : Tool {
         });
     }
 
-    private void SetBiome(Biome biome) {
-        currentBiome = biome;
+    private void SetBiome(Biome? biome) {
+        currentBiome  = biome;
+        
+        if (currentBiome != null)
+            Ghost.Visible = true;
     }
 }

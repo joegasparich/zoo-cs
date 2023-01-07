@@ -18,10 +18,10 @@ public class Tool_FootPath : Tool {
     public override ToolType Type => ToolType.FootPath;
     
     // State
-    private          FootPathData       currentFootPath;
-    private          bool               isDragging;
-    private          IntVec2            dragTile;
-    private readonly List<ToolGhost>    ghosts = new();
+    private          FootPathData?   currentFootPath;
+    private          bool            isDragging;
+    private          IntVec2         dragTile;
+    private readonly List<ToolGhost> ghosts = new();
 
     public Tool_FootPath(ToolManager tm) : base(tm) {
         allFootPaths = Find.Registry.GetAllFootPaths();
@@ -32,12 +32,11 @@ public class Tool_FootPath : Tool {
         Ghost.Snap   = true;
         Ghost.Scale  = new Vector2(1, 2);
         Ghost.Offset = new Vector2(0, -1);
-        
-        // Temp, should handle having no path
-        SetFootPath(Find.Registry.GetFootPath(FOOTPATHS.DIRT_PATH));
     }
 
     public override void OnInput(InputEvent evt) {
+        if (currentFootPath == null) return;
+        
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = true;
             dragTile   = evt.mouseWorldPos.Floor();
@@ -73,6 +72,7 @@ public class Tool_FootPath : Tool {
     }
 
     public override void Update() {
+        if (currentFootPath == null) return;
         var mousePos = Find.Input.GetMouseWorldPos();
         
         if (isDragging) {
@@ -120,6 +120,8 @@ public class Tool_FootPath : Tool {
     }
 
     public override void Render() {
+        if (currentFootPath == null) return;
+        
         foreach (var ghost in ghosts) {
             ghost.Render();
         }
@@ -135,7 +137,7 @@ public class Tool_FootPath : Tool {
                 GUI.DrawSubTexture(buttonRect, footPath.GraphicData.Sprite, footPath.GraphicData.GetCellBounds(0).BottomHalf());
                 GUI.HighlightMouseover(buttonRect);
                 
-                if (currentFootPath.Id == footPath.Id)
+                if (currentFootPath != null && currentFootPath.Id == footPath.Id)
                     GUI.DrawBorder(buttonRect, 2, Color.BLACK);
                 
                 if (GUI.ClickableArea(buttonRect))
@@ -171,6 +173,10 @@ public class Tool_FootPath : Tool {
 
     private void SetFootPath(FootPathData data) {
         currentFootPath = data;
-        Ghost.Graphics  = data.GraphicData;
+
+        if (currentFootPath != null) {
+            Ghost.Graphics = data.GraphicData;
+            Ghost.Visible  = true;
+        }
     }
 }

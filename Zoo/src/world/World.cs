@@ -167,6 +167,7 @@ public class World : ISerialisable {
     }
 
     public void UpdateAccessibilityGrids(IntVec2 tile) {
+        if (!IsPositionInMap(tile)) return;
         foreach(var (type, grid) in accessibilityGrids) {
             grid[tile.X][tile.Y] = (int)CalculateTileCost(tile, type);
         }

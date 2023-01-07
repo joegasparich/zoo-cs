@@ -29,6 +29,7 @@ public class Tool_Delete : Tool {
         Ghost.Snap        = true;
         Ghost.Elevate     = true;
         Ghost.GhostColour = GhostColour;
+        Ghost.Visible     = true;
     }
 
     public override void OnInput(InputEvent evt) {

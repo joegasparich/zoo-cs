@@ -19,8 +19,8 @@ public class Tool_TileObject : Tool {
     public override ToolType Type => ToolType.TileObject;
 
     // State
-    private ObjectData       currentObject;
-    private Side             rotation;
+    private ObjectData? currentObject;
+    private Side        rotation;
 
     public Tool_TileObject(ToolManager tm) : base(tm) {
         allObjects = Find.Registry.GetAllObjects();
@@ -31,12 +31,11 @@ public class Tool_TileObject : Tool {
         Ghost.Snap    = true;
         Ghost.Offset  = new Vector2(0.5f, 0.5f);
         Ghost.Elevate = true;
-
-        // Temp, should handle having no object
-        SetObject(Find.Registry.GetObject(OBJECTS.TREE));
     }
 
     public override void OnInput(InputEvent evt) {
+        if (currentObject == null) return;
+        
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             if (!Ghost.CanPlace) return;
 
@@ -86,7 +85,7 @@ public class Tool_TileObject : Tool {
                 
                 GUI.HighlightMouseover(buttonRect);
                 
-                if (currentObject.Id == obj.Id)
+                if (currentObject != null && currentObject.Id == obj.Id)
                     GUI.DrawBorder(buttonRect, 2, Color.BLACK);
                 
                 if (GUI.ClickableArea(buttonRect))
@@ -98,6 +97,8 @@ public class Tool_TileObject : Tool {
     }
 
     public override bool CanPlace(ToolGhost ghost) {
+        if (currentObject == null) return false;
+        
         for (int i = 0; i < currentObject.Size.X; i++) {
             for (int j = 0; j < currentObject.Size.Y; j++) {
                 var tile = (ghost.Pos + new Vector2(i, j)).Floor();
@@ -123,7 +124,10 @@ public class Tool_TileObject : Tool {
     private void SetObject(ObjectData data) {
         currentObject = data;
 
-        Ghost.Graphics = data.GraphicData;
-        Ghost.Offset = data.Size / 2f;
+        if (currentObject != null) {
+            Ghost.Graphics = data.GraphicData;
+            Ghost.Offset   = data.Size / 2f;
+            Ghost.Visible  = true;
+        }
     }
 }

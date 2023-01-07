@@ -19,7 +19,7 @@ public class Tool_Elevation : Tool {
     public override ToolType Type => ToolType.Elevation;
     
     // State
-    private Elevation                      currentElevation = Elevation.Hill;
+    private Elevation?                     currentElevation;
     private bool                           isDragging;
     private Dictionary<IntVec2, Elevation> oldElevationData = new();
     private float                          radius           = DefaultRadius;
@@ -27,14 +27,14 @@ public class Tool_Elevation : Tool {
     public Tool_Elevation(ToolManager tm) : base(tm) {}
 
     public override void Set() {
-        currentElevation = Elevation.Hill;
-
         Ghost.Type    = GhostType.Circle;
         Ghost.Radius  = radius;
         Ghost.Elevate = true;
     }
 
     public override void OnInput(InputEvent evt) {
+        if (!currentElevation.HasValue) return;
+        
         // Only listen to down and up events so that we can't start dragging from UI
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = true;
@@ -72,9 +72,10 @@ public class Tool_Elevation : Tool {
     }
 
     public override void Update() {
+        if (!currentElevation.HasValue) return;
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
         
-        var oldPoints = Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), radius, currentElevation);
+        var oldPoints = Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), radius, currentElevation.Value);
 
         foreach (var (p, e) in oldPoints) {
             oldElevationData.TryAdd(p, e);
@@ -85,11 +86,18 @@ public class Tool_Elevation : Tool {
         Find.UI.DoImmediateWindow("immElevationPanel", new Rectangle(10, 60, 100, 100), inRect => {
             GUI.TextAlign = AlignMode.MiddleCenter;
 
-            if (GUI.ButtonText(new Rectangle(10, 10, 80, 20), "Water", selected: currentElevation == Elevation.Water)) currentElevation = Elevation.Water;
-            if (GUI.ButtonText(new Rectangle(10, 40, 80, 20), "Flat",  selected: currentElevation == Elevation.Flat))  currentElevation = Elevation.Flat;
-            if (GUI.ButtonText(new Rectangle(10, 70, 80, 20), "Hill",  selected: currentElevation == Elevation.Hill)) currentElevation  = Elevation.Hill;
+            if (GUI.ButtonText(new Rectangle(10, 10, 80, 20), "Water", selected: currentElevation == Elevation.Water)) SetElevation(Elevation.Water);
+            if (GUI.ButtonText(new Rectangle(10, 40, 80, 20), "Flat",  selected: currentElevation == Elevation.Flat))  SetElevation(Elevation.Flat);
+            if (GUI.ButtonText(new Rectangle(10, 70, 80, 20), "Hill",  selected: currentElevation == Elevation.Hill))  SetElevation(Elevation.Hill);
 
             GUI.TextAlign = AlignMode.TopLeft;
         });
+    }
+    
+    private void SetElevation(Elevation? elevation) {
+        currentElevation = elevation;
+        
+        if (currentElevation != null)
+            Ghost.Visible = true;
     }
 }

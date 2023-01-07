@@ -19,7 +19,7 @@ public class Tool_Wall : Tool {
     public override ToolType Type => ToolType.Wall;
     
     // State
-    private          WallData        currentWall;
+    private          WallData?       currentWall;
     private          bool            isDragging;
     private          IntVec2         dragTile;
     private          Side            dragQuadrant;
@@ -34,12 +34,11 @@ public class Tool_Wall : Tool {
         Ghost.Snap   = true;
         Ghost.Scale  = new Vector2(1, 2);
         Ghost.Offset = new Vector2(0, -1);
-        
-        // Temp, should handle having no wall
-        SetWall(Find.Registry.GetWall(WALLS.IRON_FENCE));
     }
 
     public override void OnInput(InputEvent evt) {
+        if (currentWall == null) return;
+        
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging   = true;
             dragTile     = evt.mouseWorldPos.Floor();
@@ -80,6 +79,8 @@ public class Tool_Wall : Tool {
     }
 
     public override void Update() {
+        if (currentWall == null) return;
+        
         var mousePos      = Find.Input.GetMouseWorldPos();
         var mouseQuadrant = World.GetQuadrantAtPos(mousePos);
 
@@ -130,6 +131,8 @@ public class Tool_Wall : Tool {
     }
 
     public override void Render() {
+        if (currentWall == null) return;
+        
         foreach (var ghost in ghosts) {
             ghost.Render();
         }
@@ -145,7 +148,7 @@ public class Tool_Wall : Tool {
                 GUI.DrawSubTexture(buttonRect, wall.GraphicData.Sprite, wall.GraphicData.GetCellBounds(0).BottomPct(0.25f));
                 GUI.HighlightMouseover(buttonRect);
                 
-                if (currentWall.Id == wall.Id)
+                if (currentWall != null && currentWall.Id == wall.Id)
                     GUI.DrawBorder(buttonRect, 2, Color.BLACK);
                 
                 if (GUI.ClickableArea(buttonRect))
@@ -157,6 +160,8 @@ public class Tool_Wall : Tool {
     }
 
     public override bool CanPlace(ToolGhost ghost) {
+        if (currentWall == null) return false;
+        
         var tile     = ghost.Pos.Floor();
         var quadrant = ghost.Side;
         
@@ -208,7 +213,11 @@ public class Tool_Wall : Tool {
     }
 
     private void SetWall(WallData data) {
-        currentWall       = data;
-        Ghost.Graphics = data.GraphicData;
+        currentWall = data;
+            
+        if (currentWall != null) {
+            Ghost.Graphics = data.GraphicData;
+            Ghost.Visible  = true;
+        }
     }
 }

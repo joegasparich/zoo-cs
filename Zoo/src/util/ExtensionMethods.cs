@@ -72,6 +72,13 @@ public static class ExtensionMethods {
         return new Vector3(v.X, v.Y, 0);
     }
     
+    // Vector3 //
+    public static void Deconstruct(this Vector3 v, out float x, out float y, out float z) {
+        x = v.X;
+        y = v.Y;
+        z = v.Z;
+    }
+    
     // Rectangle //
     public static Vector2 Position(this Rectangle rect) {
         return new Vector2(rect.x, rect.y);
