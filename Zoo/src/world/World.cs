@@ -72,7 +72,7 @@ public class World : ISerialisable {
         Biomes.Setup();
         Walls.Setup();
         FootPaths.Setup();
-        Areas.Setup();
+        Areas.Setup(Find.Zoo.Entrance);
         Pathfinder = new Pathfinder(Width, Height);
 
         PopulateAccessibilityGrids();
@@ -316,7 +316,7 @@ public class World : ISerialisable {
         Find.SaveManager.ArchiveDeep("footpaths", FootPaths);
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            Areas.Setup();
+            Areas.Setup(Find.Zoo.Entrance);
         }
     }
 }

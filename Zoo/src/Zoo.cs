@@ -1,4 +1,5 @@
 using Zoo.tools;
+using Zoo.util;
 using Zoo.world;
 
 namespace Zoo;
@@ -15,8 +16,9 @@ public static class DebugSettings {
 
 public class Zoo : ISerialisable {
     // Config
-    public int Width = 10;
-    public int Height = 10;
+    public int     Width  = 10;
+    public int     Height = 10;
+    public IntVec2 Entrance;
     
     // State
     public World       World;
@@ -24,6 +26,8 @@ public class Zoo : ISerialisable {
     
     public Zoo() {
         Tools = new ToolManager();
+
+        Entrance = new IntVec2(Width / 2, Height - 1);
     }
 
     public void Setup() {

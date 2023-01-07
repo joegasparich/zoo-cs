@@ -14,7 +14,7 @@ public class AreaManager {
     
     private bool isSetup = false;
 
-    public void Setup() {
+    public void Setup(IntVec2 startTile) {
         Debug.Log("Setting up areas");
         
         if (isSetup) {
@@ -22,7 +22,7 @@ public class AreaManager {
             return;
         }
 
-        RegenerateAreas();
+        RegenerateAreas(startTile);
 
         isSetup = true;
     }
@@ -39,9 +39,9 @@ public class AreaManager {
         isSetup = false;
     }
 
-    public void RegenerateAreas() {
+    public void RegenerateAreas(IntVec2 startTile) {
         // Form areas
-        FormZooArea(new IntVec2(1, 1)); // TODO: change this to zoo entrance
+        FormZooArea(startTile);
         
         for (var i = 0; i < Find.World.Width; i++) {
             for (var j = 0; j < Find.World.Height; j++) {

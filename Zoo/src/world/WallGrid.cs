@@ -125,7 +125,7 @@ public class WallGrid : ISerialisable {
         }
     }
 
-    public Wall? PlaceWallAtTile(WallData data, IntVec2 tile, Side side) {
+    public Wall? PlaceWallAtTile(WallData data, IntVec2 tile, Side side, bool indestructable = false) {
         if (!IsWallPosInMap(tile, side)) return null;
         if (GetWallAtTile(tile, side)!.Exists) return null;
         
@@ -134,7 +134,7 @@ public class WallGrid : ISerialisable {
         grid[x][y] = new Wall() {
             Data           = data,
             GridPos        = new IntVec2(x, y),
-            Indestructable = false,
+            Indestructable = indestructable,
         };
         
         var wall = grid[x][y];
