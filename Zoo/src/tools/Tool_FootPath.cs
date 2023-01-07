@@ -73,12 +73,14 @@ public class Tool_FootPath : Tool {
     }
 
     public override void Update() {
+        var mousePos = Find.Input.GetMouseWorldPos();
+        
         if (isDragging) {
             // Dragging
             Ghost.Visible = false;
 
-            var xDif       = Find.Input.GetMouseWorldPos().X - dragTile.X;
-            var yDif       = Find.Input.GetMouseWorldPos().Y - dragTile.Y;
+            var xDif       = mousePos.Floor().X - dragTile.X;
+            var yDif       = mousePos.Floor().Y - dragTile.Y;
             var horizontal = MathF.Abs(xDif) > MathF.Abs(yDif);
             var length     = (horizontal ? MathF.Abs(xDif) : MathF.Abs(yDif)) + 1;
 
@@ -100,9 +102,9 @@ public class Tool_FootPath : Tool {
                 UpdateGhostSprite(ghost);
 
                 if (horizontal) {
-                    i += Math.Sign(Find.Input.GetMouseWorldPos().Floor().X - i);
+                    i += Math.Sign(mousePos.Floor().X - i);
                 } else {
-                    j += Math.Sign(Find.Input.GetMouseWorldPos().Floor().Y - j);
+                    j += Math.Sign(mousePos.Floor().Y - j);
                 }
             }
 
