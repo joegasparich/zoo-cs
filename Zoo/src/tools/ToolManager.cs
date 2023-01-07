@@ -51,6 +51,11 @@ public class ToolManager {
         activeTool.Render();
         Ghost.Render();
     }
+
+    public void RenderLate() {
+        activeTool.RenderLate();
+        Ghost.RenderLate();
+    }
     
     public void OnGUI() {
         activeTool.OnGUI();

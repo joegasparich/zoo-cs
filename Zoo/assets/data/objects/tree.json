@@ -10,7 +10,7 @@
     "canPlaceInWater": false,
     "type": "foliage",
     "graphicData": {
-        "spritePath": "assets/data/objects/tree.png",
+        "spritePath": "assets/textures/objects/tree.png",
         "origin": {
             "x": 0.5,
             "y": 0.7

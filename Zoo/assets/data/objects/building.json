@@ -12,7 +12,7 @@
     "canRotate": true,
     "type": "building",
     "graphicData": {
-        "spritePath": "assets/data/objects/building.png",
+        "spritePath": "assets/textures/objects/building.png",
         "cellHeight": 32,
         "cellWidth": 32,
         "origin": {

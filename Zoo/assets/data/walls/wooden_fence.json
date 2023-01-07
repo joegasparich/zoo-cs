@@ -3,7 +3,7 @@
     "name": "Wooden Fence",
     "type": "fence",
     "graphicData": {
-        "spritePath": "assets/data/walls/wooden_fence.png",
+        "spritePath": "assets/textures/walls/wooden_fence.png",
         "cellHeight": 32,
         "cellWidth": 16
     },

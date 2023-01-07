@@ -3,7 +3,7 @@
     "name": "Iron Bar Fence",
     "type": "fence",
     "graphicData": {
-        "spritePath": "assets/data/walls/iron_bar_fence.png",
+        "spritePath": "assets/textures/walls/iron_bar_fence.png",
         "cellHeight": 32,
         "cellWidth": 16
     },

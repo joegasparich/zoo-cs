@@ -75,8 +75,19 @@ public class ToolGhost {
             Pos = Pos.Floor();
         }
     }
-    
+
     public void Render() {
+        switch (Type) {
+            case GhostType.Sprite:
+                RenderSprite();
+                break;
+            case GhostType.None:
+            default:
+                break;
+        }
+    }
+    
+    public void RenderLate() {
         if (!Visible) return;
 
         switch (Type) {
@@ -85,9 +96,6 @@ public class ToolGhost {
                 break;
             case GhostType.Square:
                 RenderSquare();
-                break;
-            case GhostType.Sprite:
-                RenderSprite();
                 break;
             case GhostType.None:
             default:

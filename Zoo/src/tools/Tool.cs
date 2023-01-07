@@ -34,6 +34,7 @@ public abstract class Tool {
     public virtual void Update() {}
     public virtual void PostUpdate() {}
     public virtual void Render() {}
+    public virtual void RenderLate() {}
     public virtual void OnGUI() {}
     public virtual void OnInput(InputEvent  evt) {}
     public virtual bool CanPlace(ToolGhost ghost) => true;

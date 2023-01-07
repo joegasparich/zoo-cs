@@ -59,10 +59,11 @@ public class Zoo : ISerialisable {
 
     public void Render() {
         World.Render();
+        Tools.Render();
     }
 
     public void RenderLate() {
-        Tools.Render();
+        Tools.RenderLate();
         World.RenderDebug();
     }
 
