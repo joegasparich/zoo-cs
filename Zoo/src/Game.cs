@@ -185,7 +185,7 @@ public static class Game {
             }
         }
         
-        if (!evt.consumed) Renderer.OnInput(evt);
+        if (!evt.consumed) Renderer.Camera.OnInput(evt);
         
         UI.PostInput(evt);
     }

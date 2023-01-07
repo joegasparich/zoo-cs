@@ -31,10 +31,6 @@ internal class Blit {
 public class Renderer {
     // Constants
     public const  int   PixelScale     = 2;
-    private const float CameraSpeed    = 2f;
-    private const float CameraZoomRate = 0.005f;
-    private const float MinZoom        = 0.5f;
-    private const float MaxZoom        = 10f;
     
     // Resources
     private static Shader discardAlphaShader = Raylib.LoadShader(null, "assets/shaders/discard_alpha.fsh");
@@ -45,23 +41,12 @@ public class Renderer {
     private List<Blit> blits = new();
     
     // State
-    private Camera3D        camera;
-    private float           zoom = 1;
-    private Vector2?        dragStart;
-    private Vector2?        dragCameraOrigin;
+    public  Camera          Camera = new();
     private RenderTexture2D pickBuffer;
     
     public Renderer() {
         Debug.Log("Initialising Renderer");
         Raylib.SetTargetFPS(60);
-
-        camera.projection = CameraProjection.CAMERA_ORTHOGRAPHIC;
-        camera.fovy       = Game.ScreenHeight / zoom;
-        camera.position   = new Vector3(0, 0, (int)Depth.Camera);
-        camera.up         = new Vector3(0, -1, 0);
-        
-        dragStart        = Find.Input.GetMousePos();
-        dragCameraOrigin = camera.target.XY();
 
         pickBuffer = Raylib.LoadRenderTexture(Game.ScreenWidth, Game.ScreenHeight);
         
@@ -74,7 +59,7 @@ public class Renderer {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.DARKBLUE);
         
-        Raylib.BeginMode3D(camera);
+        Raylib.BeginMode3D(Camera.Cam);
         {
             Game.Render3D();
             
@@ -95,57 +80,6 @@ public class Renderer {
         Raylib.EndDrawing();
         
         blits.Clear();
-    }
-
-    // TODO: Abstract camera class and move this stuff there
-    public void OnInput(InputEvent evt) {
-        // Keyboard Controls
-        float zoomDelta = 0;
-        if (evt.inputHeld == InputType.CameraLeft) {
-            camera.position.X -= CameraSpeed / zoom;
-            evt.Consume();
-        }
-        if (evt.inputHeld == InputType.CameraRight) {
-            camera.position.X += CameraSpeed / zoom;
-            evt.Consume();
-        }
-        if (evt.inputHeld == InputType.CameraUp) {
-            camera.position.Y -= CameraSpeed / zoom;
-            evt.Consume();
-        }
-        if (evt.inputHeld == InputType.CameraDown) {
-            camera.position.Y += CameraSpeed / zoom;
-            evt.Consume();
-        }
-        if (evt.inputHeld == InputType.CameraZoomIn) {
-            zoomDelta += CameraZoomRate;
-            evt.Consume();
-        }
-        if (evt.inputHeld == InputType.CameraZoomOut) {
-            zoomDelta -= CameraZoomRate;
-            evt.Consume();
-        }
-        
-        // Mouse controls
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_MIDDLE) {
-            dragStart        = evt.mousePos;
-            dragCameraOrigin = camera.target.XY();
-        }
-        if (evt.mouseHeld == MouseButton.MOUSE_BUTTON_MIDDLE) {
-            var newPos = dragCameraOrigin.Value + (dragStart.Value - evt.mousePos) / zoom;
-            camera.position = new Vector3(newPos.X, newPos.Y, camera.position.Z);
-        }
-
-        if (evt.type == InputEventType.MouseScroll) {
-            // TODO: Zoom towards mouse
-            zoomDelta = evt.mouseScroll / 10.0f;
-        }
-
-        var normalisedZoomLog = JMath.Normalise(MathF.Log(zoom), MathF.Log(MinZoom), MathF.Log(MaxZoom));
-        zoom = MathF.Exp(JMath.Lerp(MathF.Log(MinZoom), MathF.Log(MaxZoom), normalisedZoomLog + zoomDelta));
-        zoom = JMath.Clamp(zoom, MinZoom, MaxZoom);
-        camera.fovy = Game.ScreenHeight / zoom;
-        camera.target = camera.position with { Z = 0 };
     }
 
     public float GetDepth(float yPos) {
@@ -208,7 +142,7 @@ public class Renderer {
     private void RenderPickIdsToBuffer() {
         Raylib.BeginTextureMode(pickBuffer);
         Raylib.ClearBackground(Color.WHITE);
-        Raylib.BeginMode3D(camera);
+        Raylib.BeginMode3D(Camera.Cam);
         {
             foreach (var blit in blits) {
                 Raylib.BeginShaderMode(pickShader);
@@ -241,18 +175,18 @@ public class Renderer {
     // Utility //
     
     public Vector2 ScreenToWorldPos(Vector2 screenPos) {
-        var cameraCenter = (camera.position * zoom).XY() - new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
-        return (screenPos + cameraCenter) / (World.WorldScale * zoom);
+        var cameraCenter = (Camera.Position * Camera.Zoom) - new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
+        return (screenPos + cameraCenter) / (World.WorldScale * Camera.Zoom);
     }
     
     // TODO: make sure this is correct since this is literally AI generated
     public Vector2 WorldToScreenPos(Vector2 worldPos) {
-        return worldPos * (World.WorldScale * zoom) - (camera.position * zoom).XY() + new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
+        return worldPos * (World.WorldScale * Camera.Zoom) - (Camera.Position * Camera.Zoom) + new Vector2(Game.ScreenWidth/2f, Game.ScreenHeight/2f);
     }
 
     public bool IsPosOnScreen(Vector2 pos, float margin = 0) {
-        return pos.X > camera.position.X - Game.ScreenWidth/2  - margin && pos.X < camera.position.X + Game.ScreenWidth/2 + margin 
-            && pos.Y > camera.position.Y - Game.ScreenHeight/2 - margin && pos.Y < camera.position.Y + Game.ScreenHeight/2 + margin;
+        return pos.X > Camera.Position.X - Game.ScreenWidth/2  - margin && pos.X < Camera.Position.X + Game.ScreenWidth/2 + margin 
+            && pos.Y > Camera.Position.Y - Game.ScreenHeight/2 - margin && pos.Y < Camera.Position.Y + Game.ScreenHeight/2 + margin;
     }
 
     // TODO: move these to a util class
