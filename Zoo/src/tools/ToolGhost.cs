@@ -97,7 +97,7 @@ public class ToolGhost {
 
     private void RenderCircle() {
         var fillVertices = new Vector2[CircleResolution + 2];
-        var lineVertices = new Vector2[CircleResolution];
+        var lineVertices = new Vector2[CircleResolution + 1];
 
         fillVertices[0] = Pos * World.WorldScale;
         for (var n = 1; n < CircleResolution + 1; ++n) {
@@ -112,6 +112,7 @@ public class ToolGhost {
             fillVertices[n] *= World.WorldScale;
             lineVertices[n - 1] = fillVertices[n];
         }
+        lineVertices[CircleResolution] = lineVertices[0];
         fillVertices[CircleResolution + 1] = fillVertices[1];
 
         Draw.DrawLineStrip3D(lineVertices, GhostColour, (int)Depth.UI);
