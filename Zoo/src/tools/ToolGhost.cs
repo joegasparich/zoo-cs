@@ -137,7 +137,7 @@ public class ToolGhost {
         lineVertices[4] = lineVertices[0]; // close loop
 
         Draw.DrawLineStrip3D(lineVertices, GhostColour, (int)Depth.Overlay);
-        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), (int)Depth.Overlay);
+        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), (int)Depth.UI);
     }
 
     private void RenderSprite() {

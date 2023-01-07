@@ -20,11 +20,12 @@ public class Dialog_Info : Dialog {
     private static readonly Rectangle Dimensions  = new (GUI.GapSmall, 55, PanelWidth, PanelHeight);
     
     // State
+    private static int openInfoDialogs = 0;
+    
     private Entity        entity;
     private List<InfoTab> tabs;
     private int           currentTabIndex = 0;
     
-    // TODO: add 20 to the position for every subsequent dialog
     public Dialog_Info(Entity entity) : base(Dimensions) {
         ShowCloseX          = true;
         DismissOnRightClick = true;
@@ -33,6 +34,21 @@ public class Dialog_Info : Dialog {
         
         this.entity = entity;
         this.tabs   = entity.Components.Select(comp => comp.GetInfoTab()).Where(tab => tab != null).ToList();
+
+        AbsRect = new Rectangle(
+            AbsRect.x + openInfoDialogs * 20,
+            AbsRect.y + openInfoDialogs * 20,
+            AbsRect.width,
+            AbsRect.height
+        );
+
+        openInfoDialogs++;
+    }
+
+    public override void OnClose() {
+        base.OnClose();
+
+        openInfoDialogs--;
     }
 
     public override void DoWindowContents() {

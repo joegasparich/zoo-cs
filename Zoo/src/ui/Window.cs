@@ -30,6 +30,8 @@ public class Window {
     public virtual void OnInput(InputEvent evt) {
         DoWindowContents();
     }
+    
+    public virtual void OnClose() {}
 
     public virtual void Close() {
         Find.UI.CloseWindow(Id);

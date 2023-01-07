@@ -144,6 +144,11 @@ public static class ExtensionMethods {
         list.RemoveAt(index);
         list.Insert(0, item);
     }
+    public static void MoveItemAtIndexToBack<T>(this IList<T> list, int index) {
+        var item = list[index];
+        list.RemoveAt(index);
+        list.Add(item);
+    }
     public static bool NullOrEmpty<T>( this List<T>? list ) {
         return list == null || list.Count == 0;
     }

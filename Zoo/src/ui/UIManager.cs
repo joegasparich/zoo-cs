@@ -142,13 +142,17 @@ public class UIManager {
     }
 
     public void CloseWindow(string id) {
+        if (!openWindowMap.ContainsKey(id)) return;
+        
+        openWindowMap[id].OnClose();
+        
         openWindowMap.Remove(id);
         windowsToClose.Add(id);
     }
 
     public void BringWindowToFront(string id) {
         var index = windowStack.FindIndex(window => window.Id == id);
-        windowStack.MoveItemAtIndexToFront(index);
+        windowStack.MoveItemAtIndexToBack(index);
     }
     
     public Window? GetWindow(string id) {

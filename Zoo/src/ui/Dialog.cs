@@ -18,7 +18,7 @@ public class Dialog : Window {
     public    bool   Draggable    { get; protected set; }
     public    int    HeaderHeight { get; protected set; } = DefaultWindowHeaderHeight;
     private   bool   doBackground     = true;
-    protected Color  backgroundColour = Color.WHITE.WithAlpha(0.7f);
+    protected Color  backgroundColour = Color.WHITE.WithAlpha(0.9f);
     
     // State
     protected bool    headerHovered;

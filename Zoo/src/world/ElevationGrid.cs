@@ -186,9 +186,10 @@ public class ElevationGrid : ISerialisable {
                 if (!IsGridPosInGrid(gridPos)) continue;
                 if (!JMath.PointInCircle(pos, radius, gridPos)) continue;
                 if (GetElevationAtGridPos(gridPos) == elevation) continue;
+                if (!CanElevate(gridPos, elevation)) continue;
 
                 pointsToElevate.Add(gridPos);
-                changed = true; // TODO (optimisation): Check canElevate to avoid heaps of mesh regeneration
+                changed = true;
             }
         }
         

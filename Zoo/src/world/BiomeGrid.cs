@@ -117,7 +117,7 @@ public class BiomeGrid : ISerialisable {
         var floorX = (pos.X / ChunkSize).FloorToInt();
         var floorY = (pos.Y / ChunkSize).FloorToInt();
 
-        // TODO (fix): Only handles 3x3 around the pos. Change this to calculate required area based on radius
+        // Assumes that radius will never be larger than ChunkSize * 2
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (IsChunkInGrid(floorX + i, floorY + j)
