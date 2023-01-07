@@ -144,7 +144,7 @@ public class ToolGhost {
         
         var pos = (Pos + Offset) * World.WorldScale;
         if (Elevate)
-            pos.Y -= Find.World.Elevation.GetElevationAtPos(Pos + Offset);
+            pos.Y -= Find.World.Elevation.GetElevationAtPos(Pos + Offset) * World.WorldScale;
         
         Graphics.Blit(
             pos: pos,

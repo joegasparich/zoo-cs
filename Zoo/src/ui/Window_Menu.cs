@@ -29,6 +29,10 @@ public class Window_Menu : Window {
             Find.UI.PushWindow(new Dialog_NewZoo());
         }
         curY += ButtonHeight + GUI.GapSmall;
+        if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "Quickstart")) {
+            Find.SaveManager.NewGame(10, 10);
+        }
+        curY += ButtonHeight + GUI.GapSmall;
         if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "Load")) {
             showSaves = true;
         }
