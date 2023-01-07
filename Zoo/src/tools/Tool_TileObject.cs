@@ -57,13 +57,14 @@ public class Tool_TileObject : Tool {
         }
 
         if (currentObject.CanRotate) {
-            if (evt.keyDown == KeyboardKey.KEY_Q) {
+            // TODO: make sure these are rotating the right way
+            if (evt.inputDown == InputType.RotateCounterClockwise) {
                 rotation = (Side)JMath.PositiveMod((int)rotation - 1, 4);
                 Ghost.SpriteIndex = (int)rotation;
                 evt.Consume();
             }
 
-            if (evt.keyDown == KeyboardKey.KEY_E) {
+            if (evt.inputDown == InputType.RotateClockwise) {
                 rotation = (Side)JMath.PositiveMod((int)rotation + 1, 4);
                 Ghost.SpriteIndex = (int)rotation;
                 evt.Consume();

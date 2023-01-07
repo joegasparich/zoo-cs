@@ -71,8 +71,6 @@ public class Renderer {
     public void Update() {}
 
     public void Render() {
-        DoCameraControl();
-        
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.DARKBLUE);
         
@@ -99,39 +97,55 @@ public class Renderer {
         blits.Clear();
     }
 
-    private void DoCameraControl() {
-        // TODO: Refactor this out somewhere and use input manager
-
-        float inputHorizontal = Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) - Raylib.IsKeyDown(KeyboardKey.KEY_LEFT);
-        float inputVertical   = Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)  - Raylib.IsKeyDown(KeyboardKey.KEY_UP);
-
-        if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_MIDDLE)) {
-            dragStart        = Find.Input.GetMousePos();
+    // TODO: Abstract camera class and move this stuff there
+    public void OnInput(InputEvent evt) {
+        // Keyboard Controls
+        float zoomDelta = 0;
+        if (evt.inputHeld == InputType.CameraLeft) {
+            camera.position.X -= CameraSpeed / zoom;
+            evt.Consume();
+        }
+        if (evt.inputHeld == InputType.CameraRight) {
+            camera.position.X += CameraSpeed / zoom;
+            evt.Consume();
+        }
+        if (evt.inputHeld == InputType.CameraUp) {
+            camera.position.Y -= CameraSpeed / zoom;
+            evt.Consume();
+        }
+        if (evt.inputHeld == InputType.CameraDown) {
+            camera.position.Y += CameraSpeed / zoom;
+            evt.Consume();
+        }
+        if (evt.inputHeld == InputType.CameraZoomIn) {
+            zoomDelta += CameraZoomRate;
+            evt.Consume();
+        }
+        if (evt.inputHeld == InputType.CameraZoomOut) {
+            zoomDelta -= CameraZoomRate;
+            evt.Consume();
+        }
+        
+        // Mouse controls
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_MIDDLE) {
+            dragStart        = evt.mousePos;
             dragCameraOrigin = camera.target.XY();
         }
-        if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_MIDDLE)) {
-            var newPos = dragCameraOrigin.Value + (dragStart.Value - Find.Input.GetMousePos()) / zoom;
+        if (evt.mouseHeld == MouseButton.MOUSE_BUTTON_MIDDLE) {
+            var newPos = dragCameraOrigin.Value + (dragStart.Value - evt.mousePos) / zoom;
             camera.position = new Vector3(newPos.X, newPos.Y, camera.position.Z);
         }
-        
-        camera.position.X += inputHorizontal * CameraSpeed / zoom;
-        camera.position.Y += inputVertical   * CameraSpeed / zoom;
-        camera.target     =  camera.position with { Z = 0 };
-        
-        // Camera zoom
-        float zoomDelta = Raylib.GetMouseWheelMove() / 10.0f;
 
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_COMMA)) zoomDelta  += CameraZoomRate;
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_PERIOD)) zoomDelta -= CameraZoomRate;
+        if (evt.type == InputEventType.MouseScroll) {
+            // TODO: Zoom towards mouse
+            zoomDelta = evt.mouseScroll / 10.0f;
+        }
 
-        // TODO: Zoom towards mouse
-
-        // Do zoom
         var normalisedZoomLog = JMath.Normalise(MathF.Log(zoom), MathF.Log(MinZoom), MathF.Log(MaxZoom));
         zoom = MathF.Exp(JMath.Lerp(MathF.Log(MinZoom), MathF.Log(MaxZoom), normalisedZoomLog + zoomDelta));
         zoom = JMath.Clamp(zoom, MinZoom, MaxZoom);
-        
         camera.fovy = Game.ScreenHeight / zoom;
+        camera.target = camera.position with { Z = 0 };
     }
 
     public float GetDepth(float yPos) {

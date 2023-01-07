@@ -167,23 +167,25 @@ public static class Game {
 
         // Tick rate controls
         if (!evt.consumed) {
-            if (evt.keyDown == KeyboardKey.KEY_SPACE) {
+            if (evt.inputDown == InputType.Pause) {
                 paused = !paused;
                 evt.Consume();
             }
-            if (evt.keyDown == KeyboardKey.KEY_ONE) {
+            if (evt.inputDown == InputType.NormalSpeed) {
                 tickRate = TickRate.Normal;
                 evt.Consume();
             }
-            if (evt.keyDown == KeyboardKey.KEY_TWO) {
+            if (evt.inputDown == InputType.FastSpeed) {
                 tickRate = TickRate.Fast;
                 evt.Consume();
             }
-            if (evt.keyDown == KeyboardKey.KEY_THREE) {
+            if (evt.inputDown == InputType.FasterSpeed) {
                 tickRate = TickRate.Faster;
                 evt.Consume();
             }
         }
+        
+        if (!evt.consumed) Renderer.OnInput(evt);
         
         UI.PostInput(evt);
     }

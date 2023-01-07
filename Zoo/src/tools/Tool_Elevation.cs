@@ -59,12 +59,12 @@ public class Tool_Elevation : Tool {
             evt.Consume();
         }
         
-        if (evt.keyDown == KeyboardKey.KEY_LEFT_BRACKET) {
+        if (evt.inputDown == InputType.DecreaseBrushSize) {
             radius       = Math.Max(RadiusMin, radius - RadiusStep);
             Ghost.Radius = radius;
             evt.Consume();
         }
-        if (evt.keyDown == KeyboardKey.KEY_RIGHT_BRACKET) {
+        if (evt.inputDown == InputType.IncreaseBrushSize) {
             radius       = Math.Min(RadiusMax, radius + RadiusStep);
             Ghost.Radius = radius;
             evt.Consume();

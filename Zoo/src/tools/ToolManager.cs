@@ -66,7 +66,7 @@ public class ToolManager {
         }
         
         // TODO: Ctrl/Cmd + Z
-        if (evt.keyDown == KeyboardKey.KEY_Z) {
+        if (evt.inputDown == InputType.Undo) {
             Undo();
             evt.Consume();
         }
