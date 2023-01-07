@@ -104,10 +104,19 @@ public class Tool_TileObject : Tool {
                 if (Find.World.GetTileObjectAtTile(tile) != null) return false;
                 if (Find.World.Elevation.IsTileWater(tile)) return false;
                 if (!Find.World.IsPositionInMap(tile)) return false;
+                
+                foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(tile)) {
+                    if (!wall.Exists) continue;
+                    if (GetPlacementBounds(ghost).ContractedBy(0.1f).Contains(wall.WorldPos)) return false;
+                }
             }
         }
 
         return true;
+    }
+
+    private Rectangle GetPlacementBounds(ToolGhost ghost) {
+        return new Rectangle(ghost.Pos.X, ghost.Pos.Y, currentObject.Size.X, currentObject.Size.Y);
     }
 
     private void SetObject(ObjectData data) {

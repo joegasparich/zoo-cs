@@ -10,6 +10,7 @@ public enum Depth
     Ground = -1,
     GroundCover = -2,
     Water = -3,
+    Overlay = -4,
     YSorting = - 5,
     Debug = -8,
     UI = -9,
@@ -249,9 +250,9 @@ public class Renderer {
             && worldPos.Y > topLeft.Y && worldPos.Y < bottomRight.Y;
     }
 
-    public bool IsRectangleOnScreen(Rectangle rect) {
-        var topLeft     = ScreenToWorldPos(new Vector2(0, 0));
-        var bottomRight = ScreenToWorldPos(new Vector2(Game.ScreenWidth, Game.ScreenHeight));
+    public bool IsWorldRectOnScreen(Rectangle rect, float margin = 32) {
+        var topLeft     = ScreenToWorldPos(new Vector2(0, 0) - new Vector2(margin, margin));
+        var bottomRight = ScreenToWorldPos(new Vector2(Game.ScreenWidth, Game.ScreenHeight) + new Vector2(margin, margin));
 
         return rect.x + rect.width > topLeft.X     &&
             rect.x                 < bottomRight.X &&

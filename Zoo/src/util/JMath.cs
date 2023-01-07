@@ -24,7 +24,7 @@ public static class JMath {
     // Collision
     public static bool PointInRect(Rectangle rect, Vector2 point) {
         return point.X >= rect.x && point.X <= rect.x + rect.width &&
-               point.Y >= rect.y && point.Y <= rect.y + rect.height;        
+               point.Y > rect.y && point.Y < rect.y + rect.height;        
     }
     
     public static bool PointInCircle(Vector2 circlePos, float radius, Vector2 point) {

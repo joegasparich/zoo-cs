@@ -323,7 +323,7 @@ public class BiomeChunk : IDisposable {
 
     public void Render() {
         // Cull offscreen chunks
-        if (!Find.Renderer.IsRectangleOnScreen(new Rectangle(
+        if (!Find.Renderer.IsWorldRectOnScreen(new Rectangle(
             X * BiomeGrid.ChunkSize / (float)BiomeGrid.BiomeScale,
             Y * BiomeGrid.ChunkSize / (float)BiomeGrid.BiomeScale,
             Rows                    / (float)BiomeGrid.BiomeScale,

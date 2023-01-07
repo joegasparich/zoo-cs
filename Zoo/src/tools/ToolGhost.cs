@@ -121,7 +121,7 @@ public class ToolGhost {
 
     private void RenderSquare() {
         var fillVertices = new Vector2[6];
-        var lineVertices = new Vector2[4];
+        var lineVertices = new Vector2[5];
 
         fillVertices[0] = (Pos + new Vector2(Scale.X/2, Scale.Y/2)) * World.WorldScale; // Centre for fan
         fillVertices[1] = (Pos + new Vector2(0,         0))         * World.WorldScale;
@@ -134,9 +134,10 @@ public class ToolGhost {
         lineVertices[1] = fillVertices[2];
         lineVertices[2] = fillVertices[3];
         lineVertices[3] = fillVertices[4];
+        lineVertices[4] = lineVertices[0]; // close loop
 
-        Draw.DrawLineStrip3D(lineVertices, GhostColour, (int)Depth.UI);
-        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), (int)Depth.UI);
+        Draw.DrawLineStrip3D(lineVertices, GhostColour, (int)Depth.Overlay);
+        Draw.DrawTriangleFan3D(fillVertices, GhostColour.WithAlpha(0.5f), (int)Depth.Overlay);
     }
 
     private void RenderSprite() {
