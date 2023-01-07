@@ -1,12 +1,20 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Raylib_cs;
 using Zoo.util;
+using Zoo.world;
 
 namespace Zoo;
 
 public class AssetManager {
     // Config
-    private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
+    private static readonly JsonSerializerOptions JsonOpts = new() {
+        Converters ={
+            new JsonStringEnumConverter()
+        },
+        PropertyNameCaseInsensitive = true, 
+        IncludeFields = true
+    };
         
     // State
     private readonly Dictionary<string, Texture2D> textureMap = new ();
@@ -18,7 +26,13 @@ public class AssetManager {
                 continue;
             }
 
-            GetTexture(path.Replace("\\", "/"));
+            try {
+                GetTexture(path.Replace("\\", "/"));
+            }
+            catch (Exception e) {
+                Debug.Error($"Failed to load texture with path: {path}", e);
+                textureMap.Remove(path);
+            }
         }
         
         // Objects
@@ -27,10 +41,15 @@ public class AssetManager {
                 continue;
             }
 
-            var        json = File.ReadAllText(path.Replace("\\", "/"));
-            ObjectData data = JsonSerializer.Deserialize<ObjectData>(json, JsonOpts)!;
+            try {
+                var        json = File.ReadAllText(path.Replace("\\", "/"));
+                ObjectData data = JsonSerializer.Deserialize<ObjectData>(json, JsonOpts)!;
 
-            Find.Registry.RegisterObject(data);
+                Find.Registry.RegisterObject(data);
+            }
+            catch (Exception e) {
+                Debug.Error($"Failed to load object with path: {path}", e);
+            }
         }
         
         // Paths
@@ -39,10 +58,15 @@ public class AssetManager {
                 continue;
             }
 
-            var json = File.ReadAllText(path.Replace("\\", "/"));
-            FootPathData data = JsonSerializer.Deserialize<FootPathData>(json, JsonOpts)!;
+            try {
+                var json = File.ReadAllText(path.Replace("\\", "/"));
+                FootPathData data = JsonSerializer.Deserialize<FootPathData>(json, JsonOpts)!;
 
-            Find.Registry.RegisterPath(data);
+                Find.Registry.RegisterPath(data);
+            }
+            catch (Exception e) {
+                Debug.Error($"Failed to load footpath with path: {path}", e);
+            }
         }
         
         // Walls
@@ -51,10 +75,29 @@ public class AssetManager {
                 continue;
             }
             
-            var      json = File.ReadAllText(path.Replace("\\", "/"));
-            WallData data = JsonSerializer.Deserialize<WallData>(json, JsonOpts)!;
+            try {
+                var      json = File.ReadAllText(path.Replace("\\", "/"));
+                WallData data = JsonSerializer.Deserialize<WallData>(json, JsonOpts)!;
 
-            Find.Registry.RegisterWall(data);
+                Find.Registry.RegisterWall(data);
+            }
+            catch (Exception e) {
+                Debug.Error($"Failed to load wall with path: {path}", e);
+            }
+        }
+        
+        // Biomes
+        try {
+           var json = File.ReadAllText("assets/data/biomes.json");
+            Biome[] data = JsonSerializer.Deserialize<Biome[]>(json, JsonOpts)!;
+            
+            foreach (var biome in data) {
+                biome.Colour.a = 255;
+                Find.Registry.RegisterBiome(biome);
+            }
+        }
+        catch (Exception e) {
+            Debug.Error($"Failed to load biomes", e);
         }
     }
 

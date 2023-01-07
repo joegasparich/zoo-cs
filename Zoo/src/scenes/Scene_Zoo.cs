@@ -21,16 +21,16 @@ public class Scene_Zoo : Scene {
         Debug.Log("Creating new zoo");
         Zoo.Setup();
         
-        var man = new Entity(new Vector2(0, 0));
-        var renderer = man.AddComponent<RenderComponent>();
-        renderer.Graphics.SetSprite(TEXTURES.KEEPER);
-        var pf = man.AddComponent<AreaPathFollowComponent>();
-        pf.AccessibilityType = AccessibilityType.NoSolid;
-        man.AddComponent<PhysicsComponent>();
-        man.AddComponent<ElevationComponent>();
-        man.AddComponent<MoveComponent>();
-        man.AddComponent<TestControllableComponent>();
-        Game.RegisterEntity(man);
+        // var man = new Entity(new Vector2(0, 0));
+        // var renderer = man.AddComponent<RenderComponent>();
+        // renderer.Graphics.SetSprite(TEXTURES.KEEPER);
+        // var pf = man.AddComponent<AreaPathFollowComponent>();
+        // pf.AccessibilityType = AccessibilityType.NoSolid;
+        // man.AddComponent<PhysicsComponent>();
+        // man.AddComponent<ElevationComponent>();
+        // man.AddComponent<MoveComponent>();
+        // man.AddComponent<TestControllableComponent>();
+        // Game.RegisterEntity(man);
     }
 
     public override void Stop() {

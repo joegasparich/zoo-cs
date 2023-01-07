@@ -20,15 +20,16 @@ public class Tool_Biome : Tool {
     public override ToolType Type => ToolType.Biome;
     
     // State
-    private Biome                           currentBiome;
-    private bool                            isDragging;
-    private Dictionary<string, Biome[][][]> oldChunkData = new();
-    private float                           radius       = DefaultRadius;
+    private Biome                         currentBiome;
+    private bool                          isDragging;
+    private Dictionary<string, int[][][]> oldChunkData = new();
+    private float                         radius       = DefaultRadius;
 
     public Tool_Biome(ToolManager tm) : base(tm) {}
 
     public override void Set() {
-        SetBiome(Biome.Sand);
+        var sand = Find.Registry.GetBiome(1); // TODO: Handle no biome initially
+        SetBiome(sand);
 
         Ghost.Type    = GhostType.Circle;
         Ghost.Radius  = radius;
@@ -52,7 +53,7 @@ public class Tool_Biome : Tool {
                 // Copy here so we don't lose the data when clearing
                 Data = oldChunkData.ToDictionary(entry => entry.Key, entry => entry.Value),
                 Undo = data => {
-                    foreach (var (key, value) in (Dictionary<string, Biome[][][]>)data) {
+                    foreach (var (key, value) in (Dictionary<string, int[][][]>)data) {
                         var pos   = IntVec2.FromString(key);
                         var chunk = Find.World.Biomes.GetChunk(pos.X, pos.Y);
                         chunk.Load(value);
@@ -94,13 +95,11 @@ public class Tool_Biome : Tool {
     public override void OnGUI() {
         Find.UI.DoImmediateWindow("immBiomePanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
             var i = 0;
-            foreach (Biome biome in Enum.GetValues(typeof(Biome))) {
-                var info = BiomeInfo.Get(biome);
-                
+            foreach (Biome biome in Find.Registry.GetAllBiomes()) {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
 
-                GUI.DrawRect(buttonRect, info.Colour);
+                GUI.DrawRect(buttonRect, biome.Colour);
                 GUI.HighlightMouseover(buttonRect);
                 
                 if (currentBiome == biome)

@@ -1,20 +1,20 @@
 using System.Numerics;
-using Raylib_cs;
-using Zoo.entities;
+using System.Text.Json.Serialization;
+using Zoo.world;
 
 namespace Zoo;
 
-public static class ObjectType {
-    public static readonly string Foliage = "foliage";
-    public static readonly string Building = "building";
-    public static readonly string Consumable = "consumables";
-    public static readonly string Misc = "misc"; 
+public enum ObjectType {
+    Foliage,
+    Building,
+    Consumable,
+    Misc
 }
 
 public class ObjectData {
     public string      Id;
     public string      Name;
-    public string      Type; // TODO: Translate this to ObjectType
+    public ObjectType  Type;
     public GraphicData GraphicData;
     public Vector2     Size             = Vector2.One;
     public bool        Solid            = true;
@@ -42,6 +42,7 @@ public class Registry {
     private readonly Dictionary<string, ObjectData>   objectRegistry = new();
     private readonly Dictionary<string, WallData>     wallRegistry   = new();
     private readonly Dictionary<string, FootPathData> pathRegistry   = new();
+    private readonly Dictionary<int, Biome>           biomeRegistry  = new();
 
     public void RegisterObject(ObjectData data) {
         objectRegistry.Add(data.Id, data);
@@ -55,6 +56,10 @@ public class Registry {
         pathRegistry.Add(data.Id, data);
         Debug.Log($"Registered path {data.Name}");
     }
+    public void RegisterBiome(Biome biome) {
+        biomeRegistry.Add(biome.Id, biome);
+        Debug.Log($"Registered biome {biome.Name}");
+    }
     
     // TODO: Automate loading assets similar to DefOf?
     public ObjectData GetObject(string id) {
@@ -66,6 +71,9 @@ public class Registry {
     public FootPathData GetFootPath(string id) {
         return pathRegistry[id];
     }
+    public Biome GetBiome(int id) {
+        return biomeRegistry[id];
+    }
     
     public List<ObjectData> GetAllObjects() {
         return objectRegistry.Values.ToList();
@@ -75,5 +83,8 @@ public class Registry {
     }
     public List<FootPathData> GetAllFootPaths() {
         return pathRegistry.Values.ToList();
+    }
+    public List<Biome> GetAllBiomes() {
+        return biomeRegistry.Values.ToList();
     }
 }

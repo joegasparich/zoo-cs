@@ -68,7 +68,7 @@ public class TileObjectComponent : Component {
         return new InfoTab(Data.Name, rect => {
             var listing = new Listing(rect);
             listing.Header(Data.Name.Capitalise());
-            listing.Label($"Type: {Data.Type.Capitalise()}");
+            listing.Label($"Type: {Data.Type.ToString().Capitalise()}");
             listing.Label($"Solid: {Data.Solid.ToString().Capitalise()}");
         });
     }

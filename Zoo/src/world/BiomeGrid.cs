@@ -6,25 +6,10 @@ using Zoo.util;
 
 namespace Zoo.world;
 
-public enum Biome : byte {
-    Grass,
-    Sand,
-    Snow
-}
-
-// TODO (fix): this is weird
-public class BiomeInfo {
+public class Biome {
+    public int    Id;
     public string Name;
-    public Color Colour;
-
-    public static BiomeInfo Get(Biome biome) {
-        switch (biome) {
-            case Biome.Grass: return new() { Name = "Grass", Colour = new Color(182, 213, 60,  255) };
-            case Biome.Sand:  return new() { Name = "Sand", Colour  = new Color(244, 204, 161, 255) };
-            case Biome.Snow:  return new() { Name = "Snow", Colour  = new Color(223, 246, 246, 255) };
-            default:          return new();
-        }
-    }
+    public Color  Colour;
 }
 
 public class BiomeGrid : ISerialisable {
@@ -50,7 +35,7 @@ public class BiomeGrid : ISerialisable {
         this.cols = cols;
     }
 
-    public void Setup(Biome[][][][][]? data = null) {
+    public void Setup(int[][][][][]? data = null) {
         if (isSetup) {
             Debug.Warn("Tried to setup BiomeGrid which was already setup");
             return;
@@ -223,20 +208,22 @@ public class BiomeChunk : IDisposable {
 
     public Vector2 ChunkPos => new Vector2(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize);
     
-    public BiomeChunk(int x, int y, int cols, int rows, Biome[][][]? data = null) {
+    public BiomeChunk(int x, int y, int cols, int rows, int[][][]? data = null) {
         X    = x;
         Y    = y;
         Rows = rows;
         Cols = cols;
+
+        var grass = Find.Registry.GetBiome(0);
         
         grid = new BiomeCell[Cols][];
         for (var i = 0; i < Cols; i++) {
             grid[i] = new BiomeCell[Rows];
             for (var j = 0; j < Rows; j++) {
                 if (data != null) {
-                    grid[i][j] = new BiomeCell(data[i][j]);
+                    grid[i][j] = new BiomeCell(data[i][j].Select(id => Find.Registry.GetBiome(id)).ToArray());
                 } else {
-                    grid[i][j] = new BiomeCell(new []{ Biome.Grass, Biome.Grass, Biome.Grass, Biome.Grass});
+                    grid[i][j] = new BiomeCell(new []{ grass, grass, grass, grass});
                 }
             }
         }
@@ -278,7 +265,7 @@ public class BiomeChunk : IDisposable {
             for (int j = 0; j < Rows; ++j) {
                 var cell = grid[i][j];
                 for (int q = 0; q < 4; q++) {
-                    var colour          = BiomeInfo.Get(cell.Quadrants[q]).Colour;
+                    var colour          = cell.Quadrants[q].Colour;
                     var pos             = ChunkPos + new Vector2(i, j);
                     var tile            = (pos / BiomeGrid.BiomeScale).Floor();
                     var slopeBrightness = ElevationUtility.GetSlopeVariantColourOffset(Find.World.Elevation.GetTileSlopeVariant(tile), pos, (Side)q);
@@ -369,14 +356,14 @@ public class BiomeChunk : IDisposable {
         return pos.X >= 0 && pos.X < Cols && pos.Y >= 0 && pos.Y < Rows;
     }
 
-    public Biome[][][] Save() {
-        return grid.Select(row => row.Select(cell => cell.Quadrants.ToArray()).ToArray()).ToArray();
+    public int[][][] Save() {
+        return grid.Select(row => row.Select(cell => cell.Quadrants.Select(biome => biome.Id).ToArray()).ToArray()).ToArray();
     }
     
-    public void Load(Biome[][][] data) {
+    public void Load(int[][][] data) {
         for (var i = 0; i < Cols; ++i) {
             for (var j = 0; j < Rows; ++j) {
-                grid[i][j].Quadrants = data[i][j];
+                grid[i][j].Quadrants = data[i][j].Select(id => Find.Registry.GetBiome(id)).ToArray();
             }
         }
         
