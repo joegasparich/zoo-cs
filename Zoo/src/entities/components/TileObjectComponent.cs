@@ -1,4 +1,5 @@
-﻿using Zoo.ui;
+﻿using Zoo.defs;
+using Zoo.ui;
 using Zoo.util;
 using Zoo.world;
 
@@ -9,7 +10,7 @@ public class TileObjectComponent : Component {
     private RenderComponent renderer;
     
     // Config
-    public ObjectData Data;
+    public ObjectDef Data;
     
     // State
     private Side rotation;
@@ -54,7 +55,7 @@ public class TileObjectComponent : Component {
         
         Find.SaveManager.ArchiveValue("objectId",
             () => Data.Id,
-            path => Data = Find.Registry.GetObject(path)
+            path => Data = Find.AssetManager.Get<ObjectDef>(path)
         );
         Find.SaveManager.ArchiveValue("rotation", ref rotation);
 

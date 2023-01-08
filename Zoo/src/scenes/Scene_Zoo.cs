@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.entities;
 using Zoo.util;
 using Zoo.world;
@@ -67,7 +68,7 @@ public class Scene_Zoo : Scene {
     }
 
     private void GenerateOuterWalls() {
-        var ironFence = Find.Registry.GetWall(WALLS.IRON_FENCE);
+        var ironFence = Find.AssetManager.Get<WallDef>(WALLS.IRON_FENCE);
         for (var i = 0; i < Zoo.Width; i++) {
             Zoo.World.Walls.PlaceWallAtTile(ironFence, new IntVec2(i, 0),              Side.North, true);
             Zoo.World.Walls.PlaceWallAtTile(ironFence, new IntVec2(i, Zoo.Height - 1), Side.South, true);

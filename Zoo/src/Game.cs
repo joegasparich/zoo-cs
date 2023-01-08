@@ -1,6 +1,8 @@
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.entities;
 using Zoo.ui;
+using Zoo.world;
 
 namespace Zoo;
 
@@ -21,7 +23,6 @@ public static class Game {
     // Managers
     public static InputManager Input        = new();
     public static Renderer     Renderer     = new();
-    public static Registry     Registry     = new();
     public static AssetManager AssetManager = new();
     public static SaveManager  SaveManager  = new();
     public static SceneManager SceneManager = new();
@@ -59,6 +60,7 @@ public static class Game {
         
         AssetManager.LoadAssets();
         UI.Init();
+        
         Find.SceneManager.LoadScene(new Scene_Menu());
     }
 
@@ -101,7 +103,7 @@ public static class Game {
     }
     
     private static void PreUpdate() {
-        SceneManager.GetCurrentScene().PreUpdate();
+        SceneManager.GetCurrentScene()?.PreUpdate();
         foreach (var entity in entities.Values) {
             entity.PreUpdate();
         }
@@ -110,14 +112,14 @@ public static class Game {
     private static void Update() {
         Renderer.Update();
         
-        SceneManager.GetCurrentScene().Update();
+        SceneManager.GetCurrentScene()?.Update();
         foreach (var entity in entities.Values) {
             entity.Update();
         }
     }
     
     private static void PostUpdate() {
-        SceneManager.GetCurrentScene().PostUpdate();
+        SceneManager.GetCurrentScene()?.PostUpdate();
         foreach (var entity in entities.Values) {
             entity.PostUpdate();
         }
@@ -126,7 +128,7 @@ public static class Game {
     }
 
     public static void Render() {
-        SceneManager.GetCurrentScene().Render();
+        SceneManager.GetCurrentScene()?.Render();
         
         foreach (var entity in entities.Values) {
             entity.Render();
@@ -136,7 +138,7 @@ public static class Game {
     }
 
     public static void RenderLate() {
-        SceneManager.GetCurrentScene().RenderLate();
+        SceneManager.GetCurrentScene()?.RenderLate();
     }
 
     public static void Render2D() {
@@ -146,7 +148,7 @@ public static class Game {
     public static void OnInput(InputEvent evt) {
         if (!evt.consumed) UI.OnInput(evt);
         
-        if (!evt.consumed) SceneManager.GetCurrentScene().OnInput(evt);
+        if (!evt.consumed) SceneManager.GetCurrentScene()?.OnInput(evt);
         
         foreach (var entity in entities.Values) {
             if (!evt.consumed) entity.OnInput(evt);
@@ -178,7 +180,7 @@ public static class Game {
     }
 
     public static void OnGUI() {
-        Find.SceneManager.GetCurrentScene().OnGUI();
+        Find.SceneManager.GetCurrentScene()?.OnGUI();
     }
 
     public static int RegisterEntity(Entity entity) {

@@ -16,7 +16,6 @@ public static class Find {
 
     public static World World => Zoo.World;
 
-    public static Registry     Registry     => Game.Registry;
     public static InputManager Input        => Game.Input;
     public static Renderer     Renderer     => Game.Renderer;
     public static AssetManager AssetManager => Game.AssetManager;

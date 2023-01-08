@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.ui;
 using Zoo.util;
 using Zoo.world;
@@ -11,20 +12,20 @@ public class Tool_FootPath : Tool {
     private const int ButtonSize = 30;
     
     // References
-    private List<FootPathData> allFootPaths;
+    private List<FootPathDef> allFootPaths;
 
     // Virtual Properties
     public override string   Name => "Path Tool";
     public override ToolType Type => ToolType.FootPath;
     
     // State
-    private          FootPathData?   currentFootPath;
+    private          FootPathDef?   currentFootPath;
     private          bool            isDragging;
     private          IntVec2         dragTile;
     private readonly List<ToolGhost> ghosts = new();
 
     public Tool_FootPath(ToolManager tm) : base(tm) {
-        allFootPaths = Find.Registry.GetAllFootPaths();
+        allFootPaths = Find.AssetManager.GetAll<FootPathDef>();
     }
 
     public override void Set() {
@@ -134,14 +135,10 @@ public class Tool_FootPath : Tool {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
                 
-                GUI.DrawSubTexture(buttonRect, footPath.GraphicData.Sprite, footPath.GraphicData.GetCellBounds(0).BottomHalf());
-                GUI.HighlightMouseover(buttonRect);
-                
-                if (currentFootPath != null && currentFootPath.Id == footPath.Id)
-                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
-                
-                if (GUI.ClickableArea(buttonRect))
+                if (GUI.ButtonEmpty(buttonRect, selected: currentFootPath != null && currentFootPath.Id == footPath.Id))
                     SetFootPath(footPath);
+                
+                GUI.DrawSubTexture(buttonRect, footPath.GraphicData.Sprite, footPath.GraphicData.GetCellBounds(0).BottomHalf());
                 
                 i++;
             }
@@ -171,12 +168,14 @@ public class Tool_FootPath : Tool {
         ghost.Offset      = new Vector2(0, -1 - elevation);
     }
 
-    private void SetFootPath(FootPathData data) {
+    private void SetFootPath(FootPathDef data) {
         currentFootPath = data;
 
         if (currentFootPath != null) {
             Ghost.Graphics = data.GraphicData;
             Ghost.Visible  = true;
+        } else {
+            Ghost.Visible = false;
         }
     }
 }

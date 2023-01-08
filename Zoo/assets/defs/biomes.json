@@ -1,0 +1,26 @@
+[
+    {
+        "class": "BiomeDef",
+        "id": "grass",
+        "name": "Grass",
+        "colour": {"r": 182, "g": 213, "b": 60, "a": 255}
+    },
+    {
+        "class": "BiomeDef",
+        "id": "sand",
+        "name": "Sand",
+        "colour": {"r": 244, "g": 204, "b": 161, "a": 255}
+    },
+    {
+        "class": "BiomeDef",
+        "id": "snow",
+        "name": "Snow",
+        "colour": {"r": 223, "g": 246, "b": 246, "a": 255}
+    },
+    {
+        "class": "BiomeDef",
+        "id": "dirt",
+        "name": "Dirt",
+        "colour": {"r": 138, "g": 102, "b": 56, "a": 255}
+    }
+]

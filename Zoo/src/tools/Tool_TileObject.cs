@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.entities;
 using Zoo.ui;
 using Zoo.util;
@@ -12,18 +13,18 @@ public class Tool_TileObject : Tool {
     private const int ButtonSize = 30;
     
     // References
-    private List<ObjectData> allObjects;
+    private List<ObjectDef> allObjects;
 
     // Virtual Properties
     public override string   Name => "Object Tool";
     public override ToolType Type => ToolType.TileObject;
 
     // State
-    private ObjectData? currentObject;
+    private ObjectDef? currentObject;
     private Side        rotation;
 
     public Tool_TileObject(ToolManager tm) : base(tm) {
-        allObjects = Find.Registry.GetAllObjects();
+        allObjects = Find.AssetManager.GetAll<ObjectDef>();
     }
 
     public override void Set() {
@@ -78,18 +79,11 @@ public class Tool_TileObject : Tool {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
                 
-                GUI.DrawRect(buttonRect, GUI.UIButtonColour);
+                if (GUI.ButtonEmpty(buttonRect, selected: currentObject != null && currentObject.Id == obj.Id))
+                    SetObject(obj);
                 
                 // TODO: Write an icon helper for this
                 GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.GraphicData.Sprite, obj.GraphicData.GetCellBounds(0));
-                
-                GUI.HighlightMouseover(buttonRect);
-                
-                if (currentObject != null && currentObject.Id == obj.Id)
-                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
-                
-                if (GUI.ClickableArea(buttonRect))
-                    SetObject(obj);
 
                 i++;
             }
@@ -121,13 +115,15 @@ public class Tool_TileObject : Tool {
         return new Rectangle(ghost.Pos.X, ghost.Pos.Y, currentObject.Size.X, currentObject.Size.Y);
     }
 
-    private void SetObject(ObjectData data) {
+    private void SetObject(ObjectDef data) {
         currentObject = data;
 
         if (currentObject != null) {
             Ghost.Graphics = data.GraphicData;
             Ghost.Offset   = data.Size / 2f;
             Ghost.Visible  = true;
+        } else {
+            Ghost.Visible = false;
         }
     }
 }

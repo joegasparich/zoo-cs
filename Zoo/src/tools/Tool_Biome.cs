@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.ui;
 using Zoo.util;
 using Zoo.world;
@@ -20,10 +21,10 @@ public class Tool_Biome : Tool {
     public override ToolType Type => ToolType.Biome;
     
     // State
-    private Biome?                        currentBiome;
-    private bool                          isDragging;
-    private Dictionary<string, int[][][]> oldChunkData = new();
-    private float                         radius       = DefaultRadius;
+    private BiomeDef?                           currentBiome;
+    private bool                             isDragging;
+    private Dictionary<string, string[][][]> oldChunkData = new();
+    private float                            radius       = DefaultRadius;
 
     public Tool_Biome(ToolManager tm) : base(tm) {}
 
@@ -52,7 +53,7 @@ public class Tool_Biome : Tool {
                 // Copy here so we don't lose the data when clearing
                 Data = oldChunkData.ToDictionary(entry => entry.Key, entry => entry.Value),
                 Undo = data => {
-                    foreach (var (key, value) in (Dictionary<string, int[][][]>)data) {
+                    foreach (var (key, value) in (Dictionary<string, string[][][]>)data) {
                         var pos   = IntVec2.FromString(key);
                         var chunk = Find.World.Biomes.GetChunk(pos.X, pos.Y);
                         chunk.Load(value);
@@ -95,17 +96,11 @@ public class Tool_Biome : Tool {
     public override void OnGUI() {
         Find.UI.DoImmediateWindow("immBiomePanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
             var i = 0;
-            foreach (Biome biome in Find.Registry.GetAllBiomes()) {
+            foreach (BiomeDef biome in Find.AssetManager.GetAll<BiomeDef>()) {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
 
-                GUI.DrawRect(buttonRect, biome.Colour);
-                GUI.HighlightMouseover(buttonRect);
-                
-                if (currentBiome == biome)
-                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
-
-                if (GUI.ClickableArea(buttonRect))
+                if (GUI.ButtonEmpty(buttonRect, biome.Colour, currentBiome == biome))
                     SetBiome(biome);
                 
                 i++;
@@ -113,10 +108,13 @@ public class Tool_Biome : Tool {
         });
     }
 
-    private void SetBiome(Biome? biome) {
+    private void SetBiome(BiomeDef? biome) {
         currentBiome  = biome;
-        
-        if (currentBiome != null)
+
+        if (currentBiome != null) {
             Ghost.Visible = true;
+        } else {
+            Ghost.Visible = false;
+        }
     }
 }

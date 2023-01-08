@@ -96,8 +96,11 @@ public class Tool_Elevation : Tool {
     
     private void SetElevation(Elevation? elevation) {
         currentElevation = elevation;
-        
-        if (currentElevation != null)
+
+        if (currentElevation != null) {
             Ghost.Visible = true;
+        } else {
+            Ghost.Visible = false;
+        }
     }
 }

@@ -9,9 +9,13 @@ public static class OBJECTS {
 }
 
 public static class WALLS {
-    public const string IRON_FENCE = "iron_bar";
+    public const string IRON_FENCE = "iron_bar_fence";
 }
 
 public static class FOOTPATHS {
-    public const string DIRT_PATH = "dirt";
+    public const string DIRT_PATH = "dirt_path";
+}
+
+public static class BIOMES {
+    public const string GRASS = "grass";
 }

@@ -1,4 +1,5 @@
 {
+    "class": "WallDef",
     "id": "iron_bar",
     "name": "Iron Bar Fence",
     "type": "fence",

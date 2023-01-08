@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -14,7 +15,7 @@ public enum FootPathSpriteIndex {
 
 public class FootPath : ISerialisable {
     // Config
-    public FootPathData? Data           = null;
+    public FootPathDef? Data           = null;
     public IntVec2       Pos            = default;
     public bool          Indestructable = false;
     public Color         OverrideColour = Color.WHITE;
@@ -23,7 +24,7 @@ public class FootPath : ISerialisable {
     public bool Exists => Data != null;
 
     public void Serialise() {
-        Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.Registry.GetFootPath(id));
+        Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.Get<FootPathDef>(id));
         Find.SaveManager.ArchiveValue("pos",            ref Pos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
     }
@@ -51,7 +52,7 @@ public class FootPathGrid : ISerialisable {
         for (var i = 0; i < cols; i++) {
             grid[i] = new FootPath[rows];
             for (var j = 0; j < rows; j++) {
-                var pathData = data?[i][j] != null ? Find.Registry.GetFootPath(data[i][j]) : null;
+                var pathData = data?[i][j] != null ? Find.AssetManager.Get<FootPathDef>(data[i][j]) : null;
                 grid[i][j] = new FootPath() {
                     Data = pathData,
                     Pos = new IntVec2(i, j),
@@ -98,7 +99,7 @@ public class FootPathGrid : ISerialisable {
         }
     }
 
-    public FootPath? PlacePathAtTile(FootPathData data, IntVec2 tile) {
+    public FootPath? PlacePathAtTile(FootPathDef data, IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
         if (GetFootPathAtTile(tile)!.Exists) return null;
         

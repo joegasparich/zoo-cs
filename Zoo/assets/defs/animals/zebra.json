@@ -1,0 +1,14 @@
+{
+    "class": "AnimalDef",
+    "id": "plains_zebra",
+    "name": "Plains Zebra",
+    "inheritsFrom": "base_animal",
+    "graphicData": {
+        "spritePath": "assets/textures/animals/zebra.png",
+        "origin": {
+            "x": 0.5,
+            "y": 0.7
+        }
+    },
+    "canSwim": false
+}

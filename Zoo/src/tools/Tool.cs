@@ -9,6 +9,7 @@ public enum ToolType {
     Wall,
     Door,
     FootPath,
+    Animal,
     TileObject,
     Delete
 }

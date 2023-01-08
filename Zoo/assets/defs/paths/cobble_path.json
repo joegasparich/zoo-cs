@@ -1,5 +1,6 @@
 {
-  "id": "cobble",
+  "class": "FootPathDef",
+  "id": "cobble_path",
   "name": "Cobble Path",
   "graphicData": {
     "spritePath": "assets/textures/paths/cobble_path.png",

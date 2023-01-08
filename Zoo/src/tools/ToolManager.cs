@@ -102,6 +102,9 @@ public class ToolManager {
             case ToolType.FootPath:
                 activeTool = new Tool_FootPath(this);
                 break;
+            case ToolType.Animal:
+                activeTool = new Tool_Animal(this);
+                break;
             case ToolType.TileObject:
                 activeTool = new Tool_TileObject(this);
                 break;

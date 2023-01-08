@@ -1,4 +1,5 @@
 {
+    "class": "WallDef",
     "id": "wooden",
     "name": "Wooden Fence",
     "type": "fence",

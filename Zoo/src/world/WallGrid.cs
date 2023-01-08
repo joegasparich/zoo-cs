@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -22,7 +23,7 @@ public enum WallSpriteIndex {
 
 public class Wall : ISerialisable {
     // Config
-    public WallData?   Data           = null;
+    public WallDef?   Data           = null;
     public IntVec2     GridPos        = default;
     public bool        Indestructable = false;
     public bool        IsDoor         = false;
@@ -34,7 +35,7 @@ public class Wall : ISerialisable {
     public bool        Exists      => Data != null;
 
     public void Serialise() {
-        Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.Registry.GetWall(id));
+        Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.AssetManager.Get<WallDef>(id));
         Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
@@ -73,7 +74,7 @@ public class WallGrid : ISerialisable {
             
             for (var j = 0; j < rows + (int)orientation; j++) {
                 var worldPos = WallUtility.WallToWorldPosition(new IntVec2(i, j), orientation);
-                var wallData = data?[i][j]?.id != null ? Find.Registry.GetWall(data[i][j]!.id!) : null;
+                var wallData = data?[i][j]?.id != null ? Find.AssetManager.Get<WallDef>(data[i][j]!.id!) : null;
                 grid[i][j] = new Wall {
                     Data           = wallData,
                     GridPos        = new IntVec2(i, j),
@@ -125,7 +126,7 @@ public class WallGrid : ISerialisable {
         }
     }
 
-    public Wall? PlaceWallAtTile(WallData data, IntVec2 tile, Side side, bool indestructable = false) {
+    public Wall? PlaceWallAtTile(WallDef data, IntVec2 tile, Side side, bool indestructable = false) {
         if (!IsWallPosInMap(tile, side)) return null;
         if (GetWallAtTile(tile, side)!.Exists) return null;
         

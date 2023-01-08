@@ -1,0 +1,10 @@
+{
+    "class": "AnimalDef",
+    "id": "base_animal",
+    "abstract": true,
+    "needs": [
+        "hunger",
+        "thirst",
+        "energy"
+    ]
+}

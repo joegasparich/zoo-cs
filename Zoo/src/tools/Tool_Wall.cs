@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.entities;
 using Zoo.ui;
 using Zoo.util;
@@ -12,21 +13,21 @@ public class Tool_Wall : Tool {
     private const int ButtonSize = 30;
     
     // References
-    private List<WallData> allWalls;
+    private List<WallDef> allWalls;
     
     // Virtual Properties
     public override string   Name => "Wall Tool";
     public override ToolType Type => ToolType.Wall;
     
     // State
-    private          WallData?       currentWall;
+    private          WallDef?       currentWall;
     private          bool            isDragging;
     private          IntVec2         dragTile;
     private          Side            dragQuadrant;
     private readonly List<ToolGhost> ghosts = new();
 
     public Tool_Wall(ToolManager tm) : base(tm) {
-        allWalls = Find.Registry.GetAllWalls();
+        allWalls = Find.AssetManager.GetAll<WallDef>();
     }
 
     public override void Set() {
@@ -144,15 +145,11 @@ public class Tool_Wall : Tool {
             foreach (var wall in allWalls) {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
+
+                if (GUI.ButtonEmpty(buttonRect, selected: currentWall != null && currentWall.Id == wall.Id))
+                    SetWall(wall);
                 
                 GUI.DrawSubTexture(buttonRect, wall.GraphicData.Sprite, wall.GraphicData.GetCellBounds(0).BottomPct(0.25f));
-                GUI.HighlightMouseover(buttonRect);
-                
-                if (currentWall != null && currentWall.Id == wall.Id)
-                    GUI.DrawBorder(buttonRect, 2, Color.BLACK);
-                
-                if (GUI.ClickableArea(buttonRect))
-                    SetWall(wall);
                 
                 i++;
             }
@@ -212,12 +209,14 @@ public class Tool_Wall : Tool {
         }
     }
 
-    private void SetWall(WallData data) {
+    private void SetWall(WallDef data) {
         currentWall = data;
             
         if (currentWall != null) {
             Ghost.Graphics = data.GraphicData;
             Ghost.Visible  = true;
+        } else {
+            Ghost.Visible = false;
         }
     }
 }

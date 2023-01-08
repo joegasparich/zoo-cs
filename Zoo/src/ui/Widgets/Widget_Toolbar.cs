@@ -51,6 +51,11 @@ public class Widget_Toolbar : Window {
         }
         curX += ButtonWidth + GUI.GapSmall;
 
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Animal", selected: toolManager.GetActiveTool() is Tool_Animal)) {
+            toolManager.SetTool(ToolType.Animal);
+        }
+        curX += ButtonWidth + GUI.GapSmall;
+        
         if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Object", selected: toolManager.GetActiveTool() is Tool_TileObject)) {
             toolManager.SetTool(ToolType.TileObject);
         }

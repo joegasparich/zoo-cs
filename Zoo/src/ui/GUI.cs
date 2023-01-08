@@ -178,12 +178,27 @@ public static class GUI {
         FontSize  = DefaultFontSize;
         TextAlign = prevAlign;
     }
-    
+
+    public static bool ButtonEmpty(Rectangle rect, Color? col = null, bool selected = false) {
+        DrawRect(rect, col ?? UIButtonColour);
+        HighlightMouseover(rect);
+        
+        if (selected)
+            DrawBorder(rect, 2, Color.BLACK);
+        
+        if (HoverableArea(rect))
+            Find.UI.SetCursor(MouseCursor.MOUSE_CURSOR_POINTING_HAND);
+
+        return ClickableArea(rect);
+    }
 
     public static bool ButtonText(Rectangle rect, string text, Color? col = null, bool selected = false) {
         DrawRect(rect, col ?? UIButtonColour);
         HighlightMouseover(rect);
-        if (selected) DrawBorder(rect, 2, Color.BLACK);
+        
+        if (selected) 
+            DrawBorder(rect, 2, Color.BLACK);
+        
         Label(rect, text);
 
         if (HoverableArea(rect)) {

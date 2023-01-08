@@ -2,15 +2,10 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.util;
 
 namespace Zoo.world;
-
-public class Biome {
-    public int    Id;
-    public string Name;
-    public Color  Colour;
-}
 
 public class BiomeGrid : ISerialisable {
     // Constants
@@ -35,7 +30,7 @@ public class BiomeGrid : ISerialisable {
         this.cols = cols;
     }
 
-    public void Setup(int[][][][][]? data = null) {
+    public void Setup(string[][][][][]? data = null) {
         if (isSetup) {
             Debug.Warn("Tried to setup BiomeGrid which was already setup");
             return;
@@ -134,7 +129,7 @@ public class BiomeGrid : ISerialisable {
         }
     }
 
-    public void SetBiomeInRadius(Vector2 pos, float radius, Biome biome) {
+    public void SetBiomeInRadius(Vector2 pos, float radius, BiomeDef biome) {
         foreach (var chunk in GetChunksInRadius(pos, radius)) {
             chunk.SetBiomeInRadius(pos - new Vector2(chunk.X * ChunkSize, chunk.Y * ChunkSize), radius, biome);
         }
@@ -208,20 +203,20 @@ public class BiomeChunk : IDisposable {
 
     public Vector2 ChunkPos => new Vector2(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize);
     
-    public BiomeChunk(int x, int y, int cols, int rows, int[][][]? data = null) {
+    public BiomeChunk(int x, int y, int cols, int rows, string[][][]? data = null) {
         X    = x;
         Y    = y;
         Rows = rows;
         Cols = cols;
 
-        var grass = Find.Registry.GetBiome(0);
+        var grass = Find.AssetManager.Get<BiomeDef>(BIOMES.GRASS);
         
         grid = new BiomeCell[Cols][];
         for (var i = 0; i < Cols; i++) {
             grid[i] = new BiomeCell[Rows];
             for (var j = 0; j < Rows; j++) {
                 if (data != null) {
-                    grid[i][j] = new BiomeCell(data[i][j].Select(id => Find.Registry.GetBiome(id)).ToArray());
+                    grid[i][j] = new BiomeCell(data[i][j].Select(id => Find.AssetManager.Get<BiomeDef>(id)).ToArray());
                 } else {
                     grid[i][j] = new BiomeCell(new []{ grass, grass, grass, grass});
                 }
@@ -322,7 +317,7 @@ public class BiomeChunk : IDisposable {
         Raylib.UnloadMesh(ref chunkMesh);
     }
 
-    public void SetBiomeInRadius(Vector2 pos, float radius, Biome biome) {
+    public void SetBiomeInRadius(Vector2 pos, float radius, BiomeDef biome) {
         bool changed = false;
         
         for (float i = pos.X - radius; i < pos.X + radius; i++) {
@@ -356,14 +351,14 @@ public class BiomeChunk : IDisposable {
         return pos.X >= 0 && pos.X < Cols && pos.Y >= 0 && pos.Y < Rows;
     }
 
-    public int[][][] Save() {
+    public string[][][] Save() {
         return grid.Select(row => row.Select(cell => cell.Quadrants.Select(biome => biome.Id).ToArray()).ToArray()).ToArray();
     }
     
-    public void Load(int[][][] data) {
+    public void Load(string[][][] data) {
         for (var i = 0; i < Cols; ++i) {
             for (var j = 0; j < Rows; ++j) {
-                grid[i][j].Quadrants = data[i][j].Select(id => Find.Registry.GetBiome(id)).ToArray();
+                grid[i][j].Quadrants = data[i][j].Select(id => Find.AssetManager.Get<BiomeDef>(id)).ToArray();
             }
         }
         
@@ -372,13 +367,13 @@ public class BiomeChunk : IDisposable {
 }
 
 internal class BiomeCell {
-    public Biome[] Quadrants;
+    public BiomeDef[] Quadrants;
     
-    public BiomeCell(Biome[] quadrants) {
+    public BiomeCell(BiomeDef[] quadrants) {
         Quadrants = quadrants;
     }
     
-    public void SetQuadrant(Side quadrant, Biome biome) {
+    public void SetQuadrant(Side quadrant, BiomeDef biome) {
         Quadrants[(int)quadrant] = biome;
     }
 

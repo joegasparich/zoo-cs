@@ -1,0 +1,26 @@
+[
+    {
+        "class": "NeedDef",
+        "id": "hunger",
+        "name": "Hunger",
+        "changePerTick": -0.004,
+        "happinessFactor": 1,
+        "canDie": true
+    },
+    {
+        "class": "NeedDef",
+        "id": "thirst",
+        "name": "Thirst",
+        "changePerTick": -0.005,
+        "happinessFactor": 1,
+        "canDie": true
+    },
+    {
+        "class": "NeedDef",
+        "id": "energy",
+        "name": "Energy",
+        "changePerTick": -0.0025,
+        "happinessFactor": 0.5,
+        "canDie": false
+    }
+]
