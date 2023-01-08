@@ -1,4 +1,6 @@
-﻿namespace Zoo.defs; 
+﻿using System.Text.Json.Serialization;
+
+namespace Zoo.defs; 
 
 public class Def {
     // Config

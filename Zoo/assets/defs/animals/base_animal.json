@@ -3,8 +3,8 @@
     "id": "BaseAnimal",
     "abstract": true,
     "needs": [
-        "hunger",
-        "thirst",
-        "energy"
+        "Hunger",
+        "Thirst",
+        "Energy"
     ]
 }

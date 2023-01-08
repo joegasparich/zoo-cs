@@ -3,6 +3,21 @@ using Zoo.util;
 
 namespace Zoo; 
 
+public class DefRef<T> where T : Def {
+    private T?     def = null;
+    private string name;
+    
+    public DefRef(string name) {
+        this.name = name;
+    }
+
+    public T Def => def ??= Find.AssetManager.Get<T>(name);
+    
+    public static implicit operator T(DefRef<T> wrapper) {
+        return wrapper.Def;
+    }
+}
+
 [AttributeUsage(AttributeTargets.Class)]
 public class DefOf : Attribute {}
 

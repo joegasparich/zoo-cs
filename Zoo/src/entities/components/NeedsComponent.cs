@@ -1,15 +1,13 @@
-﻿namespace Zoo.entities;
+﻿using Zoo.defs;
+
+namespace Zoo.entities;
 
 public class Need {
     // Constants
     public const float MaxNeed = 100;
     
     // Config
-    public string Id;
-    public string Name;
-    public float  ChangePerTick;
-    public float  HappinessFactor;
-    public bool   CanDie;
+    public NeedDef Def;
 
     // State
     public float Value;
@@ -31,7 +29,7 @@ public class NeedsComponent : Component {
                 need.Value = Need.MaxNeed;
             }
             
-            need.Value += need.ChangePerTick;
+            need.Value += need.Def.ChangePerTick;
         }
     }
 }

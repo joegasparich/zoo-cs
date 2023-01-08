@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -12,14 +13,52 @@ public static class TexturePaths {
     public static readonly string Keeper = "assets/textures/keeper.png";
 }
 
+// TODO: Find a way to directly resolve def references instead of using a wrapper
+public class DefJsonConverterFactory : JsonConverterFactory {
+    public override bool CanConvert(Type type) {
+        if (!type.IsGenericType)
+            return false;
+
+        return type.GetGenericTypeDefinition() == typeof(DefRef<>);
+    }
+
+    public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options) {
+        Type defType = type.GetGenericArguments()[0];
+
+        return (JsonConverter)Activator.CreateInstance(
+            typeof(DefJsonConverter<>).MakeGenericType(defType),
+            BindingFlags.Instance | BindingFlags.Public,
+            binder: null,
+            args: new object[] { options },
+            culture: null)!;
+    }
+    
+    private class DefJsonConverter<T> : JsonConverter<DefRef<T>> where T : Def {
+        public DefJsonConverter(JsonSerializerOptions options) {}
+        
+        public override DefRef<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
+            if (reader.TokenType != JsonTokenType.String)
+                throw new JsonException();
+
+            var name = reader.GetString()!;
+
+            return new DefRef<T>(name);
+        }
+        public override void Write(Utf8JsonWriter writer, DefRef<T> value, JsonSerializerOptions options) {}
+    }
+}
+
+
 public class AssetManager {
     // Config
     private static readonly JsonSerializerOptions JsonOpts = new() {
-        Converters ={
-            new JsonStringEnumConverter()
+        Converters = {
+            new JsonStringEnumConverter(),
+            new DefJsonConverterFactory()
         },
         PropertyNameCaseInsensitive = true, 
-        IncludeFields = true
+        IncludeFields               = true,
+        
     };
         
     // State
@@ -43,7 +82,7 @@ public class AssetManager {
             }
         }
         
-        // Data
+        // Defs
         Queue<JsonObject> dataQueue = new ();
         foreach (var path in Directory.EnumerateFiles("assets/defs", "*.*", SearchOption.AllDirectories)) {
             if (!path.EndsWith(".json")) {
@@ -71,42 +110,45 @@ public class AssetManager {
             
             var id = data["id"]?.ToString();
             if (id == null) {
-                Debug.Error($"Failed to load data, missing id: {data}");
+                Debug.Error($"Failed to load def, missing id: {data}");
                 continue;
             }
             
-            Debug.Log($"Loading data with id {id}");
-            
             if (defMapFlat.ContainsKey(id)) {
-                Debug.Error($"Failed to load data {id}, id already exists");
+                Debug.Error($"Failed to load def {id}, id already exists");
                 continue;
             }
             
             // Get type
             var typeString = data["class"]?.ToString();
             if (typeString == null) {
-                Debug.Error($"Failed to load data {id}, no type specified");
+                Debug.Error($"Failed to load def {id}, no type specified");
                 continue;
             }
             var type = Type.GetType("Zoo.defs." + typeString);
             if (type == null) {
-                Debug.Error($"Failed to load data {id}, type {typeString} doesn't exist");
+                Debug.Error($"Failed to load def {id}, type {typeString} doesn't exist");
                 continue;
             }
+            
+            Debug.Log($"Loading {typeString} with id {id}");
 
             // Instantiate
             Def instance;
             try {
                 instance = (Def)JsonSerializer.Deserialize(data, type, JsonOpts);
             } catch (Exception e) {
-                Debug.Error($"Failed to load data {id}, could not deserialize json", e);
+                Debug.Error($"Failed to load def {id}, could not deserialize json", e);
                 continue;
             }
             
             // Inheritance
             if (instance.InheritsFrom != null) {
+                if (!dataQueue.Any(d => d["id"]?.ToString() == instance.InheritsFrom) && !defMapFlat.ContainsKey(instance.InheritsFrom)) {
+                    Debug.Error($"Failed to load def {id}, could not find parent {instance.InheritsFrom}");
+                    continue;
+                }
                 if (!defMapFlat.ContainsKey(instance.InheritsFrom)) {
-                    // TODO: prevent loop
                     dataQueue.Enqueue(data);
                     continue;
                 }
@@ -137,12 +179,12 @@ public class AssetManager {
 
     public Def? Get(Type type, string id) {
         if (!defMap.ContainsKey(type)) {
-            Debug.Error($"Failed to get asset of type {type}, no assets of that type have been loaded");
+            Debug.Error($"Failed to get def of type {type}, no defs of that type have been loaded");
             return null;
         }
 
         if (!defMap[type].ContainsKey(id)) {
-            Debug.Error($"Failed to get asset of type {type} with id {id}, no asset with that id has been loaded");
+            Debug.Error($"Failed to get def of type {type} with id {id}, no def with that id has been loaded");
             return null;
         }
 
@@ -151,12 +193,12 @@ public class AssetManager {
 
     public T? Get<T>(string id) where T : Def {
         if (!defMap.ContainsKey(typeof(T))) {
-            Debug.Error($"Failed to get asset of type {typeof(T)}, no assets of that type have been loaded");
+            Debug.Error($"Failed to get def of type {typeof(T)}, no defs of that type have been loaded");
             return null;
         }
 
         if (!defMap[typeof(T)].ContainsKey(id)) {
-            Debug.Error($"Failed to get asset of type {typeof(T)} with id {id}, no asset with that id has been loaded");
+            Debug.Error($"Failed to get def of type {typeof(T)} with id {id}, no def with that id has been loaded");
             return null;
         }
 
@@ -165,7 +207,7 @@ public class AssetManager {
     
     public List<T>? GetAll<T>() where T : Def {
         if (!defMap.ContainsKey(typeof(T))) {
-            Debug.Error($"Failed to get assets of type {typeof(T)}, no assets of that type have been loaded");
+            Debug.Error($"Failed to get defs of type {typeof(T)}, no defs of that type have been loaded");
             return null;
         }
         
