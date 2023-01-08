@@ -209,8 +209,6 @@ public class BiomeChunk : IDisposable {
         Rows = rows;
         Cols = cols;
 
-        var grass = Find.AssetManager.Get<BiomeDef>(BIOMES.GRASS);
-        
         grid = new BiomeCell[Cols][];
         for (var i = 0; i < Cols; i++) {
             grid[i] = new BiomeCell[Rows];
@@ -218,7 +216,7 @@ public class BiomeChunk : IDisposable {
                 if (data != null) {
                     grid[i][j] = new BiomeCell(data[i][j].Select(id => Find.AssetManager.Get<BiomeDef>(id)).ToArray());
                 } else {
-                    grid[i][j] = new BiomeCell(new []{ grass, grass, grass, grass});
+                    grid[i][j] = new BiomeCell(new []{ BiomeDefOf.Grass, BiomeDefOf.Grass, BiomeDefOf.Grass, BiomeDefOf.Grass});
                 }
             }
         }

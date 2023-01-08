@@ -1,6 +1,6 @@
 {
   "class": "FootPathDef",
-  "id": "dirt_path",
+  "id": "DirtPath",
   "name": "Dirt Path",
   "graphicData": {
     "spritePath": "assets/textures/paths/dirt_path.png",

@@ -1,6 +1,6 @@
 {
     "class": "AnimalDef",
-    "id": "base_animal",
+    "id": "BaseAnimal",
     "abstract": true,
     "needs": [
         "hunger",

@@ -1,6 +1,6 @@
 {
     "class": "WallDef",
-    "id": "iron_bar",
+    "id": "IronBarFence",
     "name": "Iron Bar Fence",
     "type": "fence",
     "graphicData": {

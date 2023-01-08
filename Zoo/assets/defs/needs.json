@@ -1,7 +1,7 @@
 [
     {
         "class": "NeedDef",
-        "id": "hunger",
+        "id": "Hunger",
         "name": "Hunger",
         "changePerTick": -0.004,
         "happinessFactor": 1,
@@ -9,7 +9,7 @@
     },
     {
         "class": "NeedDef",
-        "id": "thirst",
+        "id": "Thirst",
         "name": "Thirst",
         "changePerTick": -0.005,
         "happinessFactor": 1,
@@ -17,7 +17,7 @@
     },
     {
         "class": "NeedDef",
-        "id": "energy",
+        "id": "Energy",
         "name": "Energy",
         "changePerTick": -0.0025,
         "happinessFactor": 0.5,

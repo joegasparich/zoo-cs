@@ -46,6 +46,6 @@ public class TestControllableComponent : Component {
         base.Serialise();
         
         // Hack to restore naked entity sprite
-        entity.GetComponent<RenderComponent>().Graphics.SetSprite(TEXTURES.KEEPER);
+        entity.GetComponent<RenderComponent>().Graphics.SetSprite(TexturePaths.Keeper);
     }
 }

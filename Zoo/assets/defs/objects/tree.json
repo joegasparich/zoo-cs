@@ -1,6 +1,6 @@
 {
     "class": "ObjectDef",
-    "id": "tree",
+    "id": "Tree",
     "name": "tree",
     "solid": true,
     "size": {

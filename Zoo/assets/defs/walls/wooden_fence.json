@@ -1,6 +1,6 @@
 {
     "class": "WallDef",
-    "id": "wooden",
+    "id": "WoodenFence",
     "name": "Wooden Fence",
     "type": "fence",
     "graphicData": {

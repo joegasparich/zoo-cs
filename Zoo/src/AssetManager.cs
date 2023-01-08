@@ -7,6 +7,11 @@ using Zoo.util;
 
 namespace Zoo;
 
+// TODO: Find a home for this
+public static class TexturePaths {
+    public static readonly string Keeper = "assets/textures/keeper.png";
+}
+
 public class AssetManager {
     // Config
     private static readonly JsonSerializerOptions JsonOpts = new() {
@@ -116,6 +121,8 @@ public class AssetManager {
             defMap[type].Add(id, instance);
             defMapFlat.Add(id, instance);
         }
+
+        DefUtility.LoadDefOfs();
     }
 
     public Texture2D GetTexture(string path) {
@@ -126,6 +133,20 @@ public class AssetManager {
         }
 
         return textureMap[path];
+    }
+
+    public Def? Get(Type type, string id) {
+        if (!defMap.ContainsKey(type)) {
+            Debug.Error($"Failed to get asset of type {type}, no assets of that type have been loaded");
+            return null;
+        }
+
+        if (!defMap[type].ContainsKey(id)) {
+            Debug.Error($"Failed to get asset of type {type} with id {id}, no asset with that id has been loaded");
+            return null;
+        }
+
+        return defMap[type][id];
     }
 
     public T? Get<T>(string id) where T : Def {

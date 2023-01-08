@@ -1,6 +1,6 @@
 {
     "class": "ObjectDef",
-    "id": "building",
+    "id": "Building",
     "name": "building",
     "solid": true,
     "size": {
