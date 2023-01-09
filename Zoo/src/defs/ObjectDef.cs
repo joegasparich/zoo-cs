@@ -9,7 +9,7 @@ public enum ObjectType {
     Misc
 }
 
-public class ObjectDef : Def {
+public class ObjectDef : EntityDef {
     public ObjectType  Type;
     public GraphicData GraphicData;
     public Vector2     Size             = Vector2.One;

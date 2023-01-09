@@ -2,7 +2,7 @@
 
 namespace Zoo.defs; 
 
-public class AnimalDef : Def {
+public class AnimalDef : EntityDef {
     public GraphicData       GraphicData;
     public bool              CanSwim;
     public DefRef<NeedDef>[] Needs;

@@ -1,10 +1,15 @@
 using Zoo.ui;
 
-namespace Zoo.entities; 
+namespace Zoo.entities;
+
+public abstract class ComponentData {
+    public abstract Type CompClass { get; }
+}
 
 public abstract class Component : ISerialisable {
     // References
-    protected Entity entity;
+    protected Entity        entity;
+    public    ComponentData Data;
     
     // Properties
     protected virtual Type[] Dependencies => Array.Empty<Type>();

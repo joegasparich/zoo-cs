@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -13,48 +12,13 @@ public static class TexturePaths {
     public static readonly string Keeper = "assets/textures/keeper.png";
 }
 
-// TODO: Find a way to directly resolve def references instead of using a wrapper
-public class DefJsonConverterFactory : JsonConverterFactory {
-    public override bool CanConvert(Type type) {
-        if (!type.IsGenericType)
-            return false;
-
-        return type.GetGenericTypeDefinition() == typeof(DefRef<>);
-    }
-
-    public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options) {
-        Type defType = type.GetGenericArguments()[0];
-
-        return (JsonConverter)Activator.CreateInstance(
-            typeof(DefJsonConverter<>).MakeGenericType(defType),
-            BindingFlags.Instance | BindingFlags.Public,
-            binder: null,
-            args: new object[] { options },
-            culture: null)!;
-    }
-    
-    private class DefJsonConverter<T> : JsonConverter<DefRef<T>> where T : Def {
-        public DefJsonConverter(JsonSerializerOptions options) {}
-        
-        public override DefRef<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
-            if (reader.TokenType != JsonTokenType.String)
-                throw new JsonException();
-
-            var name = reader.GetString()!;
-
-            return new DefRef<T>(name);
-        }
-        public override void Write(Utf8JsonWriter writer, DefRef<T> value, JsonSerializerOptions options) {}
-    }
-}
-
-
 public class AssetManager {
     // Config
     private static readonly JsonSerializerOptions JsonOpts = new() {
         Converters = {
             new JsonStringEnumConverter(),
-            new DefJsonConverterFactory()
+            new DefJsonConverterFactory(),
+            new CompJsonConverter()
         },
         PropertyNameCaseInsensitive = true, 
         IncludeFields               = true,

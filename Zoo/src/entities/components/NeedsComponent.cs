@@ -17,6 +17,12 @@ public class Need {
     }
 }
 
+public class NeedsComponentData : ComponentData {
+    public override Type CompClass => typeof(NeedsComponent);
+
+    public List<DefRef<NeedDef>> Needs;
+}
+
 public class NeedsComponent : Component {
     // State
     public List<Need> Needs = new();

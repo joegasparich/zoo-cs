@@ -2,9 +2,14 @@
     "class": "AnimalDef",
     "id": "BaseAnimal",
     "abstract": true,
-    "needs": [
-        "Hunger",
-        "Thirst",
-        "Energy"
+    "components": [
+        {
+            "dataClass": "NeedsComponentData",
+            "needs": [
+                "Hunger",
+                "Thirst",
+                "Energy"
+            ]
+        }
     ]
 }
