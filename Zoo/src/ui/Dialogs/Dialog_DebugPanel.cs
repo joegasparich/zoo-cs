@@ -28,8 +28,8 @@ public class Dialog_DebugPanel : Dialog {
             DebugSettings.CellGrid =  !DebugSettings.CellGrid;
         curY += ButtonHeight + GUI.GapSmall;
 
-        if (GUI.ButtonText(new Rectangle(10, curY, ButtonWidth, ButtonHeight), "Biome Chunks", DebugSettings.BiomeChunks ? EnabledColor : DisabledColor))
-            DebugSettings.BiomeChunks =  !DebugSettings.BiomeChunks;
+        if (GUI.ButtonText(new Rectangle(10, curY, ButtonWidth, ButtonHeight), "Terrain Chunks", DebugSettings.TerrainChunks ? EnabledColor : DisabledColor))
+            DebugSettings.TerrainChunks =  !DebugSettings.TerrainChunks;
         curY += ButtonHeight + GUI.GapSmall;
 
         if (GUI.ButtonText(new Rectangle(10, curY, ButtonWidth, ButtonHeight), "Elevation Grid", DebugSettings.ElevationGrid ? EnabledColor : DisabledColor))

@@ -26,8 +26,8 @@ public class Widget_Toolbar : Window {
         GUI.TextAlign = AlignMode.MiddleCenter;
         
         // TODO: Do tool buttons with a loop?
-        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Biome", selected: toolManager.GetActiveTool() is Tool_Biome)) {
-            toolManager.SetTool(ToolType.Biome);
+        if (GUI.ButtonText(new Rectangle(curX, 10, ButtonWidth, ButtonHeight), "Terrain", selected: toolManager.GetActiveTool() is Tool_Terrain)) {
+            toolManager.SetTool(ToolType.Terrain);
         }
         curX += ButtonWidth + GUI.GapSmall;
 

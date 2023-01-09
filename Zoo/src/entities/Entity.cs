@@ -99,9 +99,8 @@ public class Entity : ISerialisable {
         if (components.ContainsKey(typeof(T)))
             return (T)components[typeof(T)];
         
-        // TODO (optimisation): Is there a faster way to do this?
         foreach (var type in components.Keys) {
-            if (type.IsSubclassOf(typeof(T))) {
+            if (typeof(T).IsAssignableFrom(type)) {
                 return (T)components[type];
             }
         }
@@ -112,9 +111,8 @@ public class Entity : ISerialisable {
     public bool HasComponent(Type type) {
         if (components.ContainsKey(type)) return true;
         
-        // TODO (optimisation): Is there a faster way to do this?
         foreach (var t in components.Keys) {
-            if (t.IsSubclassOf(type)) {
+            if (t.IsAssignableFrom(type)) {
                 return true;
             }
         }

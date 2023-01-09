@@ -6,7 +6,7 @@ namespace Zoo;
 
 public static class DebugSettings {
     public static bool CellGrid        = false;
-    public static bool BiomeChunks     = false;
+    public static bool TerrainChunks     = false;
     public static bool ElevationGrid   = false;
     public static bool AreaGrid        = false;
     public static bool PathfindingGrid = false;

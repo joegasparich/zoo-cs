@@ -7,9 +7,9 @@ using Zoo.util;
 
 namespace Zoo.world;
 
-public class BiomeGrid : ISerialisable {
+public class TerrainGrid : ISerialisable {
     // Constants
-    public static readonly int   BiomeScale          = 2;
+    public static readonly int   TerrainScale          = 2;
     internal const         int   ChunkSize           = 20;
     internal const         float SlopeColourStrength = 0.3f;
 
@@ -18,36 +18,36 @@ public class BiomeGrid : ISerialisable {
     private int cols;
     
     // Collections
-    private  BiomeChunk[][]    chunkGrid;
-    internal Queue<BiomeChunk> chunkRegenQueue = new();
+    private  TerrainChunk[][]    chunkGrid;
+    internal Queue<TerrainChunk> chunkRegenQueue = new();
     
     // State
     private bool           isSetup = false;
     private string         elevationListenerHandle;
 
-    public BiomeGrid(int rows, int cols) {
+    public TerrainGrid(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
     }
 
     public void Setup(string[][][][][]? data = null) {
         if (isSetup) {
-            Debug.Warn("Tried to setup BiomeGrid which was already setup");
+            Debug.Warn("Tried to setup TerrainGrid which was already setup");
             return;
         }
         
-        Debug.Log("Setting up biome grid");
+        Debug.Log("Setting up terrain grid");
         
         var chunkCols = cols / ChunkSize + Convert.ToInt32(cols % ChunkSize != 0);
         var chunkRows = rows / ChunkSize + Convert.ToInt32(rows % ChunkSize != 0);
         
-        chunkGrid = new BiomeChunk[chunkCols][];
+        chunkGrid = new TerrainChunk[chunkCols][];
         
         for (var i = 0; i < chunkCols; i++) {
-            chunkGrid[i] = new BiomeChunk[chunkRows];
+            chunkGrid[i] = new TerrainChunk[chunkRows];
             
             for (var j = 0; j < chunkRows; j++) {
-                chunkGrid[i][j] = new BiomeChunk(
+                chunkGrid[i][j] = new TerrainChunk(
                     i, 
                     j,
                     i == chunkCols - 1 && cols % ChunkSize != 0 ? cols % ChunkSize : ChunkSize,
@@ -64,7 +64,7 @@ public class BiomeGrid : ISerialisable {
 
     public void Reset() {
         if (!isSetup) {
-            Debug.Warn("Tried to reset when BiomeGrid wasn't setup");
+            Debug.Warn("Tried to reset when TerrainGrid wasn't setup");
             return;
         }
         
@@ -97,18 +97,18 @@ public class BiomeGrid : ISerialisable {
         return col >= 0 && col < cols / (float)ChunkSize && row >= 0 && row < rows / (float)ChunkSize;
     }
     
-    public BiomeChunk GetChunk(int col, int row) {
+    public TerrainChunk GetChunk(int col, int row) {
         if (!IsChunkInGrid(col, row)) return null;
         return chunkGrid[col][row];
     }
 
-    public BiomeChunk GetChunkAtTile(IntVec2 pos) {
-        var col = pos.X * BiomeScale / ChunkSize;
-        var row = pos.Y * BiomeScale / ChunkSize;
+    public TerrainChunk GetChunkAtTile(IntVec2 pos) {
+        var col = pos.X * TerrainScale / ChunkSize;
+        var row = pos.Y * TerrainScale / ChunkSize;
         return GetChunk(col, row);
     }
 
-    public IEnumerable<BiomeChunk> GetChunksInRadius(Vector2 pos, float radius) {
+    public IEnumerable<TerrainChunk> GetChunksInRadius(Vector2 pos, float radius) {
         var floorX = (pos.X / ChunkSize).FloorToInt();
         var floorY = (pos.Y / ChunkSize).FloorToInt();
 
@@ -129,15 +129,15 @@ public class BiomeGrid : ISerialisable {
         }
     }
 
-    public void SetBiomeInRadius(Vector2 pos, float radius, BiomeDef biome) {
+    public void SetTerrainInRadius(Vector2 pos, float radius, TerrainDef terrain) {
         foreach (var chunk in GetChunksInRadius(pos, radius)) {
-            chunk.SetBiomeInRadius(pos - new Vector2(chunk.X * ChunkSize, chunk.Y * ChunkSize), radius, biome);
+            chunk.SetTerrainInRadius(pos - new Vector2(chunk.X * ChunkSize, chunk.Y * ChunkSize), radius, terrain);
         }
     }
     
     private void OnElevationUpdated(object data) {
         var (pos, radius) = (ValueTuple<Vector2, float>)data;
-        RegenerateChunksInRadius(pos * BiomeScale, radius + 6);
+        RegenerateChunksInRadius(pos * TerrainScale, radius + 6);
     }
 
     public void RegenerateChunksInRadius(Vector2 pos, float radius) {
@@ -159,8 +159,8 @@ public class BiomeGrid : ISerialisable {
         // Horizontal
         for (var i = 0; i < (rows / ChunkSize) + 1; i++) {
             Debug.DrawLine(
-                new Vector2(0, i * ChunkSize / (float)BiomeScale),
-                new Vector2(Find.World.Height, i * ChunkSize / (float)BiomeScale),
+                new Vector2(0, i * ChunkSize / (float)TerrainScale),
+                new Vector2(Find.World.Height, i * ChunkSize / (float)TerrainScale),
                 Color.ORANGE, 
                 true
             );
@@ -168,8 +168,8 @@ public class BiomeGrid : ISerialisable {
         // Vertical
         for (var i = 0; i < (cols / ChunkSize) + 1; i++) {
             Debug.DrawLine(
-                new Vector2(i * ChunkSize / (float)BiomeScale, 0),
-                new Vector2(i * ChunkSize / (float)BiomeScale, Find.World.Width),
+                new Vector2(i * ChunkSize / (float)TerrainScale, 0),
+                new Vector2(i * ChunkSize / (float)TerrainScale, Find.World.Width),
                 Color.ORANGE, 
                 true
             );
@@ -190,9 +190,9 @@ public class BiomeGrid : ISerialisable {
     }
 }
 
-public class BiomeChunk : IDisposable {
+public class TerrainChunk : IDisposable {
     private Mesh          chunkMesh;
-    private BiomeCell[][] grid;
+    private TerrainCell[][] grid;
     private bool          isSetup          = false;
     private bool          shouldRegenerate = false;
     
@@ -201,22 +201,22 @@ public class BiomeChunk : IDisposable {
     public int  Rows             { get; }
     public int  Cols             { get; }
 
-    public Vector2 ChunkPos => new Vector2(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize);
+    public Vector2 ChunkPos => new Vector2(X * TerrainGrid.ChunkSize, Y * TerrainGrid.ChunkSize);
     
-    public BiomeChunk(int x, int y, int cols, int rows, string[][][]? data = null) {
+    public TerrainChunk(int x, int y, int cols, int rows, string[][][]? data = null) {
         X    = x;
         Y    = y;
         Rows = rows;
         Cols = cols;
 
-        grid = new BiomeCell[Cols][];
+        grid = new TerrainCell[Cols][];
         for (var i = 0; i < Cols; i++) {
-            grid[i] = new BiomeCell[Rows];
+            grid[i] = new TerrainCell[Rows];
             for (var j = 0; j < Rows; j++) {
                 if (data != null) {
-                    grid[i][j] = new BiomeCell(data[i][j].Select(id => Find.AssetManager.Get<BiomeDef>(id)).ToArray());
+                    grid[i][j] = new TerrainCell(data[i][j].Select(id => Find.AssetManager.Get<TerrainDef>(id)).ToArray());
                 } else {
-                    grid[i][j] = new BiomeCell(new []{ BiomeDefOf.Grass, BiomeDefOf.Grass, BiomeDefOf.Grass, BiomeDefOf.Grass});
+                    grid[i][j] = new TerrainCell(new []{ TerrainDefOf.Grass, TerrainDefOf.Grass, TerrainDefOf.Grass, TerrainDefOf.Grass});
                 }
             }
         }
@@ -245,7 +245,7 @@ public class BiomeChunk : IDisposable {
     }
     
     public void Regenerate() {
-        Find.World.Biomes.chunkRegenQueue.Enqueue(this);
+        Find.World.Terrain.chunkRegenQueue.Enqueue(this);
     }
 
     internal void RegenerateMeshNow() {
@@ -260,16 +260,16 @@ public class BiomeChunk : IDisposable {
                 for (int q = 0; q < 4; q++) {
                     var colour          = cell.Quadrants[q].Colour;
                     var pos             = ChunkPos + new Vector2(i, j);
-                    var tile            = (pos / BiomeGrid.BiomeScale).Floor();
+                    var tile            = (pos / TerrainGrid.TerrainScale).Floor();
                     var slopeBrightness = ElevationUtility.GetSlopeVariantColourOffset(Find.World.Elevation.GetTileSlopeVariant(tile), pos, (Side)q);
-                    colour = colour.Brighten(slopeBrightness * BiomeGrid.SlopeColourStrength);
+                    colour = colour.Brighten(slopeBrightness * TerrainGrid.SlopeColourStrength);
                     
-                    var quadrantVertices = BiomeCell.GetQuadrantVertices(new Vector2(i, j), (Side)q);
+                    var quadrantVertices = TerrainCell.GetQuadrantVertices(new Vector2(i, j), (Side)q);
                     for (int v = 0; v < 3; v++) {
-                        var elevation = Find.World.Elevation.GetElevationAtPos((quadrantVertices[v] + ChunkPos) / BiomeGrid.BiomeScale);
+                        var elevation = Find.World.Elevation.GetElevationAtPos((quadrantVertices[v] + ChunkPos) / TerrainGrid.TerrainScale);
                         
                         vertices[vertexIndex * 3]     = quadrantVertices[v].X;
-                        vertices[vertexIndex * 3 + 1] = quadrantVertices[v].Y - elevation * BiomeGrid.BiomeScale;
+                        vertices[vertexIndex * 3 + 1] = quadrantVertices[v].Y - elevation * TerrainGrid.TerrainScale;
                         vertices[vertexIndex * 3 + 2] = 0;
                         
                         colours[vertexIndex * 4]     = colour.r;
@@ -298,16 +298,16 @@ public class BiomeChunk : IDisposable {
     public void Render() {
         // Cull offscreen chunks
         if (!Find.Renderer.IsWorldRectOnScreen(new Rectangle(
-            X * BiomeGrid.ChunkSize / (float)BiomeGrid.BiomeScale,
-            Y * BiomeGrid.ChunkSize / (float)BiomeGrid.BiomeScale,
-            Rows                    / (float)BiomeGrid.BiomeScale,
-            Cols                    / (float)BiomeGrid.BiomeScale))
+            X * TerrainGrid.ChunkSize / (float)TerrainGrid.TerrainScale,
+            Y * TerrainGrid.ChunkSize / (float)TerrainGrid.TerrainScale,
+            Rows                    / (float)TerrainGrid.TerrainScale,
+            Cols                    / (float)TerrainGrid.TerrainScale))
         ) return;
 
         var matDefault = Raylib.LoadMaterialDefault();
         Raylib.DrawMesh(chunkMesh, matDefault, Matrix4x4.Transpose(
-            Matrix4x4.CreateTranslation(X * BiomeGrid.ChunkSize, Y * BiomeGrid.ChunkSize, (int)Depth.Ground) *
-            Matrix4x4.CreateScale(World.WorldScale / (float)BiomeGrid.BiomeScale, World.WorldScale / (float)BiomeGrid.BiomeScale, 1)
+            Matrix4x4.CreateTranslation(X * TerrainGrid.ChunkSize, Y * TerrainGrid.ChunkSize, (int)Depth.Ground) *
+            Matrix4x4.CreateScale(World.WorldScale / (float)TerrainGrid.TerrainScale, World.WorldScale / (float)TerrainGrid.TerrainScale, 1)
         ));
     }
 
@@ -315,7 +315,7 @@ public class BiomeChunk : IDisposable {
         Raylib.UnloadMesh(ref chunkMesh);
     }
 
-    public void SetBiomeInRadius(Vector2 pos, float radius, BiomeDef biome) {
+    public void SetTerrainInRadius(Vector2 pos, float radius, TerrainDef terrain) {
         bool changed = false;
         
         for (float i = pos.X - radius; i < pos.X + radius; i++) {
@@ -326,12 +326,12 @@ public class BiomeChunk : IDisposable {
                 // Get triangles in circle
                 for (var q = 0; q < 4; q++) {
                     var side = (Side)q;
-                    foreach (var point in BiomeCell.GetQuadrantVertices(cellPos, side)) {
+                    foreach (var point in TerrainCell.GetQuadrantVertices(cellPos, side)) {
                         if (JMath.PointInCircle(pos, radius, point)) {
                             var xFloor = cellPos.X.RoundToInt();
                             var yFloor = cellPos.Y.RoundToInt();
-                            if (grid[xFloor][yFloor].Quadrants[(int)side] != biome) {
-                                grid[xFloor][yFloor].SetQuadrant(side, biome);
+                            if (grid[xFloor][yFloor].Quadrants[(int)side] != terrain) {
+                                grid[xFloor][yFloor].SetQuadrant(side, terrain);
                                 changed = true;
                             }
                         }
@@ -350,13 +350,13 @@ public class BiomeChunk : IDisposable {
     }
 
     public string[][][] Save() {
-        return grid.Select(row => row.Select(cell => cell.Quadrants.Select(biome => biome.Id).ToArray()).ToArray()).ToArray();
+        return grid.Select(row => row.Select(cell => cell.Quadrants.Select(terrain => terrain.Id).ToArray()).ToArray()).ToArray();
     }
     
     public void Load(string[][][] data) {
         for (var i = 0; i < Cols; ++i) {
             for (var j = 0; j < Rows; ++j) {
-                grid[i][j].Quadrants = data[i][j].Select(id => Find.AssetManager.Get<BiomeDef>(id)).ToArray();
+                grid[i][j].Quadrants = data[i][j].Select(id => Find.AssetManager.Get<TerrainDef>(id)).ToArray();
             }
         }
         
@@ -364,15 +364,15 @@ public class BiomeChunk : IDisposable {
     }
 }
 
-internal class BiomeCell {
-    public BiomeDef[] Quadrants;
+internal class TerrainCell {
+    public TerrainDef[] Quadrants;
     
-    public BiomeCell(BiomeDef[] quadrants) {
+    public TerrainCell(TerrainDef[] quadrants) {
         Quadrants = quadrants;
     }
     
-    public void SetQuadrant(Side quadrant, BiomeDef biome) {
-        Quadrants[(int)quadrant] = biome;
+    public void SetQuadrant(Side quadrant, TerrainDef terrain) {
+        Quadrants[(int)quadrant] = terrain;
     }
 
     public static Vector2[] GetQuadrantVertices(Vector2 pos, Side quadrant) {

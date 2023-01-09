@@ -4,7 +4,7 @@ namespace Zoo.tools;
 
 public enum ToolType {
     None,
-    Biome,
+    Terrain,
     Elevation,
     Wall,
     Door,

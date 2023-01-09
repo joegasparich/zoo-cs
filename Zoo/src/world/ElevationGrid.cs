@@ -226,7 +226,7 @@ public class ElevationGrid : ISerialisable {
 
         RegenerateWaterMesh();
 
-        // Notify Biome Grid
+        // Notify Terrain Grid
         Messenger.Fire(EventType.ElevationUpdated, (pos, radius));
         
         // Notify Pathfinders
@@ -237,21 +237,21 @@ public class ElevationGrid : ISerialisable {
         return oldPointsInCircle;
     }
 
-    private HashSet<BiomeChunk> affectedBiomeChunks = new();
+    private HashSet<TerrainChunk> affectedTerrainChunks = new();
     public void SetElevationFromUndoData(Dictionary<IntVec2, Elevation> undoData) {
-        affectedBiomeChunks.Clear();
+        affectedTerrainChunks.Clear();
         
         foreach (var (gp, e) in undoData) {
             grid[gp.X][gp.Y] = e;
 
             foreach (var tile in GetSurroundingTiles(gp)) {
-                affectedBiomeChunks.Add(Find.World.Biomes.GetChunkAtTile(tile));
+                affectedTerrainChunks.Add(Find.World.Terrain.GetChunkAtTile(tile));
             }
         }
         
         RegenerateWaterMesh();
 
-        foreach (var chunk in affectedBiomeChunks) {
+        foreach (var chunk in affectedTerrainChunks) {
             chunk.Regenerate();
         }
     }

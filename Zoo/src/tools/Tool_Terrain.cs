@@ -7,7 +7,7 @@ using Zoo.world;
 
 namespace Zoo.tools; 
 
-public class Tool_Biome : Tool {
+public class Tool_Terrain : Tool {
     // Constants
     private const float DefaultRadius      = 0.65f;
     private const float RadiusStep         = 0.1f;
@@ -17,16 +17,16 @@ public class Tool_Biome : Tool {
     private const int   ButtonSize         = 30;
 
     // Virtual Properties
-    public override string   Name => "Biome Tool";
-    public override ToolType Type => ToolType.Biome;
+    public override string   Name => "Terrain Tool";
+    public override ToolType Type => ToolType.Terrain;
     
     // State
-    private BiomeDef?                           currentBiome;
+    private TerrainDef?                      currentTerrain;
     private bool                             isDragging;
     private Dictionary<string, string[][][]> oldChunkData = new();
     private float                            radius       = DefaultRadius;
 
-    public Tool_Biome(ToolManager tm) : base(tm) {}
+    public Tool_Terrain(ToolManager tm) : base(tm) {}
 
     public override void Set() {
         Ghost.Type    = GhostType.Circle;
@@ -35,7 +35,7 @@ public class Tool_Biome : Tool {
     }
 
     public override void OnInput(InputEvent evt) {
-        if (currentBiome == null) return;
+        if (currentTerrain == null) return;
         
         // Only listen to down and up events so that we can't start dragging from UI
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
@@ -49,13 +49,13 @@ public class Tool_Biome : Tool {
             isDragging = false;
 
             toolManager.PushAction(new ToolAction() {
-                Name = "Biome brush",
+                Name = "Terrain brush",
                 // Copy here so we don't lose the data when clearing
                 Data = oldChunkData.ToDictionary(entry => entry.Key, entry => entry.Value),
                 Undo = data => {
                     foreach (var (key, value) in (Dictionary<string, string[][][]>)data) {
                         var pos   = IntVec2.FromString(key);
-                        var chunk = Find.World.Biomes.GetChunk(pos.X, pos.Y);
+                        var chunk = Find.World.Terrain.GetChunk(pos.X, pos.Y);
                         chunk.Load(value);
                     }
                 }
@@ -77,41 +77,41 @@ public class Tool_Biome : Tool {
     }
 
     public override void Update() {
-        if (currentBiome == null) return;
+        if (currentTerrain == null) return;
         if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
 
-        var pos = Find.Input.GetMouseWorldPos() * BiomeGrid.BiomeScale;
+        var pos = Find.Input.GetMouseWorldPos() * TerrainGrid.TerrainScale;
         
         // Save backups for undo
-        foreach (var chunk in Find.World.Biomes.GetChunksInRadius(pos, radius * BiomeGrid.BiomeScale)) {
+        foreach (var chunk in Find.World.Terrain.GetChunksInRadius(pos, radius * TerrainGrid.TerrainScale)) {
             var key = new IntVec2(chunk.X, chunk.Y).ToString();
             if (!oldChunkData.ContainsKey(key))
                 oldChunkData.Add(key, chunk.Save());
         }
         
-        // Set biome in a circle
-        Find.World.Biomes.SetBiomeInRadius(pos, radius * BiomeGrid.BiomeScale, currentBiome);
+        // Set terrain in a circle
+        Find.World.Terrain.SetTerrainInRadius(pos, radius * TerrainGrid.TerrainScale, currentTerrain);
     }
 
     public override void OnGUI() {
-        Find.UI.DoImmediateWindow("immBiomePanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
+        Find.UI.DoImmediateWindow("immTerrainPanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
             var i = 0;
-            foreach (BiomeDef biome in Find.AssetManager.GetAll<BiomeDef>()) {
+            foreach (TerrainDef terrain in Find.AssetManager.GetAll<TerrainDef>()) {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
 
-                if (GUI.ButtonEmpty(buttonRect, biome.Colour, currentBiome == biome))
-                    SetBiome(biome);
+                if (GUI.ButtonEmpty(buttonRect, terrain.Colour, currentTerrain == terrain))
+                    SetTerrain(terrain);
                 
                 i++;
             }
         });
     }
 
-    private void SetBiome(BiomeDef? biome) {
-        currentBiome  = biome;
+    private void SetTerrain(TerrainDef? terrain) {
+        currentTerrain  = terrain;
 
-        if (currentBiome != null) {
+        if (currentTerrain != null) {
             Ghost.Visible = true;
         } else {
             Ghost.Visible = false;

@@ -87,8 +87,8 @@ public class ToolManager {
         
         // TODO: can we automate this
         switch(type) {
-            case ToolType.Biome:
-                activeTool = new Tool_Biome(this);
+            case ToolType.Terrain:
+                activeTool = new Tool_Terrain(this);
                 break;
             case ToolType.Elevation:
                 activeTool = new Tool_Elevation(this);

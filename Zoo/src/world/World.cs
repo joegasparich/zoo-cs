@@ -46,7 +46,7 @@ public class World : ISerialisable {
 
     // Grids
     public ElevationGrid Elevation  { get; private set; }
-    public BiomeGrid     Biomes     { get; private set; }
+    public TerrainGrid     Terrain     { get; private set; }
     public WallGrid      Walls      { get; private set; }
     public FootPathGrid  FootPaths  { get; private set; }
     public AreaManager   Areas      { get; private set; }
@@ -59,7 +59,7 @@ public class World : ISerialisable {
         Height = height;
 
         Elevation  = new ElevationGrid(Width + 1, Height + 1);
-        Biomes     = new BiomeGrid(Width * BiomeGrid.BiomeScale, Height * BiomeGrid.BiomeScale);
+        Terrain     = new TerrainGrid(Width * TerrainGrid.TerrainScale, Height * TerrainGrid.TerrainScale);
         Walls      = new WallGrid(Width, Height);
         FootPaths  = new FootPathGrid(Width, Height);
         Areas      = new AreaManager();
@@ -69,7 +69,7 @@ public class World : ISerialisable {
         if (isSetup) return;
 
         Elevation.Setup();
-        Biomes.Setup();
+        Terrain.Setup();
         Walls.Setup();
         FootPaths.Setup();
         Areas.Setup(Find.Zoo.Entrance);
@@ -84,7 +84,7 @@ public class World : ISerialisable {
     
     public void Reset() {
         Elevation.Reset();
-        Biomes.Reset();
+        Terrain.Reset();
         Walls.Reset();
         FootPaths.Reset();
         Areas.Reset();
@@ -100,18 +100,18 @@ public class World : ISerialisable {
     public void Update() {}
 
     public void PostUpdate() {
-        Biomes.PostUpdate();
+        Terrain.PostUpdate();
     }
 
     public void Render() {
-        Biomes.Render();
+        Terrain.Render();
         Elevation.Render();
         Walls.Render();
         FootPaths.Render();
     }
     public void RenderDebug() {
         if (DebugSettings.CellGrid) RenderDebugCellGrid();
-        if (DebugSettings.BiomeChunks) Biomes.RenderChunkDebug();
+        if (DebugSettings.TerrainChunks) Terrain.RenderChunkDebug();
         if (DebugSettings.ElevationGrid) Elevation.RenderDebug();
         if (DebugSettings.AreaGrid) Areas.RenderDebugAreaGrid();
         if (DebugSettings.PathfindingGrid) Pathfinder.DrawDebugGrid();
@@ -311,7 +311,7 @@ public class World : ISerialisable {
         }
         
         Find.SaveManager.ArchiveDeep("elevation", Elevation);
-        Find.SaveManager.ArchiveDeep("biomes", Biomes);
+        Find.SaveManager.ArchiveDeep("terrain", Terrain);
         Find.SaveManager.ArchiveDeep("walls", Walls);
         Find.SaveManager.ArchiveDeep("footpaths", FootPaths);
 

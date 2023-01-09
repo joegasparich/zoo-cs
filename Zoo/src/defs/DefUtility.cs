@@ -43,6 +43,6 @@ public static class WallDefOf {
 }
 
 [DefOf]
-public static class BiomeDefOf {
-    public static BiomeDef Grass;
+public static class TerrainDefOf {
+    public static TerrainDef Grass;
 }

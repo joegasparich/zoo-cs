@@ -2,6 +2,6 @@
 
 namespace Zoo.defs; 
 
-public class BiomeDef : Def {
+public class TerrainDef : Def {
     public Color Colour;
 }

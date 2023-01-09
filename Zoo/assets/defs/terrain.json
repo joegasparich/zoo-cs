@@ -1,24 +1,24 @@
 [
     {
-        "class": "BiomeDef",
+        "class": "TerrainDef",
         "id": "Grass",
         "name": "Grass",
         "colour": {"r": 182, "g": 213, "b": 60, "a": 255}
     },
     {
-        "class": "BiomeDef",
+        "class": "TerrainDef",
         "id": "Sand",
         "name": "Sand",
         "colour": {"r": 244, "g": 204, "b": 161, "a": 255}
     },
     {
-        "class": "BiomeDef",
+        "class": "TerrainDef",
         "id": "Snow",
         "name": "Snow",
         "colour": {"r": 223, "g": 246, "b": 246, "a": 255}
     },
     {
-        "class": "BiomeDef",
+        "class": "TerrainDef",
         "id": "Dirt",
         "name": "Dirt",
         "colour": {"r": 138, "g": 102, "b": 56, "a": 255}

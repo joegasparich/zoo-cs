@@ -74,8 +74,8 @@ public static class ElevationUtility {
         float NW = 1.0f,   N = 0.75f, W = 0.5f,   NE = 0.25f;
         float SW = -0.25f, E = -0.5f, S = -0.75f, SE = -1.0f;
         
-        var xRel = pos.X / BiomeGrid.BiomeScale % 1;
-        var yRel = pos.Y / BiomeGrid.BiomeScale % 1;
+        var xRel = pos.X / TerrainGrid.TerrainScale % 1;
+        var yRel = pos.Y / TerrainGrid.TerrainScale % 1;
 
         switch (slope) {
             case SlopeVariant.N:
