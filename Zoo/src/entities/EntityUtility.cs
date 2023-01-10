@@ -28,7 +28,7 @@ public static class EntityUtility {
             Find.SaveManager.CurrentSaveNode = entityData;
             var pos = Find.SaveManager.Deserialise<Vector2>(entityData["pos"]);
             Debug.Assert(pos != null);
-            var entity    = new Entity();
+            var entity = new Entity(pos, null);
             entity.Serialise();
             Game.RegisterEntity(entity, entity.Id);
         }

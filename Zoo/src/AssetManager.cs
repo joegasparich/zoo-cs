@@ -1,6 +1,5 @@
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.util;
@@ -13,17 +12,12 @@ public static class TexturePaths {
 }
 
 public class AssetManager {
-    // Config
-    private static readonly JsonSerializerOptions JsonOpts = new() {
-        Converters = {
-            new JsonStringEnumConverter(),
-            new DefJsonConverterFactory(),
+    private JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings() {
+        Converters = new List<JsonConverter>() {
             new CompJsonConverter()
         },
-        PropertyNameCaseInsensitive = true, 
-        IncludeFields               = true,
-        
-    };
+        ContractResolver = new CustomContractResolver()
+    });
         
     // State
     private readonly Dictionary<string, Texture2D>             textureMap = new();
@@ -47,21 +41,24 @@ public class AssetManager {
         }
         
         // Defs
-        Queue<JsonObject> dataQueue = new ();
+        Queue<JObject> dataQueue = new ();
         foreach (var path in Directory.EnumerateFiles("assets/defs", "*.*", SearchOption.AllDirectories)) {
             if (!path.EndsWith(".json")) {
                 continue;
             }
 
+            // TODO: Ensure ids exist in here somewhere
+            
             try {
                 var json = File.ReadAllText(path.Replace("\\", "/"));
                 try {
-                    var dataList = JsonSerializer.Deserialize<JsonObject[]>(json, JsonOpts)!;
+                    var dataList = JsonConvert.DeserializeObject<List<JObject>>(json);
+                    // var dataList = JsonSerializer.Deserialize<JsonObject[]>(json, JsonOpts)!;
                     foreach (var data in dataList) {
                         dataQueue.Enqueue(data);
                     }
                 } catch {
-                    var data = JsonSerializer.Deserialize<JsonObject>(json, JsonOpts)!;
+                    var data = JsonConvert.DeserializeObject<JObject>(json)!;
                     dataQueue.Enqueue(data);
                 }
             } catch (Exception e) {
@@ -69,9 +66,32 @@ public class AssetManager {
             }
         }
         
+        // Resolve inheritance
+        Queue<JObject>              resolvedQueue = new();
+        Dictionary<string, JObject> resolvedDict  = new();
         while (dataQueue.Count > 0) {
             var data = dataQueue.Dequeue();
-            
+            if (!data.ContainsKey("abstract"))
+                data.Add("abstract", false);
+            if (data.TryGetValue("inherits", out var inherits)) {
+                var inheritsId = inherits.Value<string>();
+                if (resolvedDict.ContainsKey(inheritsId)) {
+                    var merged = (JObject)resolvedDict[inheritsId].DeepClone();
+                    merged.Merge(data);
+                    data = merged;
+                } else {
+                    // TODO: Prevent looping
+                    dataQueue.Enqueue(data);
+                }
+            }
+            resolvedQueue.Enqueue(data);
+            resolvedDict.Add(data["id"].ToString(), data);
+        }
+        
+        // Deserialize
+        while (resolvedQueue.Count > 0) {
+            var data = resolvedQueue.Dequeue();
+             
             var id = data["id"]?.ToString();
             if (id == null) {
                 Debug.Error($"Failed to load def, missing id: {data}");
@@ -96,36 +116,22 @@ public class AssetManager {
             }
             
             Debug.Log($"Loading {typeString} with id {id}");
-
+        
             // Instantiate
             Def instance;
             try {
-                instance = (Def)JsonSerializer.Deserialize(data, type, JsonOpts);
+                instance = (Def)data.ToObject(type, serializer)!;
             } catch (Exception e) {
                 Debug.Error($"Failed to load def {id}, could not deserialize json", e);
                 continue;
             }
-            
-            // Inheritance
-            if (instance.InheritsFrom != null) {
-                if (!dataQueue.Any(d => d["id"]?.ToString() == instance.InheritsFrom) && !defMapFlat.ContainsKey(instance.InheritsFrom)) {
-                    Debug.Error($"Failed to load def {id}, could not find parent {instance.InheritsFrom}");
-                    continue;
-                }
-                if (!defMapFlat.ContainsKey(instance.InheritsFrom)) {
-                    dataQueue.Enqueue(data);
-                    continue;
-                }
-                var parent = defMapFlat[instance.InheritsFrom];
-                instance.InheritFrom(parent);
-            }
-            
+             
             // Register
             if (!defMap.ContainsKey(type))
                 defMap.Add(type, new Dictionary<string, Def>());
-            
+                
             defMap[type].Add(id, instance);
-            defMapFlat.Add(id, instance);
+            defMapFlat[id] = instance;
         }
 
         DefUtility.LoadDefOfs();
@@ -141,7 +147,16 @@ public class AssetManager {
         return textureMap[path];
     }
 
-    public Def? Get(Type type, string id) {
+    public Def? GetDef(string id) {
+        if (!defMapFlat.ContainsKey(id)) {
+            Debug.Error($"Failed to get def with id {id}, no defs of that type have been loaded");
+            return null;
+        }
+        
+        return defMapFlat[id];
+    }
+
+    public Def? GetDef(Type type, string id) {
         if (!defMap.ContainsKey(type)) {
             Debug.Error($"Failed to get def of type {type}, no defs of that type have been loaded");
             return null;
@@ -155,7 +170,7 @@ public class AssetManager {
         return defMap[type][id];
     }
 
-    public T? Get<T>(string id) where T : Def {
+    public T? GetDef<T>(string id) where T : Def {
         if (!defMap.ContainsKey(typeof(T))) {
             Debug.Error($"Failed to get def of type {typeof(T)}, no defs of that type have been loaded");
             return null;
@@ -169,7 +184,7 @@ public class AssetManager {
         return (T)defMap[typeof(T)][id];
     }
     
-    public List<T>? GetAll<T>() where T : Def {
+    public List<T>? GetAllDefs<T>() where T : Def {
         if (!defMap.ContainsKey(typeof(T))) {
             Debug.Error($"Failed to get defs of type {typeof(T)}, no defs of that type have been loaded");
             return null;

@@ -9,13 +9,14 @@ public abstract class ComponentData {
 public abstract class Component : ISerialisable {
     // References
     protected Entity        entity;
-    public    ComponentData Data;
+    public    ComponentData data;
     
     // Properties
     protected virtual Type[] Dependencies => Array.Empty<Type>();
     
-    public Component(Entity entity) {
+    public Component(Entity entity, ComponentData? data) {
         this.entity = entity;
+        this.data   = data;
     }
 
     public virtual void Start() {

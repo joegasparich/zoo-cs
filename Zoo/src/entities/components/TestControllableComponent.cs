@@ -10,7 +10,7 @@ public class TestControllableComponent : Component {
 
     protected override Type[] Dependencies => new[] { typeof(PathFollowComponent) };
 
-    public TestControllableComponent(Entity entity) : base(entity) {}
+    public TestControllableComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
     public override void Start() {
         base.Start();

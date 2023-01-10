@@ -96,7 +96,7 @@ public class Tool_Terrain : Tool {
     public override void OnGUI() {
         Find.UI.DoImmediateWindow("immTerrainPanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
             var i = 0;
-            foreach (TerrainDef terrain in Find.AssetManager.GetAll<TerrainDef>()) {
+            foreach (TerrainDef terrain in Find.AssetManager.GetAllDefs<TerrainDef>()) {
                 // TODO: Wrap
                 var buttonRect = new Rectangle(i * (ButtonSize + GUI.GapSmall) + GUI.GapSmall, GUI.GapSmall, ButtonSize, ButtonSize);
 

@@ -33,7 +33,7 @@ public class Dialog_Info : Dialog {
         HeaderHeight        = 22;
         
         this.entity = entity;
-        this.tabs   = entity.Components.Select(comp => comp.GetInfoTab()).Where(tab => tab != null).ToList();
+        this.tabs   = entity.GetInfoTabs();
 
         AbsRect = new Rectangle(
             AbsRect.x + openInfoDialogs * 20,

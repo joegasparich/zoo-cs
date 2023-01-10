@@ -1,4 +1,8 @@
-﻿namespace Zoo.entities; 
+﻿namespace Zoo.entities;
+
+public class ElevationComponentData : ComponentData {
+    public override Type CompClass => typeof(ElevationComponent);
+}
 
 public class ElevationComponent : Component {
     // References
@@ -7,7 +11,7 @@ public class ElevationComponent : Component {
     // Properties 
     protected override Type[] Dependencies => new Type[] { typeof(RenderComponent) };
 
-    public ElevationComponent(Entity entity) : base(entity) {}
+    public ElevationComponent(Entity entity, ElevationComponentData? data) : base(entity, data) {}
 
     public override void Start() {
         base.Start();

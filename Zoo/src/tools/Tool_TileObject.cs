@@ -24,7 +24,7 @@ public class Tool_TileObject : Tool {
     private Side        rotation;
 
     public Tool_TileObject(ToolManager tm) : base(tm) {
-        allObjects = Find.AssetManager.GetAll<ObjectDef>();
+        allObjects = Find.AssetManager.GetAllDefs<ObjectDef>();
     }
 
     public override void Set() {
@@ -43,14 +43,12 @@ public class Tool_TileObject : Tool {
             var obj = GenEntity.CreateTileObject(currentObject.Id, Ghost.Pos);
             if (obj == null) return;
             
-            obj.GetComponent<TileObjectComponent>().SetRotation(rotation);
+            obj.SetRotation(rotation);
 
-            Game.RegisterEntity(obj);
-            
             toolManager.PushAction(new ToolAction() {
                 Name = $"Place {currentObject.Name}",
                 Data = obj.Id,
-                Undo = data => Game.GetEntityById((int)data).Destroy(),
+                Undo = data => obj.Destroy(),
             });
             
             evt.Consume();

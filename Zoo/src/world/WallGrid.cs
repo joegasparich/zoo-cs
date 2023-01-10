@@ -35,7 +35,7 @@ public class Wall : ISerialisable {
     public bool        Exists      => Data != null;
 
     public void Serialise() {
-        Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.AssetManager.Get<WallDef>(id));
+        Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.AssetManager.GetDef<WallDef>(id));
         Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
@@ -74,7 +74,7 @@ public class WallGrid : ISerialisable {
             
             for (var j = 0; j < rows + (int)orientation; j++) {
                 var worldPos = WallUtility.WallToWorldPosition(new IntVec2(i, j), orientation);
-                var wallData = data?[i][j]?.id != null ? Find.AssetManager.Get<WallDef>(data[i][j]!.id!) : null;
+                var wallData = data?[i][j]?.id != null ? Find.AssetManager.GetDef<WallDef>(data[i][j]!.id!) : null;
                 grid[i][j] = new Wall {
                     Data           = wallData,
                     GridPos        = new IntVec2(i, j),

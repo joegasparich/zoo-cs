@@ -1,48 +1,32 @@
 ﻿using System.Numerics;
 using Zoo.defs;
+using Zoo.util;
 
 namespace Zoo.entities; 
 
 public static class GenEntity {
-    public static Entity? CreateAnimal(string animalId, Vector2 pos) {
+    private static T? CreateEntity<T>(Vector2 pos, EntityDef def) where T : Entity {
         if (!Find.World.IsPositionInMap(pos)) return null;
-
-        var def = Find.AssetManager.Get<AnimalDef>(animalId);
-
-        var entity = new Entity(pos);
-
-        // Renderer
-        var renderer = entity.AddComponent<RenderComponent>();
-        Debug.Assert(def.GraphicData != null);
-        renderer.Graphics = def.GraphicData;
         
-        // Tile object
-        var animal = entity.AddComponent<AnimalComponent>();
-        animal.Def = def;
-        
-        entity.AddComponent<ElevationComponent>();
+        var entity = Activator.CreateInstance(typeof(T), pos, def) as T;
+
+        foreach (var compData in def.Components) {
+            var comp = entity.AddComponent(compData.CompClass);
+            comp.data = compData;
+        }
 
         return entity;
     }
     
-    public static Entity? CreateTileObject(string objectId, Vector2 pos) {
-        if (!Find.World.IsPositionInMap(pos)) return null;
+    public static TileObject? CreateTileObject(string objectId, Vector2 pos) {
+        var def = Find.AssetManager.GetDef<ObjectDef>(objectId);
 
-        var data = Find.AssetManager.Get<ObjectDef>(objectId);
+        return CreateEntity<TileObject>(pos + def.Size / 2f, def);
+    }
+    
+    public static Animal? CreateAnimal(string animalId, Vector2 pos) {
+        var def = Find.AssetManager.GetDef<AnimalDef>(animalId);
 
-        var entity = new Entity(pos + data.Size / 2f);
-
-        // Renderer
-        var renderer = entity.AddComponent<RenderComponent>();
-        Debug.Assert(data.GraphicData != null);
-        renderer.Graphics = data.GraphicData;
-        
-        // Tile object
-        var tileObject = entity.AddComponent<TileObjectComponent>();
-        tileObject.Data = data;
-        
-        entity.AddComponent<ElevationComponent>();
-
-        return entity;
+        return CreateEntity<Animal>(pos, def);
     }
 }

@@ -21,7 +21,7 @@ public class Tool_Animal : Tool {
     private AnimalDef? currentAnimal;
 
     public Tool_Animal(ToolManager tm) : base(tm) {
-        allAnimals = Find.AssetManager.GetAll<AnimalDef>();
+        allAnimals = Find.AssetManager.GetAllDefs<AnimalDef>();
     }
 
     public override void Set() {
@@ -35,15 +35,13 @@ public class Tool_Animal : Tool {
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             if (!Ghost.CanPlace) return;
 
-            var obj = GenEntity.CreateAnimal(currentAnimal.Id, Ghost.Pos);
-            if (obj == null) return;
-            
-            Game.RegisterEntity(obj);
+            var animal = GenEntity.CreateAnimal(currentAnimal.Id, Ghost.Pos);
+            if (animal == null) return;
             
             toolManager.PushAction(new ToolAction() {
                 Name = $"Place {currentAnimal.Name}",
-                Data = obj.Id,
-                Undo = data => Game.GetEntityById((int)data).Destroy(),
+                Data = animal.Id,
+                Undo = data => animal.Destroy(),
             });
             
             evt.Consume();
@@ -72,7 +70,7 @@ public class Tool_Animal : Tool {
         if (currentAnimal == null) return false;
 
         var tileObject = Find.World.GetTileObjectAtTile(ghost.Pos.Floor());
-        if (tileObject != null && tileObject.GetComponent<TileObjectComponent>().Data.Solid) return false;
+        if (tileObject != null && tileObject.Def.Solid) return false;
 
         if (!currentAnimal.CanSwim && Find.World.Elevation.IsPositionWater(ghost.Pos.Floor())) return false;
 

@@ -11,7 +11,7 @@ public class DefRef<T> where T : Def {
         this.name = name;
     }
 
-    public T Def => def ??= Find.AssetManager.Get<T>(name);
+    public T Def => def ??= Find.AssetManager.GetDef<T>(name);
     
     public static implicit operator T(DefRef<T> wrapper) {
         return wrapper.Def;
@@ -31,7 +31,7 @@ public static class DefUtility {
             foreach (var field in fields) {
                 if (field.FieldType.BaseType != typeof(Def)) continue;
                 
-                field.SetValue(null, Find.AssetManager.Get(field.FieldType, field.Name));
+                field.SetValue(null, Find.AssetManager.GetDef(field.FieldType, field.Name));
             }
         }
     }

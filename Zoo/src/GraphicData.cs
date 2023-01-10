@@ -19,8 +19,6 @@ public class GraphicData {
     // Properties
     public int CellWidth => cellWidth == 0 ? Sprite.width : cellWidth;
     public int CellHeight => cellHeight == 0 ? Sprite.height : cellHeight;
-    
-    public GraphicData() {}
 
     [JsonConstructor]
     public GraphicData(string spritePath, int cellWidth, int cellHeight) {

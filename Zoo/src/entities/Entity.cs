@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.ui;
 
 namespace Zoo.entities; 
@@ -8,44 +9,48 @@ public class Entity : ISerialisable {
     // Config
     public  int                         Id;
     private Dictionary<Type, Component> components = new();
+    private EntityDef                   def;
     
     // State
     public Vector2 Pos;
     private string infoDialogId;
     
     // Properties
-    public IEnumerable<Component> Components => components.Values;
+    public         IEnumerable<Component> Components => components.Values;
+    public virtual EntityDef              Def        => def;
 
-    public Entity() {}
-    public Entity(Vector2 pos) {
-        Pos = pos;
+    public Entity(Vector2 pos, EntityDef? def) {
+        Pos      = pos;
+        this.def = def;
+        
+        Game.RegisterEntity(this);
     }
 
-    public void Setup() {
+    public virtual void Setup() {
         foreach (var component in components.Values) {
             component.Start();
         }
     }
 
-    public void PreUpdate() {
+    public virtual void PreUpdate() {
         foreach (var component in components.Values) {
             component.PreUpdate();
         }
     }
 
-    public void Update() {
+    public virtual void Update() {
         foreach (var component in components.Values) {
             component.Update();
         }
     }
 
-    public void PostUpdate() {
+    public virtual void PostUpdate() {
         foreach (var component in components.Values) {
             component.PostUpdate();
         }
     }
 
-    public void Render() {
+    public virtual void Render() {
         foreach (var component in components.Values) {
             component.Render();
         }
@@ -57,7 +62,7 @@ public class Entity : ISerialisable {
         }
     }
 
-    public void Destroy() {
+    public virtual void Destroy() {
         foreach (var component in components.Values) {
             component.End();
         }
@@ -65,7 +70,7 @@ public class Entity : ISerialisable {
         Game.UnregisterEntity(this);
     }
 
-    public void OnInput(InputEvent evt) {
+    public virtual void OnInput(InputEvent evt) {
         foreach (var component in components.Values) {
             component.OnInput(evt);
 
@@ -81,14 +86,19 @@ public class Entity : ISerialisable {
         }
     }
     
-    public T AddComponent<T>(params object?[]? args) where T : Component {
-        args ??= Array.Empty<object>();
-        args = args.Prepend(this).ToArray();
-        var component = (T)Activator.CreateInstance(typeof(T), args)!;
+    // Add existing component
+    public T AddComponent<T>(T component) where T : Component {
         components.Add(component.GetType(), component);
         return component;
     }
-    public T AddComponent<T>(T component) where T : Component {
+    // Generate component from type
+    public T AddComponent<T>(ComponentData? data = null) where T : Component {
+        var component = (T)Activator.CreateInstance(typeof(T), this, data)!;
+        components.Add(component.GetType(), component);
+        return component;
+    }
+    public Component AddComponent(Type type, ComponentData? data = null) {
+        var component = (Component)Activator.CreateInstance(type, this, data)!;
         components.Add(component.GetType(), component);
         return component;
     }
@@ -120,7 +130,7 @@ public class Entity : ISerialisable {
         return false;
     }
 
-    public void Serialise() {
+    public virtual void Serialise() {
         Find.SaveManager.ArchiveValue("id", ref Id);
         Find.SaveManager.ArchiveValue("pos", ref Pos);
         
@@ -128,5 +138,14 @@ public class Entity : ISerialisable {
             () => EntityUtility.SaveComponents(components.Values),
             data => EntityUtility.LoadComponents(this, data)
         );
+        
+        Find.SaveManager.ArchiveValue("defId",
+            () => def.Id,
+            id => def = Find.AssetManager.GetDef(id) as EntityDef
+        );
+    }
+
+    public virtual List<InfoTab> GetInfoTabs() {
+        return Components.Select(comp => comp.GetInfoTab()).Where(tab => tab != null).ToList();
     }
 }

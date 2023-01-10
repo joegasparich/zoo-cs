@@ -100,8 +100,8 @@ public class ElevationGrid : ISerialisable {
                 if (!Find.World.IsPositionInMap(tile)) continue;
                 
                 // Check for Tile Objects
-                var entity = Find.World.GetTileObjectAtTile(tile);
-                if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceInWater: false }) return false;
+                var tileObject = Find.World.GetTileObjectAtTile(tile);
+                if (tileObject is { Def.CanPlaceInWater: false }) return false;
                 // Check for paths
                 if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;
             }
@@ -113,8 +113,8 @@ public class ElevationGrid : ISerialisable {
                 if (!Find.World.IsPositionInMap(tile)) continue;
 
                 // Check for Tile Objects
-                var entity = Find.World.GetTileObjectAtTile(tile);
-                if (entity?.GetComponent<TileObjectComponent>() is { Data.CanPlaceOnSlopes: false }) return false;
+                var tileObject = Find.World.GetTileObjectAtTile(tile);
+                if (tileObject is { Def.CanPlaceOnSlopes: false }) return false;
                 // Check for paths
                 // TODO (fix): Figure out if points are being elevated in a way where this is valid
                 if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;

@@ -10,11 +10,19 @@
     "canPlaceOnSlopes": true,
     "canPlaceInWater": false,
     "type": "foliage",
-    "graphicData": {
-        "spritePath": "assets/textures/objects/tree.png",
-        "origin": {
-            "x": 0.5,
-            "y": 0.7
+    "components": [
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/objects/tree.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.7
+                }
+            }
+        },
+        {
+            "dataClass":  "ElevationComponentData"
         }
-    }
+    ]
 }

@@ -27,7 +27,7 @@ public class Tool_Wall : Tool {
     private readonly List<ToolGhost> ghosts = new();
 
     public Tool_Wall(ToolManager tm) : base(tm) {
-        allWalls = Find.AssetManager.GetAll<WallDef>();
+        allWalls = Find.AssetManager.GetAllDefs<WallDef>();
     }
 
     public override void Set() {

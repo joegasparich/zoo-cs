@@ -40,8 +40,8 @@ public class World : ISerialisable {
     public int Height;
 
     // Collections
-    private readonly Dictionary<int, Entity>                tileObjects        = new();
-    private readonly Dictionary<string, Entity>             tileObjectMap      = new();
+    private readonly Dictionary<int, TileObject>                tileObjects        = new();
+    private readonly Dictionary<string, TileObject>             tileObjectMap      = new();
     private readonly Dictionary<AccessibilityType, int[][]> accessibilityGrids = new();
 
     // Grids
@@ -117,33 +117,29 @@ public class World : ISerialisable {
         if (DebugSettings.PathfindingGrid) Pathfinder.DrawDebugGrid();
     }
 
-    public void RegisterTileObject(Entity tileObject) {
-        var component = tileObject.GetComponent<TileObjectComponent>();
-
+    public void RegisterTileObject(TileObject tileObject) {
         tileObjects.Add(tileObject.Id, tileObject);
-        foreach (var tile in component.GetOccupiedTiles()) {
+        foreach (var tile in tileObject.GetOccupiedTiles()) {
             tileObjectMap.Add(tile.ToString(), tileObject);
         }
 
-        if (component.Data.Solid) {
-            foreach (var tile in component.GetOccupiedTiles()) {
+        if (tileObject.Def.Solid) {
+            foreach (var tile in tileObject.GetOccupiedTiles()) {
                 UpdateAccessibilityGrids(tile);
             }
 
-            Messenger.Fire(EventType.PlaceSolid, component.GetOccupiedTiles().ToList());
+            Messenger.Fire(EventType.PlaceSolid, tileObject.GetOccupiedTiles().ToList());
         }
     }
 
-    public void UnregisterTileObject(Entity tileObject) {
-        var component = tileObject.GetComponent<TileObjectComponent>();
-
+    public void UnregisterTileObject(TileObject tileObject) {
         tileObjects.Remove(tileObject.Id);
-        foreach (var tile in component.GetOccupiedTiles()) {
+        foreach (var tile in tileObject.GetOccupiedTiles()) {
             tileObjectMap.Remove(tile.ToString());
         }
         
-        if (component.Data.Solid) {
-            foreach (var tile in component.GetOccupiedTiles()) {
+        if (tileObject.Def.Solid) {
+            foreach (var tile in tileObject.GetOccupiedTiles()) {
                 UpdateAccessibilityGrids(tile);
             }
         }
@@ -177,7 +173,7 @@ public class World : ISerialisable {
         Debug.Assert(IsPositionInMap(tile));
 
         // Solid
-        if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].GetComponent<TileObjectComponent>()!.Data.Solid) {
+        if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].Def.Solid) {
             return TileCost.None;
         }
         
@@ -267,7 +263,7 @@ public class World : ISerialisable {
         return Side.North;
     }
 
-    public Entity? GetTileObjectAtTile(IntVec2 tile) {
+    public TileObject? GetTileObjectAtTile(IntVec2 tile) {
         return tileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
     }
 

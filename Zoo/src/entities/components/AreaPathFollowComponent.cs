@@ -14,7 +14,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
     private Vector2?    enterDoorPos;
     private bool        areaPathCompleted;
     
-    public AreaPathFollowComponent(Entity entity) : base(entity) {}
+    public AreaPathFollowComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
     public override void Update() {
         if (areaPath.NullOrEmpty() && !enterDoorPos.HasValue) {

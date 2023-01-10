@@ -214,7 +214,7 @@ public class TerrainChunk : IDisposable {
             grid[i] = new TerrainCell[Rows];
             for (var j = 0; j < Rows; j++) {
                 if (data != null) {
-                    grid[i][j] = new TerrainCell(data[i][j].Select(id => Find.AssetManager.Get<TerrainDef>(id)).ToArray());
+                    grid[i][j] = new TerrainCell(data[i][j].Select(id => Find.AssetManager.GetDef<TerrainDef>(id)).ToArray());
                 } else {
                     grid[i][j] = new TerrainCell(new []{ TerrainDefOf.Grass, TerrainDefOf.Grass, TerrainDefOf.Grass, TerrainDefOf.Grass});
                 }
@@ -356,7 +356,7 @@ public class TerrainChunk : IDisposable {
     public void Load(string[][][] data) {
         for (var i = 0; i < Cols; ++i) {
             for (var j = 0; j < Rows; ++j) {
-                grid[i][j].Quadrants = data[i][j].Select(id => Find.AssetManager.Get<TerrainDef>(id)).ToArray();
+                grid[i][j].Quadrants = data[i][j].Select(id => Find.AssetManager.GetDef<TerrainDef>(id)).ToArray();
             }
         }
         

@@ -2,13 +2,18 @@
     "class": "AnimalDef",
     "id": "PlainsZebra",
     "name": "Plains Zebra",
-    "inheritsFrom": "BaseAnimal",
-    "graphicData": {
-        "spritePath": "assets/textures/animals/zebra.png",
-        "origin": {
-            "x": 0.5,
-            "y": 0.7
+    "inherits": "BaseAnimal",
+    "canSwim": false,
+    "components": [
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/animals/zebra.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.7
+                }
+            }
         }
-    },
-    "canSwim": false
+    ]
 }

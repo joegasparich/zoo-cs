@@ -19,7 +19,7 @@ public class PathFollowComponent : InputComponent {
     private   string                placeSolidHandle;
     protected bool                  pathCompleted;
 
-    public PathFollowComponent(Entity entity) : base(entity) {}
+    public PathFollowComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
     public override void Start() {
         base.Start();

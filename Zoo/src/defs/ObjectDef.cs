@@ -11,7 +11,6 @@ public enum ObjectType {
 
 public class ObjectDef : EntityDef {
     public ObjectType  Type;
-    public GraphicData GraphicData;
     public Vector2     Size             = Vector2.One;
     public bool        Solid            = true;
     public bool        CanPlaceOnSlopes = false;

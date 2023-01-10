@@ -11,7 +11,7 @@ public class MoveComponent : Component {
     // Properties
     protected override Type[] Dependencies => new Type[] { typeof(InputComponent), typeof(PhysicsComponent) };
 
-    public MoveComponent(Entity entity) : base(entity) {}
+    public MoveComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
     public override void Start() {
         base.Start();

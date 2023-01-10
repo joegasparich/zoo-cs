@@ -25,7 +25,7 @@ public class Tool_FootPath : Tool {
     private readonly List<ToolGhost> ghosts = new();
 
     public Tool_FootPath(ToolManager tm) : base(tm) {
-        allFootPaths = Find.AssetManager.GetAll<FootPathDef>();
+        allFootPaths = Find.AssetManager.GetAllDefs<FootPathDef>();
     }
 
     public override void Set() {

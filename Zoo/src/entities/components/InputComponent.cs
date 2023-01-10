@@ -6,7 +6,7 @@ public class InputComponent : Component {
     // State
     public Vector2 InputVector;
     
-    public InputComponent(Entity entity) : base(entity) {}
+    public InputComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
     public override void Serialise() {
         base.Serialise();

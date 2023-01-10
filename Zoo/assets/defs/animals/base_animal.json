@@ -3,6 +3,9 @@
     "id": "BaseAnimal",
     "abstract": true,
     "components": [
+        { 
+            "dataClass":  "ElevationComponentData"
+        },
         {
             "dataClass": "NeedsComponentData",
             "needs": [

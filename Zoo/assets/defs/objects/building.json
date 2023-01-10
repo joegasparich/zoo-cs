@@ -12,17 +12,25 @@
     "canPlaceInWater": false,
     "canRotate": true,
     "type": "building",
-    "graphicData": {
-        "spritePath": "assets/textures/objects/building.png",
-        "cellHeight": 32,
-        "cellWidth": 32,
-        "origin": {
-            "x": 0.5,
-            "y": 0.5
+    "components": [
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/objects/building.png",
+                "cellHeight": 32,
+                "cellWidth": 32,
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.5
+                },
+                "scale": {
+                    "x": 2,
+                    "y": 2
+                }
+            }
         },
-        "scale": {
-            "x": 2,
-            "y": 2
+        {
+            "dataClass":  "ElevationComponentData"
         }
-    }
+    ]
 }

@@ -19,4 +19,8 @@
         <HintPath>bin\Debug\net6.0\Raylib-cs.dll</HintPath>
       </Reference>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    </ItemGroup>
 </Project>

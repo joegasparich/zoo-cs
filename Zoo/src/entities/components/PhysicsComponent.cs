@@ -11,7 +11,7 @@ public class PhysicsComponent : Component {
     private Vector2 velocity = Vector2.Zero;
     private Vector2 force = Vector2.Zero;
 
-    public PhysicsComponent(Entity entity) : base(entity) {}
+    public PhysicsComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
     public override void Update() {
         entity.Pos = entity.Pos + velocity;
