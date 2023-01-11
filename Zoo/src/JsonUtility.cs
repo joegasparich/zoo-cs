@@ -34,14 +34,20 @@ public class DefJsonConverter<T> : JsonConverter<DefRef<T>> where T : Def {
 }
 
 public class CompJsonConverter : JsonConverter {
+    // TODO: This needs to be kept in sync with the main serializer config, can we automate this?
+    private JsonSerializer internalSerializer = JsonSerializer.Create(new JsonSerializerSettings() {
+        ContractResolver = new CustomContractResolver()
+    });
+    
     public override bool CanConvert(Type objectType) {
         return objectType == typeof(ComponentData);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
         var obj           = JObject.Load(reader);
-        var componentType = Type.GetType("Zoo.entities." + (obj["dataClass"]));
-        return obj.ToObject(componentType, serializer);
+        var dataClassName = obj["dataClass"]?.Value<string>() ?? "ComponentData";
+        var componentType = Type.GetType("Zoo.entities." + dataClassName);
+        return obj.ToObject(componentType, internalSerializer);
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) {

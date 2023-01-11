@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Text.Json.Nodes;
+using Zoo.defs;
 
 namespace Zoo.entities; 
 
@@ -26,11 +27,12 @@ public static class EntityUtility {
         
         foreach (JsonObject entityData in data) {
             Find.SaveManager.CurrentSaveNode = entityData;
-            var pos = Find.SaveManager.Deserialise<Vector2>(entityData["pos"]);
-            Debug.Assert(pos != null);
-            var entity = new Entity(pos, null);
+            var type = Type.GetType(Find.SaveManager.Deserialise<string>(entityData["type"]));
+            var def  = Find.AssetManager.GetDef(Find.SaveManager.Deserialise<string>(entityData["defId"])) as EntityDef;
+            var pos  = Find.SaveManager.Deserialise<Vector2>(entityData["pos"]);
+
+            var entity = GenEntity.CreateEntity(type, pos, def);
             entity.Serialise();
-            Game.RegisterEntity(entity, entity.Id);
         }
         
         Find.SaveManager.CurrentSaveNode = parent;
@@ -57,10 +59,15 @@ public static class EntityUtility {
 
         foreach (JsonObject entityData in data.AsArray()) {
             Find.SaveManager.CurrentSaveNode = entityData;
-            Type      componentType = Type.GetType(entityData["type"].ToString());
-            Component component     = (Component)Activator.CreateInstance(componentType, entity);
-            component.Serialise();
-            entity.AddComponent(component);
+            Type componentType = Type.GetType(entityData["type"].ToString());
+            if (entity.HasComponent(componentType)) {
+                var component = entity.GetComponent(componentType);
+                component.Serialise();
+            } else {
+                var component = (Component)Activator.CreateInstance(componentType, entity);
+                component.Serialise();
+                entity.AddComponent(component);
+            }
         }
         
         Find.SaveManager.CurrentSaveNode = parent;

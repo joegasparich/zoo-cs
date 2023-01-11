@@ -5,14 +5,25 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public static class GenEntity {
-    private static T? CreateEntity<T>(Vector2 pos, EntityDef def) where T : Entity {
+    public static T? CreateEntity<T>(Vector2 pos, EntityDef def) where T : Entity {
         if (!Find.World.IsPositionInMap(pos)) return null;
         
         var entity = Activator.CreateInstance(typeof(T), pos, def) as T;
 
         foreach (var compData in def.Components) {
-            var comp = entity.AddComponent(compData.CompClass);
-            comp.data = compData;
+            entity.AddComponent(compData.CompClass, compData);
+        }
+
+        return entity;
+    }
+    
+    public static Entity CreateEntity(Type type, Vector2 pos, EntityDef def) {
+        if (!Find.World.IsPositionInMap(pos)) return null;
+        
+        var entity = Activator.CreateInstance(type, pos, def) as Entity;
+
+        foreach (var compData in def.Components) {
+            entity.AddComponent(compData.CompClass, compData);
         }
 
         return entity;

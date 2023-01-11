@@ -90,7 +90,7 @@ public class SaveManager {
         catch (Exception e) {
             Find.SceneManager.LoadScene(new Scene_Menu());
             
-            Debug.Error("Error loading game: " + e);
+            Debug.Error("Error loading game: ", e);
         }
     }
 

@@ -1,9 +1,16 @@
+using Newtonsoft.Json;
 using Zoo.ui;
 
 namespace Zoo.entities;
 
-public abstract class ComponentData {
-    public abstract Type CompClass { get; }
+/// <summary>
+/// Component Data is immutable, and contains component data that comes from a def
+/// </summary>
+public class ComponentData {
+    [JsonProperty]
+    private string compClass;
+
+    public virtual Type CompClass => Type.GetType("Zoo.entities." + compClass);
 }
 
 public abstract class Component : ISerialisable {
@@ -14,7 +21,7 @@ public abstract class Component : ISerialisable {
     // Properties
     protected virtual Type[] Dependencies => Array.Empty<Type>();
     
-    public Component(Entity entity, ComponentData? data) {
+    public Component(Entity entity, ComponentData? data = null) {
         this.entity = entity;
         this.data   = data;
     }

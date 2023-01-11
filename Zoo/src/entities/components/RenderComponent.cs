@@ -13,15 +13,17 @@ public class RenderComponentData : ComponentData {
 
 public class RenderComponent : Component {
     // State
-    public Vector2 Offset         = Vector2.Zero;
-    public Color   OverrideColour = Color.WHITE;
-    public int     SpriteIndex    = 0;
+    public Vector2     Offset         = Vector2.Zero;
+    public Color       OverrideColour = Color.WHITE;
+    public int         SpriteIndex    = 0; // TODO: move this shit into graphics now that they are per instance
+    public GraphicData Graphics;
     
     // Properties
     public RenderComponentData Data => (RenderComponentData)data;
-    public GraphicData Graphics => Data.GraphicData;
 
-    public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {}
+    public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
+        Graphics = data.GraphicData; // TODO: deep copy
+    }
 
     public override void Start() {
         base.Start();

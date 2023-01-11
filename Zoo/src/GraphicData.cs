@@ -9,20 +9,20 @@ namespace Zoo;
 // Any per object changes need to be sent through the blit params
 public class GraphicData {
     // Config
-    public  string    SpritePath;
-    public  Texture2D Sprite;
-    public  Vector2   Origin = Vector2.Zero;
-    public  Vector2   Scale  = Vector2.One;
-    private int       cellWidth;
-    private int       cellHeight;
+    public  readonly string    SpritePath;
+    public  readonly Vector2   Origin = Vector2.Zero;
+    public  readonly Vector2   Scale  = Vector2.One;
+    private readonly int       cellWidth;
+    private readonly int       cellHeight;
 
     // Properties
-    public int CellWidth => cellWidth == 0 ? Sprite.width : cellWidth;
-    public int CellHeight => cellHeight == 0 ? Sprite.height : cellHeight;
+    public Texture2D Sprite     => Find.AssetManager.GetTexture(SpritePath);
+    public int       CellWidth  => cellWidth  == 0 ? Sprite.width : cellWidth;
+    public int       CellHeight => cellHeight == 0 ? Sprite.height : cellHeight;
 
     [JsonConstructor]
     public GraphicData(string spritePath, int cellWidth, int cellHeight) {
-        SetSprite(spritePath);
+        SpritePath = spritePath;
         
         this.cellWidth  = cellWidth;
         this.cellHeight = cellHeight;
@@ -43,11 +43,6 @@ public class GraphicData {
         );
     }
     
-    public void SetSprite(string path) {
-        Sprite     = Find.AssetManager.GetTexture(path);
-        SpritePath = path;
-    }
-
     public Rectangle GetCellBounds(int cellIndex) {
         if (Sprite.Empty()) return new Rectangle(0, 0, 1, 1);
         

@@ -7,9 +7,6 @@ using Zoo.world;
 namespace Zoo.entities; 
 
 public class TileObject : Entity {
-    // References
-    private RenderComponent renderer;
-    
     // State
     private Side rotation;
     
@@ -53,8 +50,7 @@ public class TileObject : Entity {
         Find.SaveManager.ArchiveValue("rotation", ref rotation);
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            renderer.Data.GraphicData = Def.GraphicData;
-            renderer.SpriteIndex   = (int)rotation;
+            Renderer.SpriteIndex   = (int)rotation;
         }
     }
 

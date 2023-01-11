@@ -117,6 +117,20 @@ public class Entity : ISerialisable {
         
         return null;
     }
+    public Component? GetComponent(Type type) {
+        if (!HasComponent(type)) return null;
+        
+        if (components.ContainsKey(type))
+            return components[type];
+        
+        foreach (var t in components.Keys) {
+            if (type.IsAssignableFrom(t)) {
+                return components[t];
+            }
+        }
+        
+        return null;
+    }
 
     public bool HasComponent(Type type) {
         if (components.ContainsKey(type)) return true;
@@ -131,8 +145,9 @@ public class Entity : ISerialisable {
     }
 
     public virtual void Serialise() {
-        Find.SaveManager.ArchiveValue("id", ref Id);
-        Find.SaveManager.ArchiveValue("pos", ref Pos);
+        Find.SaveManager.ArchiveValue("type", () => GetType().ToString(), type => {});
+        Find.SaveManager.ArchiveValue("id",   ref Id);
+        Find.SaveManager.ArchiveValue("pos",  ref Pos);
         
         Find.SaveManager.ArchiveCustom("components",
             () => EntityUtility.SaveComponents(components.Values),

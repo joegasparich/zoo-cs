@@ -22,7 +22,7 @@
             }
         },
         {
-            "dataClass":  "ElevationComponentData"
+            "compClass":  "ElevationComponent"
         }
     ]
 }

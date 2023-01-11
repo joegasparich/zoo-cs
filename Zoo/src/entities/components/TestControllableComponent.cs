@@ -41,11 +41,4 @@ public class TestControllableComponent : Component {
             }
         }
     }
-
-    public override void Serialise() {
-        base.Serialise();
-        
-        // Hack to restore naked entity sprite
-        entity.GetComponent<RenderComponent>().Graphics.SetSprite(TexturePaths.Keeper);
-    }
 }
