@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.world;
 using Zoo.entities;
@@ -168,25 +168,25 @@ public class Tool_Delete : Tool {
         return highlightedWalls;
     }
     
-    private JsonObject GetUndoData(IEnumerable<Entity> tileObjects, IEnumerable<Wall> walls, IEnumerable<FootPath> paths) {
-        var undoData = new JsonObject();
+    private JObject GetUndoData(IEnumerable<Entity> tileObjects, IEnumerable<Wall> walls, IEnumerable<FootPath> paths) {
+        var undoData = new JObject();
             
         // Tile objects
-        var tileObjectData = new JsonArray();
+        var tileObjectData = new JArray();
         foreach (var tileObject in tileObjects) {
             tileObjectData.Add(Find.SaveManager.Serialise(tileObject));
         }
         undoData.Add(TileObjectsSaveKey, tileObjectData);
             
         // Walls
-        var wallData = new JsonArray();
+        var wallData = new JArray();
         foreach (var wall in walls) {
             wallData.Add(Find.SaveManager.Serialise(wall));
         }
         undoData.Add(WallsSaveKey, wallData);
            
         // Paths
-        var pathData = new JsonArray();
+        var pathData = new JArray();
         foreach (var path in paths) {
             pathData.Add(Find.SaveManager.Serialise(path));
         }
@@ -196,25 +196,25 @@ public class Tool_Delete : Tool {
     }
     
     private void Undo(object json) {
-        var undoData    = (JsonObject)json;
+        var undoData = (JObject)json;
         
         // Tile objects
-        var tileObjects = undoData[TileObjectsSaveKey].AsArray();
+        var tileObjects = undoData[TileObjectsSaveKey] as JArray;
         EntityUtility.LoadEntities(tileObjects);
         
         // Walls
-        var walls = undoData[WallsSaveKey].AsArray();
+        var walls = undoData[WallsSaveKey] as JArray;
         var i = 0;
-        foreach (var value in walls.Select(wallData => Find.World.Walls.GetWallByGridPos(Find.SaveManager.Deserialise<IntVec2>(wallData["gridPos"])))) {
-            Find.SaveManager.CurrentSaveNode = walls[i++].AsObject(); 
+        foreach (var value in walls.Select(wallData => Find.World.Walls.GetWallByGridPos(wallData["gridPos"].Value<IntVec2>()))) {
+            Find.SaveManager.CurrentSaveNode = walls[i++] as JObject; 
             value.Serialise();
         }
         
         // Paths
-        var paths = undoData[PathsSaveKey].AsArray();
+        var paths = undoData[PathsSaveKey] as JArray;
         i = 0;
-        foreach (var value in paths.Select(pathData => Find.World.FootPaths.GetFootPathAtTile(Find.SaveManager.Deserialise<IntVec2>(pathData["pos"])))) {
-            Find.SaveManager.CurrentSaveNode = paths[i++].AsObject(); 
+        foreach (var value in paths.Select(pathData => Find.World.FootPaths.GetFootPathAtTile(pathData["pos"].Value<IntVec2>()))) {
+            Find.SaveManager.CurrentSaveNode = paths[i++] as JObject; 
             value.Serialise();
         }
     }

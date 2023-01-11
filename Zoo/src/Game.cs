@@ -1,8 +1,7 @@
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
-using Zoo.defs;
 using Zoo.entities;
 using Zoo.ui;
-using Zoo.world;
 
 namespace Zoo;
 
@@ -248,7 +247,7 @@ public static class Game {
         SaveManager.ArchiveDeep("scene", SceneManager.GetCurrentScene());
         SaveManager.ArchiveCustom("entities", 
             () => EntityUtility.SaveEntities(entities.Values),
-            data => EntityUtility.LoadEntities(data.AsArray())
+            data => EntityUtility.LoadEntities(data as JArray)
         );
     }
 }

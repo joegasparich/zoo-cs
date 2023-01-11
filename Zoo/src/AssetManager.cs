@@ -5,13 +5,10 @@ using Zoo.defs;
 
 namespace Zoo;
 
-// TODO: Find a home for this
-public static class TexturePaths {
-    public static readonly string Keeper = "assets/textures/keeper.png";
-}
-
 public class AssetManager {
-    private JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings() {
+    // Constants
+    private const string DefPath = "assets/defs";
+    private readonly JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings() {
         Converters = new List<JsonConverter>() {
             new CompJsonConverter()
         },
@@ -25,6 +22,17 @@ public class AssetManager {
 
     public void LoadAssets() {
         // Textures
+        LoadTextures();
+        
+        // Defs
+        var dataQueue = GetDataQueue();
+        var resolvedQueue = ResolveJsonInheritance(dataQueue);
+        DeserializeDefs(resolvedQueue);
+
+        DefUtility.LoadDefOfs();
+    }
+
+    private void LoadTextures() {
         foreach (var path in Directory.EnumerateFiles("assets/textures", "*.*", SearchOption.AllDirectories)) {
             if (!path.EndsWith(".png")) {
                 continue;
@@ -32,31 +40,37 @@ public class AssetManager {
 
             try {
                 GetTexture(path.Replace("\\", "/"));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Debug.Error($"Failed to load texture with path: {path}", e);
                 textureMap.Remove(path);
             }
         }
+    }
+
+    private static Queue<JObject> GetDataQueue() {
+        var dataQueue  = new Queue<JObject>();
         
-        // Defs
-        Queue<JObject> dataQueue = new ();
-        foreach (var path in Directory.EnumerateFiles("assets/defs", "*.*", SearchOption.AllDirectories)) {
+        foreach (var path in Directory.EnumerateFiles(DefPath, "*.*", SearchOption.AllDirectories)) {
             if (!path.EndsWith(".json")) {
                 continue;
             }
 
-            // TODO: Ensure ids exist in here somewhere
-            
             try {
                 var json = File.ReadAllText(path.Replace("\\", "/"));
                 try {
+                    // Try get as list of defs
                     var dataList = JsonConvert.DeserializeObject<List<JObject>>(json);
-                    // var dataList = JsonSerializer.Deserialize<JsonObject[]>(json, JsonOpts)!;
                     foreach (var data in dataList) {
+                        var id = data["id"]?.ToString();
+                        if (id == null) {
+                            Debug.Error($"Failed to load def, missing id: {data}");
+                            continue;
+                        }
+
                         dataQueue.Enqueue(data);
                     }
                 } catch {
+                    // Fallback to single def
                     var data = JsonConvert.DeserializeObject<JObject>(json)!;
                     dataQueue.Enqueue(data);
                 }
@@ -64,44 +78,60 @@ public class AssetManager {
                 Debug.Error($"Failed to load json with path: {path}", e);
             }
         }
+
+        return dataQueue;
+    }
+
+    private static Queue<JObject> ResolveJsonInheritance(Queue<JObject> dataQueue) {
+        var resolvedQueue = new Queue<JObject>();
+        var resolvedDict  = new Dictionary<string, JObject>();
         
-        // Resolve inheritance
-        Queue<JObject>              resolvedQueue = new();
-        Dictionary<string, JObject> resolvedDict  = new();
         while (dataQueue.Count > 0) {
             var data = dataQueue.Dequeue();
+            var id   = data["id"]!.Value<string>();
+            
             if (!data.ContainsKey("abstract"))
                 data.Add("abstract", false);
-            if (data.TryGetValue("inherits", out var inherits)) {
-                var inheritsId = inherits.Value<string>();
-                if (resolvedDict.ContainsKey(inheritsId)) {
-                    var merged = (JObject)resolvedDict[inheritsId].DeepClone();
-                    merged.Merge(data);
-                    data = merged;
-                } else {
-                    // TODO: Prevent looping
-                    dataQueue.Enqueue(data);
+
+            try {
+                if (data.TryGetValue("inherits", out var inherits)) {
+                    var inheritsId = inherits.Value<string>();
+                    if (resolvedDict.ContainsKey(inheritsId)) {
+                        // Merge with child's data as priority
+                        var merged = (JObject)resolvedDict[inheritsId].DeepClone();
+                        merged.Merge(data);
+                        data = merged;
+                    } else {
+                        if (!dataQueue.Any(data => data["id"]?.Value<string>() == inheritsId)) {
+                            Debug.Error($"Failed to resolve inheritance for {id}, missing def: {inheritsId}");
+                            continue;
+                        }
+
+                        dataQueue.Enqueue(data);
+                    }
                 }
+                
+                resolvedQueue.Enqueue(data);
+                resolvedDict.Add(id, data);
+            } catch (Exception e) {
+                Debug.Error($"Failed to resolve inheritance for {id}", e);
             }
-            resolvedQueue.Enqueue(data);
-            resolvedDict.Add(data["id"].ToString(), data);
         }
-        
-        // Deserialize
-        while (resolvedQueue.Count > 0) {
-            var data = resolvedQueue.Dequeue();
-             
-            var id = data["id"]?.ToString();
-            if (id == null) {
-                Debug.Error($"Failed to load def, missing id: {data}");
-                continue;
-            }
-            
+
+        return resolvedQueue;
+    }
+
+    private void DeserializeDefs(Queue<JObject> dataQueue) {
+        while (dataQueue.Count > 0) {
+            var data = dataQueue.Dequeue();
+            var id = data["id"]!.ToString();
+
+            // Check if already loaded
             if (defMapFlat.ContainsKey(id)) {
                 Debug.Error($"Failed to load def {id}, id already exists");
                 continue;
             }
-            
+
             // Get type
             var typeString = data["class"]?.ToString();
             if (typeString == null) {
@@ -113,9 +143,9 @@ public class AssetManager {
                 Debug.Error($"Failed to load def {id}, type {typeString} doesn't exist");
                 continue;
             }
-            
+
             Debug.Log($"Loading {typeString} with id {id}");
-        
+
             // Instantiate
             Def instance;
             try {
@@ -124,16 +154,14 @@ public class AssetManager {
                 Debug.Error($"Failed to load def {id}, could not deserialize json", e);
                 continue;
             }
-             
+
             // Register
             if (!defMap.ContainsKey(type))
                 defMap.Add(type, new Dictionary<string, Def>());
-                
+
             defMap[type].Add(id, instance);
             defMapFlat[id] = instance;
         }
-
-        DefUtility.LoadDefOfs();
     }
 
     public Texture2D GetTexture(string path) {

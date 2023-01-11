@@ -1,7 +1,5 @@
 using System.Numerics;
-using System.Text.Json.Nodes;
 using Raylib_cs;
-using Zoo.entities;
 using Zoo.util;
 
 namespace Zoo.world;

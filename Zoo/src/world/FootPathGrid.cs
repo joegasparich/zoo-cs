@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.util;
@@ -151,8 +152,7 @@ public class FootPathGrid : ISerialisable {
         
         Find.SaveManager.ArchiveCollection("walls",
             GetAllFootPaths(),
-            paths => paths.Select(pathData => 
-                GetFootPathAtTile(Find.SaveManager.Deserialise<IntVec2>(pathData["pos"])))
+            paths => paths.Select(pathData => GetFootPathAtTile(pathData["pos"].Value<IntVec2>()))
         );
     }
 }

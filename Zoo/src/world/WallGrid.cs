@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.util;
@@ -402,8 +403,7 @@ public class WallGrid : ISerialisable {
 
         Find.SaveManager.ArchiveCollection("walls",
             GetAllWalls(),
-            walls => walls.Select(wallData => 
-                GetWallByGridPos(Find.SaveManager.Deserialise<IntVec2>(wallData["gridPos"])))
+            walls => walls.Select(wallData => GetWallByGridPos(wallData["gridPos"].ToObject<IntVec2>()))
         );
         
         UpdatePathfinding();

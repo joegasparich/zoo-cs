@@ -1,17 +1,17 @@
 ﻿using System.Numerics;
-using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 using Zoo.defs;
 
 namespace Zoo.entities; 
 
 public static class EntityUtility {
-    public static JsonNode SaveEntities(IEnumerable<Entity> entities) {
+    public static JToken SaveEntities(IEnumerable<Entity> entities) {
         var parent = Find.SaveManager.CurrentSaveNode;
 
-        var saveData = new JsonArray();
+        var saveData = new JArray();
 
         foreach (var entity in entities) {
-            var entityData = new JsonObject();
+            var entityData = new JObject();
             Find.SaveManager.CurrentSaveNode = entityData;
             entity.Serialise();
             saveData.Add(entityData);
@@ -21,15 +21,15 @@ public static class EntityUtility {
         return saveData;
     }
 
-    public static void LoadEntities(JsonArray data) {
+    public static void LoadEntities(JArray data) {
         var parent = Find.SaveManager.CurrentSaveNode;
         Find.SaveManager.Mode = SerialiseMode.Loading;
         
-        foreach (JsonObject entityData in data) {
+        foreach (JObject entityData in data) {
             Find.SaveManager.CurrentSaveNode = entityData;
-            var type = Type.GetType(Find.SaveManager.Deserialise<string>(entityData["type"]));
-            var def  = Find.AssetManager.GetDef(Find.SaveManager.Deserialise<string>(entityData["defId"])) as EntityDef;
-            var pos  = Find.SaveManager.Deserialise<Vector2>(entityData["pos"]);
+            var type = Type.GetType(entityData["type"].Value<string>());
+            var def  = Find.AssetManager.GetDef(entityData["defId"].Value<string>()) as EntityDef;
+            var pos  = entityData["pos"].ToObject<Vector2>();
 
             var entity = GenEntity.CreateEntity(type, pos, def);
             entity.Serialise();
@@ -38,13 +38,13 @@ public static class EntityUtility {
         Find.SaveManager.CurrentSaveNode = parent;
     }
 
-    public static JsonNode SaveComponents(IEnumerable<Component> components) {
+    public static JToken SaveComponents(IEnumerable<Component> components) {
         var parent = Find.SaveManager.CurrentSaveNode;
 
-        var saveData = new JsonArray();
+        var saveData = new JArray();
 
         foreach (var component in components) {
-            var componentData = new JsonObject();
+            var componentData = new JObject();
             Find.SaveManager.CurrentSaveNode = componentData;
             component.Serialise();
             saveData.Add(componentData);
@@ -54,11 +54,11 @@ public static class EntityUtility {
         return saveData;
     }
     
-    public static void LoadComponents(Entity entity, JsonNode data) {
+    public static void LoadComponents(Entity entity, JToken data) {
         var parent = Find.SaveManager.CurrentSaveNode;
 
-        foreach (JsonObject entityData in data.AsArray()) {
-            Find.SaveManager.CurrentSaveNode = entityData;
+        foreach (var entityData in data as JArray) {
+            Find.SaveManager.CurrentSaveNode = entityData as JObject;
             Type componentType = Type.GetType(entityData["type"].ToString());
             if (entity.HasComponent(componentType)) {
                 var component = entity.GetComponent(componentType);

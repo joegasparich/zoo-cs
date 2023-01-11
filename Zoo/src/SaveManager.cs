@@ -1,7 +1,5 @@
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using Raylib_cs;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Zoo.util;
 
 namespace Zoo;
@@ -18,16 +16,11 @@ public class SaveFile {
 
 public class SaveManager {
     // Constants
-    private readonly JsonSerializerOptions serializeOptions = new() {
-        IncludeFields = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
-
     private const string SaveDir         = "saves/";
     private const string DefaultSaveName = "save";
     
     // State
-    public JsonObject    CurrentSaveNode;
+    public JObject    CurrentSaveNode;
     public SerialiseMode Mode;
     
     public void NewGame(int width, int height) {
@@ -41,8 +34,8 @@ public class SaveManager {
 
     public void SaveGame(string name = DefaultSaveName, bool overwrite = false) {
         Debug.Log("Saving game");
-        
-        JsonObject saveData = new JsonObject();
+
+        JObject saveData = new JObject();
         saveData.Add("saveName", name);
         Mode            = SerialiseMode.Saving;
         CurrentSaveNode = saveData;
@@ -67,15 +60,15 @@ public class SaveManager {
         }
         
         // Save json object to file
-        string json = JsonSerializer.Serialize(saveData, serializeOptions);
-        File.WriteAllText($"{SaveDir}{fileName}.json", json);
+        var jsonString = JsonConvert.SerializeObject(saveData);
+        File.WriteAllText($"{SaveDir}{fileName}.json", jsonString);
     }
     
     public void LoadGame(string filePath) {
         Debug.Log("Loading game");
         
         var json = File.ReadAllText(filePath);
-        var saveData = JsonSerializer.Deserialize<JsonObject>(json, serializeOptions);
+        var saveData = JsonConvert.DeserializeObject<JObject>(json);
         
         Find.SceneManager.LoadScene(new Scene_Zoo());
 
@@ -108,8 +101,8 @@ public class SaveManager {
     }
 
     // TODO: Allow serialising regular values
-    public JsonObject Serialise(ISerialisable value) {
-        var node = new JsonObject();
+    public JObject Serialise(ISerialisable value) {
+        var node = new JObject();
         
         Mode            = SerialiseMode.Saving;
         CurrentSaveNode = node;
@@ -118,20 +111,16 @@ public class SaveManager {
         return node;
     }
 
-    public T? Deserialise<T>(JsonNode node) {
-        return node.Deserialize<T>(serializeOptions);
-    }
-    
     public void ArchiveValue<T>(string label, ref T? value) {
         switch (Mode) {
             case SerialiseMode.Saving:
-                CurrentSaveNode.Add(label, JsonSerializer.SerializeToNode(value, serializeOptions));
+                CurrentSaveNode.Add(label, JObject.FromObject(value));
                 break;
             case SerialiseMode.Loading:
                 if (CurrentSaveNode[label] == null)
                     break;
                 
-                value = JsonSerializer.Deserialize<T>(CurrentSaveNode[label]!.ToJsonString(), serializeOptions);
+                value = CurrentSaveNode[label]!.ToObject<T>();
                 break;
         }
     }
@@ -154,7 +143,7 @@ public class SaveManager {
         }
     }
     
-    public void ArchiveCustom(string label, Func<JsonNode> get, Action<JsonNode> set) {
+    public void ArchiveCustom(string label, Func<JToken> get, Action<JToken> set) {
         switch (Mode) {
             case SerialiseMode.Saving: {
                 CurrentSaveNode[label] = get();
@@ -171,25 +160,25 @@ public class SaveManager {
         var parent = CurrentSaveNode;
         switch (Mode) {
             case SerialiseMode.Saving:
-                CurrentSaveNode = new JsonObject();
+                CurrentSaveNode = new JObject();
                 value.Serialise();
                 parent[label] = CurrentSaveNode;
                 break;
             case SerialiseMode.Loading:
-                CurrentSaveNode = parent[label]!.AsObject();
+                CurrentSaveNode = parent[label] as JObject;
                 value.Serialise();
                 break;
         }
         CurrentSaveNode = parent;
     }
 
-    public void ArchiveCollection(string label, IEnumerable<ISerialisable> collection, Func<JsonArray, IEnumerable<ISerialisable>> select) {
+    public void ArchiveCollection(string label, IEnumerable<ISerialisable> collection, Func<JArray, IEnumerable<ISerialisable>> select) {
         var parent = CurrentSaveNode;
         switch (Mode) {
             case SerialiseMode.Saving: {
-                var array = new JsonArray();
+                var array = new JArray();
                 foreach (var value in collection) {
-                    CurrentSaveNode = new JsonObject();
+                    CurrentSaveNode = new JObject();
                     value.Serialise();
                     array.Add(CurrentSaveNode);
                 }
@@ -197,10 +186,10 @@ public class SaveManager {
                 break;
             }
             case SerialiseMode.Loading: {
-                var array = parent[label]!.AsArray();
+                var array = parent[label] as JArray;
                 var i = 0;
                 foreach (var value in select(array)) {
-                    CurrentSaveNode = array[i++].AsObject(); 
+                    CurrentSaveNode = array[i++] as JObject; 
                     value.Serialise();
                 }
                 break;
@@ -236,8 +225,8 @@ public class SaveManager {
     //     CurrentSaveNode = parent;
     // }
 
-    public JsonObject SerialiseToNode(ISerialisable value) {
-        var node = new JsonObject();
+    public JObject SerialiseToNode(ISerialisable value) {
+        var node = new JObject();
         Find.SaveManager.CurrentSaveNode = node;
         Find.SaveManager.Mode            = SerialiseMode.Saving;
         Find.SaveManager.ArchiveDeep("key", value);
@@ -245,7 +234,7 @@ public class SaveManager {
         return node;
     }
 
-    public void DeserialiseFromNode(ISerialisable value, JsonObject node) {
+    public void DeserialiseFromNode(ISerialisable value, JObject node) {
         Find.SaveManager.CurrentSaveNode = node;
         Find.SaveManager.Mode            = SerialiseMode.Loading;
         Find.SaveManager.ArchiveDeep("key", value);
