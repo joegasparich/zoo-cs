@@ -1,4 +1,6 @@
 ﻿using Zoo.defs;
+using Zoo.ui;
+using Zoo.util;
 
 namespace Zoo.entities;
 
@@ -49,5 +51,16 @@ public class NeedsComponent : Component {
             
             need.Value += need.Def.ChangePerTick;
         }
+    }
+
+    public override InfoTab? GetInfoTab() {
+        return new InfoTab("Needs", rect => {
+            var listing = new Listing(rect);
+            listing.Header("Needs");
+            
+            foreach (var need in Needs) {
+                listing.Label($"{need.Def.Name}: {(need.Value / Need.MaxNeed).ToStringPercent(1)}");
+            }
+        });
     }
 }

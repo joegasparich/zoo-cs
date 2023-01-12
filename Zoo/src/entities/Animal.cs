@@ -17,7 +17,7 @@ public class Animal : Entity {
 
     public override List<InfoTab> GetInfoTabs() {
         var tabs = new List<InfoTab>();
-        tabs.Add(new InfoTab(Def.Name, rect => {
+        tabs.Add(new InfoTab("General", rect => {
             var listing = new Listing(rect);
             listing.Header(Def.Name.Capitalise());
             listing.Label($"Can swim: {Def.CanSwim.ToString().Capitalise()}");

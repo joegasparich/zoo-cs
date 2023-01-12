@@ -18,6 +18,8 @@ public class Dialog_Info : Dialog {
     private const           int       PanelWidth  = 300;
     private const           int       PanelHeight = 300;
     private static readonly Rectangle Dimensions  = new (GUI.GapSmall, 55, PanelWidth, PanelHeight);
+    private const           int       TabWidth    = 50;
+    private const           int       TabHeight   = 20;
     
     // State
     private static int openInfoDialogs = 0;
@@ -59,10 +61,17 @@ public class Dialog_Info : Dialog {
 
         if (tabs.NullOrEmpty()) return;
         
-        tabs[currentTabIndex].drawTabContents(GetRect().ContractedBy(GUI.GapTiny));
-        // if (tabs.Count == 1) {
-        // }
-        
-        // TODO: Tab rendering
+        if (tabs.Count == 1) {
+            tabs[0].drawTabContents(GetRect().ContractedBy(GUI.GapTiny));
+        } else {
+            GUI.TextAlign = AlignMode.MiddleCenter;
+            for (var i = 0; i < tabs.Count; i++) {
+                var tab = tabs[i];
+                if (GUI.ButtonText(new Rectangle(i * TabWidth, 0, TabWidth, TabHeight), tab.tabName, selected: currentTabIndex == i))
+                    currentTabIndex = i;
+            }
+            GUI.Reset();
+            tabs[currentTabIndex].drawTabContents(new Rectangle(0, TabHeight, GetWidth(), GetHeight() - TabHeight).ContractedBy(GUI.GapTiny));
+        }
     }
 }
