@@ -200,7 +200,7 @@ public class Tool_Delete : Tool {
         
         // Tile objects
         var tileObjects = undoData[TileObjectsSaveKey] as JArray;
-        EntityUtility.LoadEntities(tileObjects);
+        EntitySerialiseUtility.LoadEntities(tileObjects);
         
         // Walls
         var walls = undoData[WallsSaveKey] as JArray;

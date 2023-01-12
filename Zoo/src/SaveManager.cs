@@ -18,6 +18,9 @@ public class SaveManager {
     // Constants
     private const string SaveDir         = "saves/";
     private const string DefaultSaveName = "save";
+    private readonly JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings() {
+        ContractResolver = new CustomContractResolver()
+    });
     
     // State
     public JObject    CurrentSaveNode;
@@ -114,13 +117,13 @@ public class SaveManager {
     public void ArchiveValue<T>(string label, ref T? value) {
         switch (Mode) {
             case SerialiseMode.Saving:
-                CurrentSaveNode.Add(label, JToken.FromObject(value));
+                CurrentSaveNode.Add(label, JToken.FromObject(value, serializer));
                 break;
             case SerialiseMode.Loading:
                 if (CurrentSaveNode[label] == null)
                     break;
                 
-                value = CurrentSaveNode[label]!.ToObject<T>();
+                value = CurrentSaveNode[label]!.ToObject<T>(serializer);
                 break;
         }
     }

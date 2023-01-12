@@ -266,8 +266,8 @@ public static class Game {
             
         SaveManager.ArchiveDeep("scene", SceneManager.GetCurrentScene());
         SaveManager.ArchiveCustom("entities", 
-            () => EntityUtility.SaveEntities(entities.Values),
-            data => EntityUtility.LoadEntities(data as JArray)
+            () => EntitySerialiseUtility.SaveEntities(entities.Values),
+            data => EntitySerialiseUtility.LoadEntities(data as JArray)
         );
     }
 }

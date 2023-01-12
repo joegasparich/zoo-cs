@@ -9,7 +9,7 @@ public class Need {
     public const float MaxNeed = 100;
     
     // Config
-    public NeedDef Def;
+    public DefRef<NeedDef> Def;
 
     // State
     public float Value;
@@ -31,13 +31,8 @@ public class NeedsComponent : Component {
     
     // Properties
     public NeedsComponentData Data => (NeedsComponentData)data;
-    
-    public NeedsComponent(Entity entity, NeedsComponentData? data) : base(entity, data) {}
 
-    public override void Start()
-    {
-        base.Start();
-        
+    public NeedsComponent(Entity entity, NeedsComponentData? data) : base(entity, data) {
         foreach (var need in Data.Needs) {
             Needs.Add(new Need { Def = need });
         }
@@ -49,7 +44,7 @@ public class NeedsComponent : Component {
                 need.Value = Need.MaxNeed;
             }
             
-            need.Value += need.Def.ChangePerTick;
+            need.Value += need.Def.Def.ChangePerTick;
         }
     }
 
@@ -59,8 +54,14 @@ public class NeedsComponent : Component {
             listing.Header("Needs");
             
             foreach (var need in Needs) {
-                listing.Label($"{need.Def.Name}: {(need.Value / Need.MaxNeed).ToStringPercent(1)}");
+                listing.Label($"{need.Def.Def.Name}: {(need.Value / Need.MaxNeed).ToStringPercent(1)}");
             }
         });
+    }
+
+    public override void Serialise() {
+        base.Serialise();
+         
+        Find.SaveManager.ArchiveValue("needs", ref Needs);
     }
 }

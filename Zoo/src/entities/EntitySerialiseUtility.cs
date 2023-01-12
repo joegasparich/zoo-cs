@@ -4,7 +4,7 @@ using Zoo.defs;
 
 namespace Zoo.entities; 
 
-public static class EntityUtility {
+public static class EntitySerialiseUtility {
     public static JToken SaveEntities(IEnumerable<Entity> entities) {
         var parent = Find.SaveManager.CurrentSaveNode;
 

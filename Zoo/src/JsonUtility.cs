@@ -26,9 +26,8 @@ public class DefJsonConverter<T> : JsonConverter<DefRef<T>> where T : Def {
         return Activator.CreateInstance(objectType, reader.Value as string) as DefRef<T>;
     }
 
-    public override bool CanWrite => false;
     public override void WriteJson(JsonWriter writer, DefRef<T>? value, JsonSerializer serializer) {
-        throw new NotImplementedException();
+        writer.WriteValue(value.Def.Id);
     }
 }
 

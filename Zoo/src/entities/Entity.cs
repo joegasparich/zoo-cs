@@ -174,8 +174,8 @@ public class Entity : ISerialisable {
         Find.SaveManager.ArchiveValue("pos",  ref Pos);
         
         Find.SaveManager.ArchiveCustom("components",
-            () => EntityUtility.SaveComponents(components.Values),
-            data => EntityUtility.LoadComponents(this, data)
+            () => EntitySerialiseUtility.SaveComponents(components.Values),
+            data => EntitySerialiseUtility.LoadComponents(this, data)
         );
         
         Find.SaveManager.ArchiveValue("defId",
