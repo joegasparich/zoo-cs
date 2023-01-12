@@ -44,7 +44,7 @@ public class SaveManager {
             Game.Serialise();
         }
         catch (Exception e) {
-            Debug.Error("Error saving game: " + e);
+            Debug.Error("Error saving game: ", e);
 
             return;
         }
@@ -114,7 +114,7 @@ public class SaveManager {
     public void ArchiveValue<T>(string label, ref T? value) {
         switch (Mode) {
             case SerialiseMode.Saving:
-                CurrentSaveNode.Add(label, JObject.FromObject(value));
+                CurrentSaveNode.Add(label, JToken.FromObject(value));
                 break;
             case SerialiseMode.Loading:
                 if (CurrentSaveNode[label] == null)

@@ -9,11 +9,11 @@ namespace Zoo;
 // Any per object changes need to be sent through the blit params
 public class GraphicData {
     // Config
-    public  readonly string    SpritePath;
-    public  readonly Vector2   Origin = Vector2.Zero;
-    public  readonly Vector2   Scale  = Vector2.One;
-    private readonly int       cellWidth;
-    private readonly int       cellHeight;
+    public  string    SpritePath;
+    public  Vector2   Origin = Vector2.Zero;
+    public  Vector2   Scale  = Vector2.One;
+    private int       cellWidth;
+    private int       cellHeight;
 
     // Properties
     public Texture2D Sprite     => Find.AssetManager.GetTexture(SpritePath);
@@ -26,6 +26,15 @@ public class GraphicData {
         
         this.cellWidth  = cellWidth;
         this.cellHeight = cellHeight;
+    }
+
+    public GraphicData DeepCopy()
+    {
+        return new GraphicData(SpritePath, cellWidth, cellHeight)
+        {
+            Origin = Origin,
+            Scale = Scale
+        };
     }
 
     public void Blit(Vector2 pos, float depth, Color colour, int index = 0, int pickId = 0) {

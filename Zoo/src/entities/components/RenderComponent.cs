@@ -22,7 +22,7 @@ public class RenderComponent : Component {
     public RenderComponentData Data => (RenderComponentData)data;
 
     public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
-        Graphics = data.GraphicData; // TODO: deep copy
+        Graphics = data.GraphicData.DeepCopy();
     }
 
     public override void Start() {

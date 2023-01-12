@@ -117,7 +117,7 @@ public class Tool_TileObject : Tool {
         currentObject = data;
 
         if (currentObject != null) {
-            Ghost.Graphics = data.GraphicData;
+            Ghost.Graphics = data.GraphicData.DeepCopy();
             Ghost.Offset   = data.Size / 2f;
             Ghost.Visible  = true;
         } else {

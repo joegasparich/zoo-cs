@@ -15,14 +15,6 @@ public class Animal : Entity {
 
     public Animal(Vector2 pos, AnimalDef def) : base(pos, def) {}
 
-    public override void Serialise() {
-        base.Serialise();
-        
-        // if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-        //     renderer.Data.GraphicData = Def.GetComponentData<RenderComponentData>().GraphicData;
-        // }
-    }
-
     public override List<InfoTab> GetInfoTabs() {
         var tabs = new List<InfoTab>();
         tabs.Add(new InfoTab(Def.Name, rect => {

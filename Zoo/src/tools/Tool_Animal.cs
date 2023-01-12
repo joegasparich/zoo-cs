@@ -81,7 +81,7 @@ public class Tool_Animal : Tool {
         currentAnimal = data;
 
         if (currentAnimal != null) {
-            Ghost.Graphics = data.GraphicData;
+            Ghost.Graphics = data.GraphicData.DeepCopy();
             Ghost.Visible  = true;
         } else {
             Ghost.Visible = false;

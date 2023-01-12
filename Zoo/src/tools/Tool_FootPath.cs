@@ -172,7 +172,7 @@ public class Tool_FootPath : Tool {
         currentFootPath = data;
 
         if (currentFootPath != null) {
-            Ghost.Graphics = data.GraphicData;
+            Ghost.Graphics = data.GraphicData.DeepCopy();
             Ghost.Visible  = true;
         } else {
             Ghost.Visible = false;
