@@ -27,7 +27,19 @@ public class NeedsComponent : Component {
     // State
     public List<Need>         Needs = new();
     
+    // Properties
+    public NeedsComponentData Data => (NeedsComponentData)data;
+    
     public NeedsComponent(Entity entity, NeedsComponentData? data) : base(entity, data) {}
+
+    public override void Start()
+    {
+        base.Start();
+        
+        foreach (var need in Data.Needs) {
+            Needs.Add(new Need { Def = need });
+        }
+    }
 
     public override void Update() {
         foreach (var need in Needs) {

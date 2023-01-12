@@ -2,11 +2,8 @@
     "class": "ObjectDef",
     "id": "Tree",
     "name": "tree",
+    "inherits": "BaseObject",
     "solid": true,
-    "size": {
-        "x": 1,
-        "y": 1
-    },
     "canPlaceOnSlopes": true,
     "canPlaceInWater": false,
     "type": "foliage",
@@ -20,9 +17,6 @@
                     "y": 0.7
                 }
             }
-        },
-        {
-            "compClass":  "ElevationComponent"
         }
     ]
 }

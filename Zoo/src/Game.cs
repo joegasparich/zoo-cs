@@ -28,10 +28,11 @@ public static class Game {
     public static UIManager    UI           = new();
     
     // Collections
-    private static Dictionary<int, Entity> entities         = new();
-    private static List<Entity>            entitiesToAdd    = new();
-    private static List<Entity>            entitiesToRemove = new();
-    
+    private static Dictionary<int, Entity>              entities         = new();
+    private static List<Entity>                         entitiesToAdd    = new();
+    private static List<Entity>                         entitiesToRemove = new();
+    private static Dictionary<EntityTags, List<Entity>> entitiesByTag    = new();
+
     // State
     private static int      ticksSinceGameStart;
     private static int      framesSinceGameStart;
@@ -204,6 +205,13 @@ public static class Game {
             try {
                 entity.Setup();
                 entities.Add(entity.Id, entity);
+                
+                foreach (var tag in entity.Tags) {
+                    if (!entitiesByTag.ContainsKey(tag)) 
+                        entitiesByTag.Add(tag, new List<Entity>());
+                    
+                    entitiesByTag[tag].Add(entity);
+                }
             }
             catch (Exception e) {
                 Debug.Error($"Failed to set up entity {entity.Id}:", e);
@@ -214,12 +222,24 @@ public static class Game {
         
         foreach (var entity in entitiesToRemove) {
             entities.Remove(entity.Id);
+            
+            foreach (var tag in entity.Tags) {
+                entitiesByTag[tag].Remove(entity);
+            }
         }
         entitiesToRemove.Clear();
     }
     
     public static Entity GetEntityById(int id) {
         return entities[id];
+    }
+    
+    public static IEnumerable<Entity> GetEntitiesByTag(EntityTags tag) {
+        if (!entitiesByTag.ContainsKey(tag)) yield break;
+
+        foreach (var entity in entitiesByTag[tag]) {
+            yield return entity;
+        }
     }
 
     public static void ClearEntities() {

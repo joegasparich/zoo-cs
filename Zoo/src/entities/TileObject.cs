@@ -20,9 +20,24 @@ public class TileObject : Entity {
         base.Setup();
         
         Find.World.RegisterTileObject(this);
+        
+        if (Def.Solid) {
+            foreach (var tile in GetOccupiedTiles()) {
+                Find.World.UpdateAccessibilityGrids(tile);
+            }
+
+            Messenger.Fire(EventType.PlaceSolid, GetOccupiedTiles().ToList());
+        }
     }
 
     public override void Destroy() {
+        if (Def.Solid) {
+            foreach (var tile in GetOccupiedTiles()) {
+                Find.World.UpdateAccessibilityGrids(tile);
+            }
+        }
+        
+        
         Find.World.UnregisterTileObject(this);
         
         base.Destroy();
@@ -35,7 +50,7 @@ public class TileObject : Entity {
         Renderer.SpriteIndex = (int)rotation;
     }
     
-    public IEnumerable<IntVec2> GetOccupiedTiles() {
+    public override IEnumerable<IntVec2> GetOccupiedTiles() {
         var baseTile = (Pos - Def.Size / 2).Floor();
         for (var i = 0; i < Def.Size.X; i++) {
             for (var j = 0; j < Def.Size.Y; j++) {

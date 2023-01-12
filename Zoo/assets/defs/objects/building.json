@@ -2,6 +2,7 @@
     "class": "ObjectDef",
     "id": "Building",
     "name": "building",
+    "inherits": "BaseObject",
     "solid": true,
     "size": {
         "x": 2,
@@ -28,9 +29,6 @@
                     "y": 2
                 }
             }
-        },
-        {
-            "compClass":  "ElevationComponent"
         }
     ]
 }

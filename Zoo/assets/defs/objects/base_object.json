@@ -1,0 +1,13 @@
+﻿{
+    "class": "ObjectDef",
+    "id": "BaseObject",
+    "abstract": true,
+    "components": [
+        {
+            "compClass":  "ElevationComponent"
+        }
+    ],
+    "tags": [
+        "TileObject"
+    ]
+}

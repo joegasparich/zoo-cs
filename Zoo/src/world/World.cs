@@ -40,13 +40,14 @@ public class World : ISerialisable {
     public int Height;
 
     // Collections
-    private readonly Dictionary<int, TileObject>                tileObjects        = new();
-    private readonly Dictionary<string, TileObject>             tileObjectMap      = new();
-    private readonly Dictionary<AccessibilityType, int[][]> accessibilityGrids = new();
+    private readonly Dictionary<string, List<Entity>>       entitiesByTileDynamic = new(); // Gets cleared every frame
+    private readonly Dictionary<string, List<Entity>>       entitiesByTileStatic  = new(); // Must be manually added to and removed from
+    private readonly Dictionary<string, TileObject>         tileObjectMap         = new();
+    private readonly Dictionary<AccessibilityType, int[][]> accessibilityGrids    = new();
 
     // Grids
     public ElevationGrid Elevation  { get; private set; }
-    public TerrainGrid     Terrain     { get; private set; }
+    public TerrainGrid   Terrain    { get; private set; }
     public WallGrid      Walls      { get; private set; }
     public FootPathGrid  FootPaths  { get; private set; }
     public AreaManager   Areas      { get; private set; }
@@ -89,14 +90,17 @@ public class World : ISerialisable {
         FootPaths.Reset();
         Areas.Reset();
 
-        tileObjects.Clear();
-        tileObjectMap.Clear();
+        entitiesByTileDynamic.Clear();
+        entitiesByTileStatic.Clear();
         accessibilityGrids.Clear();
         
         isSetup = false;
     }
 
-    public void PreUpdate() {}
+    // Note: This must be called before entity PreUpdate
+    public void PreUpdate() {
+        entitiesByTileDynamic.Clear();
+    }
     public void Update() {}
 
     public void PostUpdate() {
@@ -116,32 +120,41 @@ public class World : ISerialisable {
         if (DebugSettings.AreaGrid) Areas.RenderDebugAreaGrid();
         if (DebugSettings.PathfindingGrid) Pathfinder.DrawDebugGrid();
     }
-
+    
     public void RegisterTileObject(TileObject tileObject) {
-        tileObjects.Add(tileObject.Id, tileObject);
         foreach (var tile in tileObject.GetOccupiedTiles()) {
             tileObjectMap.Add(tile.ToString(), tileObject);
         }
-
-        if (tileObject.Def.Solid) {
-            foreach (var tile in tileObject.GetOccupiedTiles()) {
-                UpdateAccessibilityGrids(tile);
-            }
-
-            Messenger.Fire(EventType.PlaceSolid, tileObject.GetOccupiedTiles().ToList());
-        }
     }
-
+    
     public void UnregisterTileObject(TileObject tileObject) {
-        tileObjects.Remove(tileObject.Id);
         foreach (var tile in tileObject.GetOccupiedTiles()) {
             tileObjectMap.Remove(tile.ToString());
         }
-        
-        if (tileObject.Def.Solid) {
-            foreach (var tile in tileObject.GetOccupiedTiles()) {
-                UpdateAccessibilityGrids(tile);
-            }
+    }
+    
+    // TODO: Remove allocations from these functions
+    public void OccupyTileStatic(Entity entity) {
+        foreach (var tile in entity.GetOccupiedTiles()) {
+            if (!entitiesByTileStatic.ContainsKey(tile.ToString()))
+                entitiesByTileStatic.Add(tile.ToString(), new List<Entity>());
+
+            entitiesByTileStatic[tile.ToString()].Add(entity);
+        }
+    }
+
+    public void UnoccupyTileStatic(Entity entity) {
+        foreach (var tile in entity.GetOccupiedTiles()) {
+            entitiesByTileStatic[tile.ToString()].Remove(entity);
+        }
+    }
+    
+    public void OccupyTileDynamic(Entity entity) {
+        foreach (var tile in entity.GetOccupiedTiles()) {
+            if (!entitiesByTileDynamic.ContainsKey(tile.ToString()))
+                entitiesByTileDynamic.Add(tile.ToString(), new List<Entity>());
+
+            entitiesByTileDynamic[tile.ToString()].Add(entity);
         }
     }
 
@@ -263,6 +276,22 @@ public class World : ISerialisable {
         return Side.North;
     }
 
+    public IEnumerable<Entity> GetEntitiesAtTile(IntVec2 tile) {
+            if (!IsPositionInMap(tile)) yield break;
+        
+        if (entitiesByTileStatic.ContainsKey(tile.ToString())) {
+            foreach (var entity in entitiesByTileStatic[tile.ToString()]) {
+                yield return entity;
+            }
+        }
+
+        if (entitiesByTileDynamic.ContainsKey(tile.ToString())) {
+            foreach (var entity in entitiesByTileDynamic[tile.ToString()]) {
+                yield return entity;
+            }
+        }
+    }
+
     public TileObject? GetTileObjectAtTile(IntVec2 tile) {
         return tileObjectMap.TryGetValue(tile.ToString(), out var tileObject) ? tileObject : null;
     }
@@ -292,7 +321,7 @@ public class World : ISerialisable {
     public void Serialise() {
         // TODO Do we need to properly reset and setup here
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            tileObjects.Clear();
+            entitiesByTileStatic.Clear();
             tileObjectMap.Clear();
             
             Areas.Reset();

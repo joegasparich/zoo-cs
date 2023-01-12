@@ -2,15 +2,22 @@ using System.Numerics;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.ui;
+using Zoo.util;
 
 namespace Zoo.entities; 
+
+public enum EntityTags {
+    Animal,
+    TileObject
+}
 
 public class Entity : ISerialisable {
     // Config
     public  int                         Id;
     private Dictionary<Type, Component> components = new();
     private EntityDef                   def;
-    
+    public  HashSet<EntityTags>         Tags { get; } = new();
+
     // State
     public Vector2 Pos;
     private string infoDialogId;
@@ -22,17 +29,27 @@ public class Entity : ISerialisable {
     public Entity(Vector2 pos, EntityDef? def) {
         Pos      = pos;
         this.def = def;
+
+        foreach (var tag in def.Tags) {
+            Tags.Add(tag);
+        }
         
         Game.RegisterEntity(this);
     }
 
     public virtual void Setup() {
+        if (def.IsStatic)
+            Find.World.OccupyTileStatic(this);
+        
         foreach (var component in components.Values) {
             component.Start();
         }
     }
 
     public virtual void PreUpdate() {
+        if (!def.IsStatic)
+            Find.World.OccupyTileDynamic(this);
+        
         foreach (var component in components.Values) {
             component.PreUpdate();
         }
@@ -66,6 +83,9 @@ public class Entity : ISerialisable {
         foreach (var component in components.Values) {
             component.End();
         }
+        
+        if (def.IsStatic)
+            Find.World.UnoccupyTileStatic(this);
         
         Game.UnregisterEntity(this);
     }
@@ -142,6 +162,10 @@ public class Entity : ISerialisable {
         }
 
         return false;
+    }
+
+    public virtual IEnumerable<IntVec2> GetOccupiedTiles() {
+        yield return Pos.Floor();
     }
 
     public virtual void Serialise() {

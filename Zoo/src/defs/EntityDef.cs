@@ -4,7 +4,9 @@ using Zoo.entities;
 namespace Zoo.defs; 
 
 public class EntityDef : Def {
-    public List<ComponentData> Components;
+    public List<ComponentData> Components   = new();
+    public List<EntityTags>    Tags         = new();
+    public bool                IsStatic     = false;
     
     public GraphicData? GraphicData => GetComponentData<RenderComponentData>()?.GraphicData;
     

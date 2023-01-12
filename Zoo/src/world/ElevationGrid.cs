@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Zoo.entities;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -97,9 +98,13 @@ public class ElevationGrid : ISerialisable {
             foreach(var tile in GetSurroundingTiles(gridPos)) {
                 if (!Find.World.IsPositionInMap(tile)) continue;
                 
-                // Check for Tile Objects
-                var tileObject = Find.World.GetTileObjectAtTile(tile);
-                if (tileObject is { Def.CanPlaceInWater: false }) return false;
+                foreach (var entity in Find.World.GetEntitiesAtTile(tile)) {
+                    // Check for animals that can't swim
+                    if (entity is Animal animal  && !animal.Def.CanSwim) return false;
+                    // Check for objects that can't be underwater
+                    if (entity is TileObject obj && !obj.Def.CanPlaceInWater) return false;
+                }
+                
                 // Check for paths
                 if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;
             }
