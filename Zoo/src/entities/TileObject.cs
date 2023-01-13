@@ -37,7 +37,6 @@ public class TileObject : Entity {
             }
         }
         
-        
         Find.World.UnregisterTileObject(this);
         
         base.Destroy();

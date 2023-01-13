@@ -16,12 +16,12 @@ public class PathFollowComponent : InputComponent {
     private   IntVec2?                destination;
     private   List<IntVec2>?          path;
     private   Task<List<IntVec2>?>?   pathRequest;
-    private   CancellationTokenSource cancelPathRequest;
+    private   CancellationTokenSource cancelToken;
     private   string                  placeSolidHandle;
     protected bool                    pathCompleted;
     
     // Properties
-    public bool HasPath => path != null;
+    public bool HasPath => path != null && path.Count > 0;
 
     public PathFollowComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
@@ -48,7 +48,7 @@ public class PathFollowComponent : InputComponent {
 
     public override void End() {
         Messenger.Off(EventType.PlaceSolid, placeSolidHandle);
-        cancelPathRequest?.Cancel();
+        cancelToken?.Cancel();
     }
 
     public override void Update() {
@@ -91,13 +91,17 @@ public class PathFollowComponent : InputComponent {
         }
 
         destination                      = targetPos.Floor();
-        (pathRequest, cancelPathRequest) = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), destination.Value, AccessibilityType) ?? (null, default);
+        (pathRequest, cancelToken) = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), destination.Value, AccessibilityType) ?? (null, default);
 
         return true;
     }
 
     private void CheckPathRequest() {
         if (pathRequest is not { IsCompleted: true }) return;
+        if (pathRequest.IsCanceled) {
+            pathRequest = null;
+            return;
+        }
 
         path        = pathRequest.Result;
         pathRequest = null;
@@ -115,7 +119,10 @@ public class PathFollowComponent : InputComponent {
         path           = null;
         pathCompleted  = false;
         destination = null;
-        cancelPathRequest?.Cancel();
+        if (cancelToken != null)
+            Find.World.Pathfinder.CancelPathRequest(cancelToken);
+        pathRequest = null;
+        cancelToken = null;
     }
     
     public virtual bool ReachedDestination() {

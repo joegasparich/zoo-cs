@@ -27,19 +27,19 @@ public class NeedsComponentData : ComponentData {
 
 public class NeedsComponent : Component {
     // State
-    public List<Need>         Needs = new();
+    public Dictionary<string, Need> Needs = new();
     
     // Properties
     public NeedsComponentData Data => (NeedsComponentData)data;
 
     public NeedsComponent(Entity entity, NeedsComponentData? data) : base(entity, data) {
         foreach (var need in Data.Needs) {
-            Needs.Add(new Need { Def = need });
+            Needs.Add(need.Def.Id, new Need { Def = need });
         }
     }
 
     public override void Update() {
-        foreach (var need in Needs) {
+        foreach (var need in Needs.Values) {
             if (need.Value > Need.MaxNeed) {
                 need.Value = Need.MaxNeed;
             }
@@ -47,13 +47,21 @@ public class NeedsComponent : Component {
             need.Value += need.Def.Def.ChangePerTick;
         }
     }
+    
+    public void ModifyNeed(string defId, float amount) {
+        if (!Needs.ContainsKey(defId)) {
+            Debug.Warn($"Tried to modify non-existent need: {defId}");
+            return;
+        }
+        Needs[defId].Value += amount;
+    }
 
     public override InfoTab? GetInfoTab() {
         return new InfoTab("Needs", rect => {
             var listing = new Listing(rect);
             listing.Header("Needs");
             
-            foreach (var need in Needs) {
+            foreach (var need in Needs.Values) {
                 listing.Label($"{need.Def.Def.Name}: {(need.Value / Need.MaxNeed).ToStringPercent(1)}");
             }
         });

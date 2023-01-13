@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using Zoo.entities;
 using Zoo.util;
 
 namespace Zoo.world; 
@@ -9,14 +10,12 @@ public class Area {
     public Color  Colour { get; set; }
 
     // State
-    public List<IntVec2>                   Tiles          { get; set; }
-    public Dictionary<Area, HashSet<Wall>> ConnectedAreas { get; set; }
+    public List<IntVec2>                        Tiles             { get; set; } = new();
+    public Dictionary<Area, HashSet<Wall>>      ConnectedAreas    { get; }      = new();
 
     public Area(string id) {
         Id             = id;
         Colour         = new Color(Rand.randByte(), Rand.randByte(), Rand.randByte(), (byte)255);
-        Tiles          = new List<IntVec2>();
-        ConnectedAreas = new Dictionary<Area, HashSet<Wall>>();
     }
     
     public void AddAreaConnection(Area area, Wall door) {
@@ -37,4 +36,15 @@ public class Area {
             ConnectedAreas.Remove(area);
         }
     }
+
+    public IEnumerable<Entity> GetContainedEntities(EntityTag tag = EntityTag.All) {
+        foreach (var tile in Tiles) {
+            foreach (var entity in Find.World.GetEntitiesAtTile(tile)) {
+                if (entity.Tags.Contains(tag))
+                    yield return entity;
+            }
+        }
+    }
+    
+    
 }

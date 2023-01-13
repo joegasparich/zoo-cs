@@ -22,7 +22,7 @@ public class ConsumableComponent : Component {
     }
 
     public float Consume() {
-        var consumed = MathF.Max(Data.QuantityConsumedPerTick, quantity);
+        var consumed = MathF.Min(Data.QuantityConsumedPerTick, quantity);
         quantity -= consumed;
         if (quantity <= 0) {
             entity.Destroy();

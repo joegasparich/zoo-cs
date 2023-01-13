@@ -46,3 +46,8 @@ public static class WallDefOf {
 public static class TerrainDefOf {
     public static TerrainDef Grass;
 }
+
+[DefOf]
+public static class NeedDefOf {
+    public static NeedDef Hunger;
+}

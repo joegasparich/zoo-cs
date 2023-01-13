@@ -31,7 +31,7 @@ public static class Game {
     private static Dictionary<int, Entity>              entities         = new();
     private static List<Entity>                         entitiesToAdd    = new();
     private static List<Entity>                         entitiesToRemove = new();
-    private static Dictionary<EntityTags, List<Entity>> entitiesByTag    = new();
+    private static Dictionary<EntityTag, List<Entity>> entitiesByTag    = new();
 
     // State
     private static int      ticksSinceGameStart;
@@ -57,6 +57,8 @@ public static class Game {
     private static void Init() {
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "Zoo");
         Raylib.SetExitKey(KeyboardKey.KEY_NULL);
+        
+        entitiesByTag[EntityTag.All] = new();
         
         AssetManager.LoadAssets();
         UI.Init();
@@ -105,7 +107,11 @@ public static class Game {
     private static void PreUpdate() {
         SceneManager.GetCurrentScene()?.PreUpdate();
         foreach (var entity in entities.Values) {
-            entity.PreUpdate();
+            try {
+                entity.PreUpdate();
+            } catch (Exception e) {
+                Debug.Error($"Error in entity PreUpdate {entity.Id}", e);
+            }
         }
     }
     
@@ -114,14 +120,22 @@ public static class Game {
         
         SceneManager.GetCurrentScene()?.Update();
         foreach (var entity in entities.Values) {
-            entity.Update();
+            try {
+                entity.Update();
+            } catch (Exception e) {
+                Debug.Error($"Error in entity Update {entity.Id}", e);
+            }
         }
     }
     
     private static void PostUpdate() {
         SceneManager.GetCurrentScene()?.PostUpdate();
         foreach (var entity in entities.Values) {
-            entity.PostUpdate();
+            try {
+                entity.PostUpdate();
+            } catch (Exception e) {
+                Debug.Error($"Error in entity PostUpdate {entity.Id}", e);
+            }
         }
 
         DoEntityReg();
@@ -205,6 +219,7 @@ public static class Game {
             try {
                 entity.Setup();
                 entities.Add(entity.Id, entity);
+                entitiesByTag[EntityTag.All].Add(entity);
                 
                 foreach (var tag in entity.Tags) {
                     if (!entitiesByTag.ContainsKey(tag)) 
@@ -236,7 +251,7 @@ public static class Game {
         return entities[id];
     }
     
-    public static IEnumerable<Entity> GetEntitiesByTag(EntityTags tag) {
+    public static IEnumerable<Entity> GetEntitiesByTag(EntityTag tag) {
         if (!entitiesByTag.ContainsKey(tag)) yield break;
 
         foreach (var entity in entitiesByTag[tag]) {

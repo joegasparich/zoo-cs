@@ -12,7 +12,11 @@ public class BehaviourComponent : Component {
     public override void Start() {
         base.Start();
 
-        SetBehaviour(new IdleBehaviour(entity));
+        if (entity is Actor actor) {
+            SetBehaviour(new ConsumeBehaviour(actor));
+        } else {
+            Debug.Assert(false, "Non actor entity has behaviour component");
+        }
     }
 
     public override void Update() {

@@ -5,7 +5,7 @@ namespace Zoo.defs;
 
 public class EntityDef : Def {
     public List<ComponentData> Components   = new();
-    public List<EntityTags>    Tags         = new();
+    public List<EntityTag>    Tags         = new();
     public bool                IsStatic     = false;
     
     public GraphicData? GraphicData => GetComponentData<RenderComponentData>()?.GraphicData;

@@ -9,22 +9,16 @@ public class IdleBehaviour : Behaviour {
     private IntVec2?            wanderTile;
 
     // Properties
-    public PathFollowComponent Pather => entity.GetComponent<PathFollowComponent>();
-    public Actor               Actor  => entity as Actor;
+    public PathFollowComponent Pather => actor.GetComponent<PathFollowComponent>();
 
     public IdleBehaviour() {}
-    public IdleBehaviour(Entity entity) : base(entity) {}
-
-    public override void Start() {
-        Debug.Assert(Actor != null);
-        base.Start();
-    }
+    public IdleBehaviour(Actor actor) : base(actor) {}
 
     public override void Update() {
         base.Update();
 
         if (wanderTile == null || !Pather.HasPath) {
-            wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(Actor.Area, Actor.Pos.Floor(), 5, Actor.Accessibility);
+            wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Area, actor.Pos.Floor(), 5, actor.Accessibility);
 
             if (wanderTile.HasValue) {
                 if (!Pather.PathTo(wanderTile.Value)) 

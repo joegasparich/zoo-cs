@@ -3,11 +3,11 @@ using Zoo.entities;
 namespace Zoo.ai; 
 
 public abstract class Behaviour : ISerialisable {
-    protected Entity entity;
+    protected Actor actor;
 
     public Behaviour() {}
-    public Behaviour(Entity entity) {
-        this.entity = entity;
+    public Behaviour(Actor actor) {
+        this.actor = actor;
     }
     
     public virtual void Start()     { }

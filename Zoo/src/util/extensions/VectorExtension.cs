@@ -19,6 +19,9 @@ public static class VectorExtension {
     public static float DistanceSquared(this Vector2 a, Vector2 b) {
         return MathF.Pow(a.X - b.X, 2) + MathF.Pow(a.Y - b.Y, 2);
     }
+    public static bool InDistOf(this Vector2 a, Vector2 b, float range) {
+        return a.DistanceSquared(b) < range * range;
+    }
     public static Vector2 Normalised(this Vector2 v) {
         if (v.LengthSquared() == 0) return Vector2.Zero;
         return v / v.Length();

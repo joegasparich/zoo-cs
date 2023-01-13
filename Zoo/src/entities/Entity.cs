@@ -6,7 +6,8 @@ using Zoo.util;
 
 namespace Zoo.entities; 
 
-public enum EntityTags {
+public enum EntityTag {
+    All,
     Animal,
     TileObject,
     Consumable
@@ -17,11 +18,12 @@ public class Entity : ISerialisable {
     public  int                         Id;
     private Dictionary<Type, Component> components = new();
     private EntityDef                   def;
-    public  HashSet<EntityTags>         Tags { get; } = new();
+    public  HashSet<EntityTag>         Tags { get; } = new();
 
     // State
-    public Vector2 Pos;
-    private string infoDialogId;
+    public  Vector2 Pos;
+    private string  infoDialogId;
+    public  bool    Despawned;
     
     // Properties
     public         IEnumerable<Component> Components => components.Values;
@@ -87,6 +89,8 @@ public class Entity : ISerialisable {
         
         if (def.IsStatic)
             Find.World.UnoccupyTileStatic(this);
+
+        Despawned = true;
         
         Game.UnregisterEntity(this);
     }
@@ -153,6 +157,18 @@ public class Entity : ISerialisable {
         return null;
     }
 
+    public bool HasComponent<T>() where T : Component {
+        if (components.ContainsKey(typeof(T))) return true;
+        
+        foreach (var t in components.Keys) {
+            if (typeof(T).IsAssignableFrom(t)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     public bool HasComponent(Type type) {
         if (components.ContainsKey(type)) return true;
         

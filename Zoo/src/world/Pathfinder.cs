@@ -30,7 +30,7 @@ public class Pathfinder {
     private Tile[,] tileGrid;
     private bool isSetup = false;
 
-    private ConcurrentDictionary<string, (Task<List<IntVec2>?>, CancellationTokenSource)> pathRequests;
+    private ConcurrentDictionary<CancellationTokenSource, Task<List<IntVec2>?>> pathRequests;
 
     public Pathfinder(int width, int height) {
         cols = width;
@@ -57,21 +57,16 @@ public class Pathfinder {
     
     public (Task<List<IntVec2>?>, CancellationTokenSource)? RequestPath(IntVec2 start, IntVec2 end, AccessibilityType accessibility) {
         if (!isSetup) return null;
-        
-        var key = $"{start.X},{start.Y},{end.X},{end.Y}";
-        if (pathRequests.ContainsKey(key)) {
-            return pathRequests[key];
-        }
 
         var cancel = new CancellationTokenSource();
         var token  = cancel.Token;
         var task = Task.Run(() => {
             if (!isSetup) return null;
             var path = GetPath(start, end, accessibility);
-            pathRequests.TryRemove(key, out _);
+            pathRequests.TryRemove(cancel, out _);
             return path;
         }, token);
-        pathRequests[key] = (task, cancel);
+        pathRequests[cancel] = task;
         return (task, cancel);
     }
     
@@ -139,6 +134,15 @@ public class Pathfinder {
 
         Debug.Log($"Failed to find route from {from} to {to}");
         return null;
+    }
+    
+    public void CancelPathRequest(CancellationTokenSource cancel) {
+        if (!isSetup) return;
+        Debug.Assert(cancel != null);
+        if (pathRequests.ContainsKey(cancel)) {
+            cancel.Cancel();
+            pathRequests.TryRemove(cancel, out _);
+        }
     }
 
     private List<IntVec2> ReconstructPath(Node[,] tileDetails, IntVec2 dest) {
