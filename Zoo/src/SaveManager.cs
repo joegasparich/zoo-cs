@@ -128,10 +128,10 @@ public class SaveManager {
         }
     }
 
-    public void ArchiveValue<T>(string label, Func<T> get, Action<T?>? set) {
+    public void ArchiveValue<T>(string label, T get, Action<T?>? set) {
         switch (Mode) {
             case SerialiseMode.Saving: {
-                var value = get();
+                var value = get;
                 ArchiveValue(label, ref value);
                 break;
             }
@@ -164,11 +164,20 @@ public class SaveManager {
         switch (Mode) {
             case SerialiseMode.Saving:
                 CurrentSaveNode = new JObject();
+                CurrentSaveNode["className"] = value.GetType().ToString(); 
                 value.Serialise();
                 parent[label] = CurrentSaveNode;
                 break;
             case SerialiseMode.Loading:
                 CurrentSaveNode = parent[label] as JObject;
+                if (value == null) {
+                    var type = Type.GetType(CurrentSaveNode["className"].Value<string>());
+                    if (type == null || type.GetConstructor(Type.EmptyTypes) == null) {
+                        Debug.Warn($"Failed to load {label}, type {type} not found or has no default constructor");
+                        break;
+                    }
+                    value = (ISerialisable) Activator.CreateInstance(type);
+                }
                 value.Serialise();
                 break;
         }
@@ -228,7 +237,7 @@ public class SaveManager {
     //     CurrentSaveNode = parent;
     // }
 
-    public JObject SerialiseToNode(ISerialisable value) {
+    public JObject SerialiseToNode<T>(T value) where T : ISerialisable, new() {
         var node = new JObject();
         Find.SaveManager.CurrentSaveNode = node;
         Find.SaveManager.Mode            = SerialiseMode.Saving;
@@ -237,7 +246,7 @@ public class SaveManager {
         return node;
     }
 
-    public void DeserialiseFromNode(ISerialisable value, JObject node) {
+    public void DeserialiseFromNode<T>(T value, JObject node) where T : ISerialisable, new() {
         Find.SaveManager.CurrentSaveNode = node;
         Find.SaveManager.Mode            = SerialiseMode.Loading;
         Find.SaveManager.ArchiveDeep("key", value);

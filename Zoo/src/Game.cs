@@ -221,6 +221,8 @@ public static class Game {
         entitiesToAdd.Clear();   
         
         foreach (var entity in entitiesToRemove) {
+            if (!entities.ContainsKey(entity.Id)) continue;
+            
             entities.Remove(entity.Id);
             
             foreach (var tag in entity.Tags) {

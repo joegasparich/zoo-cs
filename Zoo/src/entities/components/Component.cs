@@ -40,6 +40,6 @@ public abstract class Component : ISerialisable {
     public virtual InfoTab? GetInfoTab()            => null;
 
     public virtual void Serialise() {
-        Find.SaveManager.ArchiveValue("type", () => GetType().ToString(), null);
+        Find.SaveManager.ArchiveValue("type", GetType().ToString(), null);
     }
 }

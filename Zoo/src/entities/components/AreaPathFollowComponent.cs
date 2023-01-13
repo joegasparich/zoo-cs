@@ -78,10 +78,10 @@ public class AreaPathFollowComponent : PathFollowComponent {
         }
     }
 
-    public override void PathTo(Vector2 target) {
+    public override bool PathTo(Vector2 target) {
         if (enterDoorPos.HasValue) {
             deferredTargetPos = target;
-            return;
+            return true;
         }
 
         ResetAreaPath();
@@ -97,10 +97,12 @@ public class AreaPathFollowComponent : PathFollowComponent {
             if (areaPath.Any()) {
                 currentArea = areaPath.Dequeue();
                 destination = target;
+                return true;
             }
-        } else {
-            base.PathTo(target);
+            return false;
         }
+        
+        return base.PathTo(target);
     }
 
     public override bool ReachedDestination() {

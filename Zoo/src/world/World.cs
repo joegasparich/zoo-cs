@@ -46,11 +46,11 @@ public class World : ISerialisable {
     private readonly Dictionary<AccessibilityType, int[][]> accessibilityGrids    = new();
 
     // Grids
-    public ElevationGrid Elevation  { get; private set; }
-    public TerrainGrid   Terrain    { get; private set; }
-    public WallGrid      Walls      { get; private set; }
-    public FootPathGrid  FootPaths  { get; private set; }
-    public AreaManager   Areas      { get; private set; }
+    public ElevationGrid Elevation  { get; }
+    public TerrainGrid   Terrain    { get; }
+    public WallGrid      Walls      { get; }
+    public FootPathGrid  FootPaths  { get; }
+    public AreaManager   Areas      { get; }
     public Pathfinder    Pathfinder { get; private set; }
 
     private bool isSetup = false;
@@ -59,11 +59,11 @@ public class World : ISerialisable {
         Width  = width;
         Height = height;
 
-        Elevation  = new ElevationGrid(Width + 1, Height + 1);
-        Terrain     = new TerrainGrid(Width * TerrainGrid.TerrainScale, Height * TerrainGrid.TerrainScale);
-        Walls      = new WallGrid(Width, Height);
-        FootPaths  = new FootPathGrid(Width, Height);
-        Areas      = new AreaManager();
+        Elevation = new ElevationGrid(Width + 1, Height + 1);
+        Terrain   = new TerrainGrid(Width * TerrainGrid.TerrainScale, Height * TerrainGrid.TerrainScale);
+        Walls     = new WallGrid(Width, Height);
+        FootPaths = new FootPathGrid(Width, Height);
+        Areas     = new AreaManager();
     }
 
     public void Setup() {
@@ -89,6 +89,7 @@ public class World : ISerialisable {
         Walls.Reset();
         FootPaths.Reset();
         Areas.Reset();
+        Pathfinder.Reset();
 
         entitiesByTileDynamic.Clear();
         entitiesByTileStatic.Clear();

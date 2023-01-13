@@ -394,9 +394,6 @@ public class ElevationGrid : ISerialisable {
         
         Find.SaveManager.ArchiveValue("cols", ref cols);
         Find.SaveManager.ArchiveValue("rows", ref rows);
-        Find.SaveManager.ArchiveValue("data", 
-            () => grid,
-            data => Setup(data)
-        );
+        Find.SaveManager.ArchiveValue("data", grid, data => Setup(data));
     }
 }

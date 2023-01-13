@@ -156,7 +156,7 @@ public class Entity : ISerialisable {
         if (components.ContainsKey(type)) return true;
         
         foreach (var t in components.Keys) {
-            if (t.IsAssignableFrom(type)) {
+            if (type.IsAssignableFrom(t)) {
                 return true;
             }
         }
@@ -169,7 +169,7 @@ public class Entity : ISerialisable {
     }
 
     public virtual void Serialise() {
-        Find.SaveManager.ArchiveValue("type", () => GetType().ToString(), type => {});
+        Find.SaveManager.ArchiveValue("type", GetType().ToString(), type => {});
         Find.SaveManager.ArchiveValue("id",   ref Id);
         Find.SaveManager.ArchiveValue("pos",  ref Pos);
         
@@ -179,7 +179,7 @@ public class Entity : ISerialisable {
         );
         
         Find.SaveManager.ArchiveValue("defId",
-            () => def.Id,
+            def.Id,
             id => def = Find.AssetManager.GetDef(id) as EntityDef
         );
     }

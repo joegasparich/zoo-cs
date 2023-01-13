@@ -8,7 +8,13 @@ public class BehaviourComponent : Component {
     protected override Type[] Dependencies => new[] { typeof(PathFollowComponent) };
 
     public BehaviourComponent(Entity entity, ComponentData? data = null) : base(entity, data) {}
-    
+
+    public override void Start() {
+        base.Start();
+
+        SetBehaviour(new IdleBehaviour(entity));
+    }
+
     public override void Update() {
         currentBehaviour?.Update();
     }

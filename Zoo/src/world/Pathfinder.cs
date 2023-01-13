@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Concurrent;
+using System.Numerics;
 using Raylib_cs;
 using Zoo.util;
 
@@ -29,14 +30,14 @@ public class Pathfinder {
     private Tile[,] tileGrid;
     private bool isSetup = false;
 
-    private Dictionary<string, Task<List<IntVec2>?>> pathRequests;
+    private ConcurrentDictionary<string, (Task<List<IntVec2>?>, CancellationTokenSource)> pathRequests;
 
     public Pathfinder(int width, int height) {
         cols = width;
         rows = height;
         
         tileGrid = new Tile[cols, rows];
-        pathRequests = new Dictionary<string, Task<List<IntVec2>?>>();
+        pathRequests = new ();
         
         // Populate connections
         for (var i = 0; i < width; i++) {
@@ -47,22 +48,31 @@ public class Pathfinder {
         
         isSetup = true;
     }
+
+    public void Reset() {
+        tileGrid = null;
+        pathRequests.Clear();
+        isSetup  = false;
+    }
     
-    public Task<List<IntVec2>?>? RequestPath(IntVec2 start, IntVec2 end, AccessibilityType accessibility) {
+    public (Task<List<IntVec2>?>, CancellationTokenSource)? RequestPath(IntVec2 start, IntVec2 end, AccessibilityType accessibility) {
         if (!isSetup) return null;
         
         var key = $"{start.X},{start.Y},{end.X},{end.Y}";
         if (pathRequests.ContainsKey(key)) {
             return pathRequests[key];
         }
-        
+
+        var cancel = new CancellationTokenSource();
+        var token  = cancel.Token;
         var task = Task.Run(() => {
+            if (!isSetup) return null;
             var path = GetPath(start, end, accessibility);
-            pathRequests.Remove(key);
+            pathRequests.TryRemove(key, out _);
             return path;
-        });
-        pathRequests.Add(key, task);
-        return task;
+        }, token);
+        pathRequests[key] = (task, cancel);
+        return (task, cancel);
     }
     
     // https://www.geeksforgeeks.org/a-search-algorithm/

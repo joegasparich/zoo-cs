@@ -25,7 +25,7 @@ public class FootPath : ISerialisable {
     public bool Exists => Data != null;
 
     public void Serialise() {
-        Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
+        Find.SaveManager.ArchiveValue("pathId",         Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
         Find.SaveManager.ArchiveValue("pos",            ref Pos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
     }

@@ -3,9 +3,11 @@
     "id": "BaseAnimal",
     "abstract": true,
     "components": [
-        { 
-            "compClass":  "ElevationComponent"
-        },
+        { "compClass": "PhysicsComponent" },
+        { "compClass": "ElevationComponent" },
+        { "compClass": "PathFollowComponent" },
+        { "compClass": "MoveComponent" },
+        { "compClass": "BehaviourComponent" },
         {
             "dataClass": "NeedsComponentData",
             "needs": [

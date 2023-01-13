@@ -13,11 +13,15 @@ public class PathFollowComponent : InputComponent {
     public AccessibilityType AccessibilityType = AccessibilityType.NoWater;
     
     // State
-    private   Vector2?              destination;
-    private   List<IntVec2>?        path;
-    private   Task<List<IntVec2>?>? pathRequest;
-    private   string                placeSolidHandle;
-    protected bool                  pathCompleted;
+    private   IntVec2?                destination;
+    private   List<IntVec2>?          path;
+    private   Task<List<IntVec2>?>?   pathRequest;
+    private   CancellationTokenSource cancelPathRequest;
+    private   string                  placeSolidHandle;
+    protected bool                    pathCompleted;
+    
+    // Properties
+    public bool HasPath => path != null;
 
     public PathFollowComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
@@ -34,6 +38,9 @@ public class PathFollowComponent : InputComponent {
         // TODO (optimisation): Avoid allocating every time this event goes off
         var affectedTiles = (List<IntVec2>)data;
 
+        if (affectedTiles.Contains(destination.Value)) {
+            ResetPath();
+        }
         if (path.Any(tile => affectedTiles.Contains(tile))) {
             PathTo(path.Last());
         }
@@ -41,6 +48,7 @@ public class PathFollowComponent : InputComponent {
 
     public override void End() {
         Messenger.Off(EventType.PlaceSolid, placeSolidHandle);
+        cancelPathRequest?.Cancel();
     }
 
     public override void Update() {
@@ -69,16 +77,23 @@ public class PathFollowComponent : InputComponent {
         return true;
     }
 
-    public virtual void PathTo(Vector2 targetPos) {
+    public virtual bool PathTo(Vector2 targetPos) {
         ResetPath();
 
         if (entity.Pos.Floor() == targetPos.Floor()) {
             pathCompleted = true;
-            return;
+            return true;
+        }
+        if (entity.Pos.Floor().GetArea() != targetPos.Floor().GetArea()) {
+            Debug.Warn($"Pather {entity.Id} tried to path outside of area");
+            pathCompleted = true;
+            return false;
         }
 
-        destination = targetPos;
-        pathRequest    = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), targetPos.Floor(), AccessibilityType);
+        destination                      = targetPos.Floor();
+        (pathRequest, cancelPathRequest) = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), destination.Value, AccessibilityType) ?? (null, default);
+
+        return true;
     }
 
     private void CheckPathRequest() {
@@ -100,6 +115,7 @@ public class PathFollowComponent : InputComponent {
         path           = null;
         pathCompleted  = false;
         destination = null;
+        cancelPathRequest?.Cancel();
     }
     
     public virtual bool ReachedDestination() {
