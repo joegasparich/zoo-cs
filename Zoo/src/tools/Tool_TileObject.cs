@@ -54,6 +54,12 @@ public class Tool_TileObject : Tool {
             evt.Consume();
         }
 
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentObject != null) {
+            SetObject(null);
+            evt.Consume();
+            return;
+        }
+
         if (currentObject.CanRotate) {
             // TODO: make sure these are rotating the right way
             if (evt.inputDown == InputType.RotateCounterClockwise) {

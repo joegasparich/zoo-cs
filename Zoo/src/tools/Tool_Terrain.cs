@@ -62,6 +62,13 @@ public class Tool_Terrain : Tool {
             
             evt.Consume();
         }
+        
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentTerrain != null) {
+            SetTerrain(null);
+            evt.Consume();
+            return;
+        }
+
 
         if (evt.inputDown == InputType.DecreaseBrushSize) {
             radius = Math.Max(RadiusMin, radius - RadiusStep);

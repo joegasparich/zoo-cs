@@ -1,0 +1,24 @@
+{
+    "class": "ObjectDef",
+    "id": "WaterBowl",
+    "name": "water bowl",
+    "inherits": "BaseConsumable",
+    "components": [
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/objects/consumables/water_bowl.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            }
+        },
+        {
+            "dataClass": "ConsumableComponentData",
+            "need": "Thirst",
+            "quantityConsumedPerTick": 0.2,
+            "maxQuantity": 500
+        }
+    ]
+}

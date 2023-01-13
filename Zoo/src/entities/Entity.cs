@@ -8,7 +8,8 @@ namespace Zoo.entities;
 
 public enum EntityTags {
     Animal,
-    TileObject
+    TileObject,
+    Consumable
 }
 
 public class Entity : ISerialisable {

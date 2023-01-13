@@ -1,0 +1,24 @@
+{
+    "class": "ObjectDef",
+    "id": "Hay",
+    "name": "hay",
+    "inherits": "BaseConsumable",
+    "components": [
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/objects/consumables/hay.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            }
+        },
+        {
+            "dataClass": "ConsumableComponentData",
+            "need": "Hunger",
+            "quantityConsumedPerTick": 0.2,
+            "maxQuantity": 500
+        }
+    ]
+}

@@ -46,10 +46,16 @@ public class Tool_Animal : Tool {
             
             evt.Consume();
         }
+        
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentAnimal != null) {
+            SetAnimal(null);
+            evt.Consume();
+        }
+
     }
 
     public override void OnGUI() {
-        Find.UI.DoImmediateWindow("immObjectPanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
+        Find.UI.DoImmediateWindow("immAnimalPanel", new Rectangle(10, 60, 200, ButtonSize + GUI.GapSmall * 2), inRect => {
             var i = 0;
             foreach (var animal in allAnimals) {
                 // TODO: Wrap

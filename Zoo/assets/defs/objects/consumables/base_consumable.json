@@ -1,0 +1,13 @@
+{
+    "class": "ObjectDef",
+    "id": "BaseConsumable",
+    "inherits": "BaseObject",
+    "abstract": true,
+    "solid": false,
+    "canPlaceOnSlopes": true,
+    "canPlaceInWater": false,
+    "type": "consumable",
+    "tags": [
+        "Consumable"
+    ]
+}

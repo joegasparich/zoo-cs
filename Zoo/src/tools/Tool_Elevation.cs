@@ -57,6 +57,13 @@ public class Tool_Elevation : Tool {
             
             evt.Consume();
         }
+
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentElevation != null) {
+            SetElevation(null);
+            evt.Consume();
+            return;
+        }
+
         
         if (evt.inputDown == InputType.DecreaseBrushSize) {
             radius       = Math.Max(RadiusMin, radius - RadiusStep);

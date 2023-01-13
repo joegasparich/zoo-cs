@@ -77,6 +77,12 @@ public class Tool_Wall : Tool {
 
             evt.Consume();
         }
+        
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentWall != null) {
+            SetWall(null);
+            evt.Consume();
+        }
+
     }
 
     public override void Update() {

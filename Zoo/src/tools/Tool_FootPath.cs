@@ -70,6 +70,12 @@ public class Tool_FootPath : Tool {
 
             evt.Consume();
         }
+        
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentFootPath != null) {
+            SetFootPath(null);
+            evt.Consume();
+        }
+
     }
 
     public override void Update() {

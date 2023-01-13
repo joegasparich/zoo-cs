@@ -77,6 +77,8 @@ public class ToolGhost {
     }
 
     public void Render() {
+        if (!Visible) return;
+        
         switch (Type) {
             case GhostType.Sprite:
                 RenderSprite();
