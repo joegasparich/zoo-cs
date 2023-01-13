@@ -221,6 +221,10 @@ public class World : ISerialisable {
         
         return accessibilityGrids[type][tile.X][tile.Y];
     }
+
+    public bool IsTileWalkable(IntVec2 tile, AccessibilityType type) {
+        return GetTileCost(tile, type) != (int)TileCost.None;
+    }
     
     public bool IsPositionInMap(Vector2 pos) {
         return pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;

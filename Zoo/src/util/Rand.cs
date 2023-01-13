@@ -1,9 +1,15 @@
 ﻿namespace Zoo.util; 
 
 public class Rand {
+    /// <summary>
+    /// Generates a random int between min (inclusive) and max (exclusive)
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
     public static int randInt(int min, int max) {
         Random rand = new Random();
-        int randomNum = rand.Next((max - min) + 1) + min;
+        int randomNum = rand.Next((max - min)) + min;
         return randomNum;
     }
     
