@@ -12,6 +12,8 @@ public class SceneManager {
             Debug.Log($"Stopping scene: {currentScene.Name}");
             currentScene.Stop();
         }
+
+        Find.UI.CloseAllWindows();
         
         currentScene = scene;
         currentScene.Start();

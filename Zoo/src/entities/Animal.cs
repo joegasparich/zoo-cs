@@ -1,4 +1,5 @@
 using System.Numerics;
+using Zoo.ai;
 using Zoo.defs;
 using Zoo.ui;
 using Zoo.util;
@@ -8,6 +9,7 @@ namespace Zoo.entities;
 public class Animal : Actor {
     // Properties
     public override AnimalDef Def => (AnimalDef)base.Def;
+    public bool IsAsleep => GetComponent<AnimalBehaviourComponent>().CurrentBehaviour is SleepBehaviour;
 
     public Animal(Vector2 pos, AnimalDef def) : base(pos, def) {}
 

@@ -16,6 +16,10 @@ public class IdleBehaviour : Behaviour {
 
     public override void Update() {
         base.Update();
+        
+        if (Pather.ReachedDestination()) {
+            completed = true;
+        }
 
         if (wanderTile == null || !Pather.HasPath) {
             wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Area, actor.Pos.Floor(), 5, actor.Accessibility);
@@ -24,10 +28,6 @@ public class IdleBehaviour : Behaviour {
                 if (!Pather.PathTo(wanderTile.Value)) 
                     wanderTile = null;
             }
-        }
-        
-        if (Pather.ReachedDestination()) {
-            wanderTile = null;
         }
     }
 

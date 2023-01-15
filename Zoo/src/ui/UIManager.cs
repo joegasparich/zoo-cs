@@ -149,6 +149,14 @@ public class UIManager {
         openWindowMap.Remove(id);
         windowsToClose.Add(id);
     }
+    
+    public void CloseAllWindows() {
+        foreach (var window in windowStack) {
+            window.OnClose();
+        }
+        windowStack.Clear();
+        openWindowMap.Clear();
+    }
 
     public void BringWindowToFront(string id) {
         var index = windowStack.FindIndex(window => window.Id == id);

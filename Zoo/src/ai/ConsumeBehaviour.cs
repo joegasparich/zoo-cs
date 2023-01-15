@@ -19,8 +19,10 @@ public class ConsumeBehaviour : Behaviour {
     private ConsumableComponent? Consumable => consumable != null ? consumable.GetComponent<ConsumableComponent>() : null;
     
     public ConsumeBehaviour() {}
-    public ConsumeBehaviour(Actor actor) : base(actor) {
+    public ConsumeBehaviour(Actor actor, NeedDef need) : base(actor) {
         Debug.Assert(Needs != null, "Consume behaviour requires the actor to have a needs component");
+        
+        Need = need;
     }
 
     public override void Update() {
@@ -30,7 +32,7 @@ public class ConsumeBehaviour : Behaviour {
             consumable = GetClosestConsumableOfType(Need.Id);
         } else {
             if (consumable.Despawned) {
-                consumable = null;
+                completed = true;
                 return;
             }
             
@@ -40,6 +42,11 @@ public class ConsumeBehaviour : Behaviour {
 
             if (CanConsume) {
                 Needs.ModifyNeed(Consumable.Data.Need.Def.Id, Consumable.Consume());
+                
+                if (Needs.Needs[Consumable.Data.Need.Def.Id].Full) {
+                    completed = true;
+                    return;
+                }
             }
         }
 

@@ -50,4 +50,6 @@ public static class TerrainDefOf {
 [DefOf]
 public static class NeedDefOf {
     public static NeedDef Hunger;
+    public static NeedDef Thirst;
+    public static NeedDef Energy;
 }

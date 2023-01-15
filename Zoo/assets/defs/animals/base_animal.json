@@ -7,7 +7,7 @@
         { "compClass": "ElevationComponent" },
         { "compClass": "PathFollowComponent" },
         { "compClass": "MoveComponent" },
-        { "compClass": "BehaviourComponent" },
+        { "compClass": "AnimalBehaviourComponent" },
         {
             "dataClass": "NeedsComponentData",
             "needs": [

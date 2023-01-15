@@ -5,9 +5,6 @@ using Zoo.util;
 namespace Zoo.entities;
 
 public class Need {
-    // Constants
-    public const float MaxNeed = 100;
-    
     // Config
     public DefRef<NeedDef> Def;
 
@@ -15,8 +12,9 @@ public class Need {
     public float Value;
 
     public Need() {
-        Value = MaxNeed;
+        Value = 1;
     }
+    public bool Full => Value >= 1;
 }
 
 public class NeedsComponentData : ComponentData {
@@ -40,10 +38,6 @@ public class NeedsComponent : Component {
 
     public override void Update() {
         foreach (var need in Needs.Values) {
-            if (need.Value > Need.MaxNeed) {
-                need.Value = Need.MaxNeed;
-            }
-            
             need.Value += need.Def.Def.ChangePerTick;
         }
     }
@@ -54,6 +48,10 @@ public class NeedsComponent : Component {
             return;
         }
         Needs[defId].Value += amount;
+        
+        if (Needs[defId].Value > 1) {
+            Needs[defId].Value = 1;
+        }
     }
 
     public override InfoTab? GetInfoTab() {
@@ -62,7 +60,7 @@ public class NeedsComponent : Component {
             listing.Header("Needs");
             
             foreach (var need in Needs.Values) {
-                listing.Label($"{need.Def.Def.Name}: {(need.Value / Need.MaxNeed).ToStringPercent(1)}");
+                listing.Label($"{need.Def.Def.Name}: {(need.Value).ToStringPercent(1)}");
             }
         });
     }
