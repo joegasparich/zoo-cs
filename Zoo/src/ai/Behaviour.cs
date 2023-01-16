@@ -1,6 +1,6 @@
 using Zoo.entities;
 
-namespace Zoo.ai; 
+namespace Zoo.ai;
 
 public abstract class Behaviour : ISerialisable {
     // References
@@ -17,7 +17,7 @@ public abstract class Behaviour : ISerialisable {
     public Behaviour(Actor actor) {
         this.actor = actor;
     }
-    
+
     public virtual void Start()     { }
     public virtual void OnComplete()       { }
     public virtual void OnExpire()         { }

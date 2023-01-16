@@ -15,5 +15,7 @@ public abstract class Actor : Entity {
     public          Area              Area          => Find.World.Areas.GetAreaAtTile(Pos.Floor());
 
     protected Actor(Vector2 pos, EntityDef? def) : base(pos, def) {}
-    
+
+    public Need? GetNeed(NeedDef def) => GetComponent<NeedsComponent>()?.Needs[def.Id];
+
 }
