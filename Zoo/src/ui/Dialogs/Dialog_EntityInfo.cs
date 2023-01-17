@@ -13,7 +13,7 @@ public class InfoTab {
     }
 }
 
-public class Dialog_Info : Dialog {
+public class Dialog_EntityInfo : Dialog {
     // Constants
     private const           int       PanelWidth  = 300;
     private const           int       PanelHeight = 300;
@@ -28,7 +28,7 @@ public class Dialog_Info : Dialog {
     private List<InfoTab> tabs;
     private int           currentTabIndex = 0;
     
-    public Dialog_Info(Entity entity) : base(Dimensions) {
+    public Dialog_EntityInfo(Entity entity) : base(Dimensions) {
         ShowCloseX          = true;
         DismissOnRightClick = true;
         Draggable           = true;
@@ -55,9 +55,6 @@ public class Dialog_Info : Dialog {
 
     public override void DoWindowContents() {
         base.DoWindowContents();
-
-        var indent = GUI.GapSmall;
-        var curY = 0;
 
         if (tabs.NullOrEmpty()) return;
         

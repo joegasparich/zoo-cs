@@ -106,7 +106,7 @@ public class Entity : ISerialisable {
         
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT && Find.Renderer.GetPickIdAtPos(evt.mousePos) == Id) {
             if (!Find.UI.IsWindowOpen(infoDialogId)) {
-                infoDialogId = Find.UI.PushWindow(new Dialog_Info(this));
+                infoDialogId = Find.UI.PushWindow(new Dialog_EntityInfo(this));
             }
                 
             evt.Consume();

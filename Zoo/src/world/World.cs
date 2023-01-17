@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using Zoo.entities;
+using Zoo.ui;
 using Zoo.util;
 
 namespace Zoo.world;
@@ -124,6 +125,16 @@ public class World : ISerialisable {
         if (DebugSettings.ElevationGrid) Elevation.RenderDebug();
         if (DebugSettings.AreaGrid) Areas.RenderDebugAreaGrid();
         if (DebugSettings.PathfindingGrid) Pathfinder.DrawDebugGrid();
+    }
+
+    public void OnInput(InputEvent evt) {
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
+            var area = Areas.GetAreaAtTile(evt.mouseWorldPos.Floor());
+            if (area == null) return;
+            var exhibit = Exhibits.GetExhibitByArea(area);
+            if (exhibit == null) return;
+            Find.UI.PushWindow(new Dialog_ExhibitInfo(exhibit));
+        }
     }
     
     public void RegisterTileObject(TileObject tileObject) {
@@ -290,12 +301,16 @@ public class World : ISerialisable {
         
         if (entitiesByTileStatic.ContainsKey(tile.ToString())) {
             foreach (var entity in entitiesByTileStatic[tile.ToString()]) {
+                if (entity.Despawned) continue;
+                
                 yield return entity;
             }
         }
 
         if (entitiesByTileDynamic.ContainsKey(tile.ToString())) {
             foreach (var entity in entitiesByTileDynamic[tile.ToString()]) {
+                if (entity.Despawned) continue;
+                
                 yield return entity;
             }
         }

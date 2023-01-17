@@ -108,6 +108,7 @@ public class AssetManager {
                         }
 
                         dataQueue.Enqueue(data);
+                        continue;
                     }
                 }
                 

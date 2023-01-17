@@ -72,7 +72,8 @@ public class Zoo : ISerialisable {
     }
 
     public void OnInput(InputEvent evt) {
-        Tools.OnInput(evt);
+        if (!evt.consumed) Tools.OnInput(evt);
+        if (!evt.consumed) World.OnInput(evt);
     }
 
     public void Serialise() {

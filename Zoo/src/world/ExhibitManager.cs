@@ -76,6 +76,8 @@ public class ExhibitManager : ISerialisable {
         
         var name = Guid.NewGuid().ToString(); // TODO: Generate a cool name
         exhibits.Add(area.Id, new Exhibit(name, area));
+        
+        Debug.Log($"Registered exhibit with name: {name}");
 
         return exhibits[area.Id];
     }
@@ -84,6 +86,8 @@ public class ExhibitManager : ISerialisable {
         if (!exhibits.ContainsKey(exhibit.Area.Id)) return;
         
         exhibits.Remove(exhibit.Area.Id);
+        
+        Debug.Log($"Exhibit {exhibit.Name} unregistered");
     }
 
     public Exhibit? GetExhibitByArea(Area area) {
