@@ -21,5 +21,6 @@ public abstract class Scene : ISerialisable {
         Game.ClearEntities();
     }
     
-    public virtual void Serialise()             {}
+    public virtual void Serialise() {}
+    public virtual void PostLoad() {}
 }

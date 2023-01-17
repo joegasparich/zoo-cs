@@ -6,7 +6,7 @@ namespace Zoo.world;
 
 public class AreaManager {
     // Constants
-    private const string ZooArea = "Zoo;";
+    public const string ZooArea = "Zoo;";
     
     // State
     private Dictionary<string, Area> areas = new();
@@ -39,7 +39,7 @@ public class AreaManager {
         isSetup = false;
     }
 
-    public void RegenerateAreas(IntVec2 startTile) {
+    private void RegenerateAreas(IntVec2 startTile) {
         // Form areas
         FormZooArea(startTile);
         
@@ -71,6 +71,10 @@ public class AreaManager {
             areaA.AddAreaConnection(areaB, wall);
             areaB.AddAreaConnection(areaA, wall);
         }
+        
+        foreach (var area in areas.Values) {
+            Messenger.Fire(EventType.AreaCreated, area);
+        }
     }
 
     public void FormZooArea(IntVec2 entrance) {
@@ -80,6 +84,8 @@ public class AreaManager {
         foreach (var tile in zooArea.Tiles) {
             tileAreaMap.Add(tile.ToString(), zooArea);
         }
+        
+        Messenger.Fire(EventType.AreaCreated, zooArea);
     }
 
     public void FormAreasAtWall(Wall placedWall) {
@@ -106,18 +112,25 @@ public class AreaManager {
         
         var newArea = new Area(Guid.NewGuid().ToString());
 
-        var larger = areaATiles.Count >= areaBTiles.Count ? areaATiles : areaBTiles;
-        var smaller = areaATiles.Count < areaBTiles.Count ? areaATiles : areaBTiles;
-
         // Old area gets the larger area (maintains zoo area)
-        oldArea.Tiles = larger;
-        foreach (var tile in larger) {
+        var oldTiles = areaATiles.Count >= areaBTiles.Count ? areaATiles : areaBTiles;
+        var newTiles = areaATiles.Count < areaBTiles.Count ? areaATiles : areaBTiles;
+
+        // Ensure that zoo entrance is in zoo area
+        if (newTiles.Contains(Find.Zoo.Entrance))
+            (oldTiles, newTiles) = (newTiles, oldTiles);
+
+        oldArea.Tiles = oldTiles;
+        foreach (var tile in oldTiles) {
             tileAreaMap[tile.ToString()] = oldArea;
         }
-        newArea.Tiles = smaller;
-        foreach (var tile in smaller) {
+        newArea.Tiles = newTiles;
+        foreach (var tile in newTiles) {
             tileAreaMap[tile.ToString()] = newArea;
         }
+        
+        Messenger.Fire(EventType.AreaUpdated, oldArea);
+        Messenger.Fire(EventType.AreaCreated, newArea);
         
         Debug.Log($"Registered new area with size {newArea.Tiles.Count}");
         
@@ -152,6 +165,9 @@ public class AreaManager {
             }
         }
         areas.Remove(areaB.Id);
+        
+        Messenger.Fire(EventType.AreaUpdated, areaA);
+        Messenger.Fire(EventType.AreaRemoved, areaB);
     }
     
     public List<Area> GetAreas() {

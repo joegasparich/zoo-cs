@@ -78,4 +78,7 @@ public class Zoo : ISerialisable {
     public void Serialise() {
         Find.SaveManager.ArchiveDeep("world", World);
     }
+    public void PostLoad() {
+        World.PostLoad();
+    }
 }

@@ -25,7 +25,7 @@ public class FootPath : ISerialisable {
     public bool Exists => Data != null;
 
     public void Serialise() {
-        Find.SaveManager.ArchiveValue("pathId",         Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
+        Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
         Find.SaveManager.ArchiveValue("pos",            ref Pos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
     }
@@ -150,7 +150,7 @@ public class FootPathGrid : ISerialisable {
         if (Find.SaveManager.Mode == SerialiseMode.Loading)
             Setup();
         
-        Find.SaveManager.ArchiveCollection("walls",
+        Find.SaveManager.ArchiveCollection("paths",
             GetAllFootPaths(),
             paths => paths.Select(pathData => GetFootPathAtTile(pathData["pos"].Value<IntVec2>()))
         );

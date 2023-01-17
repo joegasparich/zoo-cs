@@ -2,7 +2,12 @@
 
 public enum EventType {
     ElevationUpdated,
-    PlaceSolid
+    PlaceSolid,
+    AreaCreated,
+    AreaUpdated,
+    AreaRemoved,
+    AnimalPlaced,
+    AnimalRemoved,
 }
 
 public static class Messenger {

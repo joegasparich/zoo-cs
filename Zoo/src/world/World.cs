@@ -46,12 +46,13 @@ public class World : ISerialisable {
     private readonly Dictionary<AccessibilityType, int[][]> accessibilityGrids    = new();
 
     // Grids
-    public ElevationGrid Elevation  { get; }
-    public TerrainGrid   Terrain    { get; }
-    public WallGrid      Walls      { get; }
-    public FootPathGrid  FootPaths  { get; }
-    public AreaManager   Areas      { get; }
-    public Pathfinder    Pathfinder { get; private set; }
+    public ElevationGrid  Elevation  { get; }
+    public TerrainGrid    Terrain    { get; }
+    public WallGrid       Walls      { get; }
+    public FootPathGrid   FootPaths  { get; }
+    public AreaManager    Areas      { get; }
+    public ExhibitManager Exhibits   { get; }
+    public Pathfinder     Pathfinder { get; private set; }
 
     private bool isSetup = false;
 
@@ -64,6 +65,7 @@ public class World : ISerialisable {
         Walls     = new WallGrid(Width, Height);
         FootPaths = new FootPathGrid(Width, Height);
         Areas     = new AreaManager();
+        Exhibits  = new ExhibitManager();
     }
 
     public void Setup() {
@@ -74,6 +76,7 @@ public class World : ISerialisable {
         Walls.Setup();
         FootPaths.Setup();
         Areas.Setup(Find.Zoo.Entrance);
+        Exhibits.Setup();
         Pathfinder = new Pathfinder(Width, Height);
 
         PopulateAccessibilityGrids();
@@ -89,6 +92,7 @@ public class World : ISerialisable {
         Walls.Reset();
         FootPaths.Reset();
         Areas.Reset();
+        Exhibits.Reset();
         Pathfinder.Reset();
 
         entitiesByTileDynamic.Clear();
@@ -348,5 +352,11 @@ public class World : ISerialisable {
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             Areas.Setup(Find.Zoo.Entrance);
         }
+        
+        Find.SaveManager.ArchiveDeep("exhibits", Exhibits);
+    }
+
+    public void PostLoad() {
+        Exhibits.UpdateAllExhibitCaches();
     }
 }

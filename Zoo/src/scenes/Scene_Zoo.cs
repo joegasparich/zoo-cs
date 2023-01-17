@@ -86,4 +86,8 @@ public class Scene_Zoo : Scene {
     public override void Serialise() {
         Find.SaveManager.ArchiveDeep("zoo", Zoo);
     }
+
+    public override void PostLoad() {
+        Zoo.PostLoad();
+    }
 }

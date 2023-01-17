@@ -10,8 +10,9 @@ public class Area {
     public Color  Colour { get; set; }
 
     // State
-    public List<IntVec2>                        Tiles             { get; set; } = new();
-    public Dictionary<Area, HashSet<Wall>>      ConnectedAreas    { get; }      = new();
+    public List<IntVec2>                   Tiles          { get; set; } = new();
+    public Dictionary<Area, HashSet<Wall>> ConnectedAreas { get; }      = new();
+    public bool                            IsZooArea      => Id == AreaManager.ZooArea;
 
     public Area(string id) {
         Id             = id;

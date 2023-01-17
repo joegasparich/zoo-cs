@@ -36,7 +36,7 @@ public class Wall : ISerialisable {
     public bool        Exists      => Data != null;
 
     public void Serialise() {
-        Find.SaveManager.ArchiveValue("wallId", Data?.Id, id => Data = Find.AssetManager.GetDef<WallDef>(id));
+        Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.AssetManager.GetDef<WallDef>(id));
         Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);

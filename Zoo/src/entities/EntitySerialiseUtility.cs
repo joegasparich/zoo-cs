@@ -59,7 +59,7 @@ public static class EntitySerialiseUtility {
 
         foreach (var entityData in data as JArray) {
             Find.SaveManager.CurrentSaveNode = entityData as JObject;
-            Type componentType = Type.GetType(entityData["type"].ToString());
+            Type componentType = Type.GetType(entityData["type"].Value<string>());
             if (entity.HasComponent(componentType)) {
                 var component = entity.GetComponent(componentType);
                 component.Serialise();

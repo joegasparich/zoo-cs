@@ -184,7 +184,7 @@ public class TerrainGrid : ISerialisable {
         Find.SaveManager.ArchiveValue("rows", ref rows);
 
         Find.SaveManager.ArchiveValue("data", 
-            chunkGrid?.Select(row => row.Select(chunk => chunk.Save()).ToArray()).ToArray(), 
+            () => chunkGrid.Select(row => row.Select(chunk => chunk.Save()).ToArray()).ToArray(), 
             chunkData => Setup(chunkData)
         );
     }

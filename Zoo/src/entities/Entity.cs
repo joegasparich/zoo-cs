@@ -43,6 +43,8 @@ public class Entity : ISerialisable {
     public virtual void Setup() {
         if (def.IsStatic)
             Find.World.OccupyTileStatic(this);
+        else
+            Find.World.OccupyTileDynamic(this);
         
         foreach (var component in components.Values) {
             component.Start();
@@ -186,7 +188,7 @@ public class Entity : ISerialisable {
     }
 
     public virtual void Serialise() {
-        Find.SaveManager.ArchiveValue("type", GetType().ToString(), type => {});
+        Find.SaveManager.ArchiveValue("type", () => GetType().ToString(), null);
         Find.SaveManager.ArchiveValue("id",   ref Id);
         Find.SaveManager.ArchiveValue("pos",  ref Pos);
         
@@ -196,7 +198,7 @@ public class Entity : ISerialisable {
         );
         
         Find.SaveManager.ArchiveValue("defId",
-            def.Id,
+            () => def.Id,
             id => def = Find.AssetManager.GetDef(id) as EntityDef
         );
     }

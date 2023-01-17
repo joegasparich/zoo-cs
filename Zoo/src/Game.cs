@@ -286,5 +286,8 @@ public static class Game {
             () => EntitySerialiseUtility.SaveEntities(entities.Values),
             data => EntitySerialiseUtility.LoadEntities(data as JArray)
         );
+
+        if (SaveManager.Mode == SerialiseMode.Loading)
+            SceneManager.GetCurrentScene().PostLoad();
     }
 }

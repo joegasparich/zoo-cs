@@ -128,10 +128,10 @@ public class SaveManager {
         }
     }
 
-    public void ArchiveValue<T>(string label, T get, Action<T?>? set) {
+    public void ArchiveValue<T>(string label, Func<T> get, Action<T?>? set) {
         switch (Mode) {
             case SerialiseMode.Saving: {
-                var value = get;
+                var value = get();
                 ArchiveValue(label, ref value);
                 break;
             }

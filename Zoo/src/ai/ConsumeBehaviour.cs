@@ -74,6 +74,6 @@ public class ConsumeBehaviour : Behaviour {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.ArchiveValue("consumable", consumable.Id, id => Game.GetEntityById(id));
+        Find.SaveManager.ArchiveValue("consumable", () => consumable.Id, id => consumable = Game.GetEntityById(id));
     }
 }
