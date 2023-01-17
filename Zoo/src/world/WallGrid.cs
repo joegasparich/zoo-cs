@@ -333,15 +333,17 @@ public class WallGrid : ISerialisable {
         };
     }
 
-    public Wall[] GetWallsSurroundingPoint(IntVec2 point) {
-        if (!Find.World.IsPositionInMap(point)) return Array.Empty<Wall>();
+    public List<Wall> GetWallsSurroundingPoint(IntVec2 point) {
+        var walls = new List<Wall>();
 
-        return new[] {
-            GetWallAtTile(point,               Side.North)!,
-            GetWallAtTile(point,               Side.West)!,
-            GetWallAtTile(point - IntVec2.One, Side.South)!,
-            GetWallAtTile(point - IntVec2.One, Side.East)!
-        };
+        if (!IsWallGridPosInMap(point)) return walls;
+
+        if (GetWallAtTile(point,               Side.North) != null) walls.Add(GetWallAtTile(point,               Side.North)!);
+        if (GetWallAtTile(point,               Side.West)  != null) walls.Add(GetWallAtTile(point,               Side.West)!);
+        if (GetWallAtTile(point - IntVec2.One, Side.South) != null) walls.Add(GetWallAtTile(point - IntVec2.One, Side.South)!);
+        if (GetWallAtTile(point - IntVec2.One, Side.East)  != null) walls.Add(GetWallAtTile(point - IntVec2.One, Side.East)!);
+
+        return walls;
     }
 
     public bool IsWallSloped(Wall wall) {
