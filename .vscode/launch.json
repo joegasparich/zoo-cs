@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Zoo/bin/Debug/net6.0/Zoo.dll",
+            "program": "${workspaceFolder}/Zoo/bin/Debug/net7.0/Zoo.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Zoo",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
