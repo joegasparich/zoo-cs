@@ -82,4 +82,8 @@ public class Camera {
         camera.fovy = Game.ScreenHeight / zoom;
         camera.target = camera.position with { Z = 0 };
     }
+
+    public void OnScreenResized() {
+        camera.fovy = Game.ScreenHeight / zoom;
+    }
 }

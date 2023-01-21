@@ -16,8 +16,8 @@ public static class Game {
     // Constants
     // TODO: Config options
     private const int MsPerUpdate  = 10;
-    public const  int ScreenWidth  = 1280;
-    public const  int ScreenHeight = 720;
+    private const int DefaultScreenWidth  = 1280;
+    private const int DefaultScreenHeight = 720;
 
     // Managers
     public static InputManager Input        = new();
@@ -28,9 +28,9 @@ public static class Game {
     public static UIManager    UI           = new();
     
     // Collections
-    private static Dictionary<int, Entity>              entities         = new();
-    private static List<Entity>                         entitiesToAdd    = new();
-    private static List<Entity>                         entitiesToRemove = new();
+    private static Dictionary<int, Entity>             entities         = new();
+    private static List<Entity>                        entitiesToAdd    = new();
+    private static List<Entity>                        entitiesToRemove = new();
     private static Dictionary<EntityTag, List<Entity>> entitiesByTag    = new();
 
     // State
@@ -43,6 +43,8 @@ public static class Game {
     // Properties
     public static int Ticks => ticksSinceGameStart;
     public static int Frames => framesSinceGameStart;
+    public static int ScreenWidth => Raylib.GetScreenWidth();
+    public static int ScreenHeight => Raylib.GetScreenHeight();
     
     public static void Run() {
         Debug.Log("Application Started");
@@ -55,7 +57,8 @@ public static class Game {
     }
 
     private static void Init() {
-        Raylib.InitWindow(ScreenWidth, ScreenHeight, "Zoo");
+        Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
+        Raylib.InitWindow(DefaultScreenWidth, DefaultScreenHeight, "Zoo");
         Raylib.SetExitKey(KeyboardKey.KEY_NULL);
         
         entitiesByTag[EntityTag.All] = new();
@@ -95,6 +98,10 @@ public static class Game {
             }
             
             lastTime = currentTime;
+            
+            if (Raylib.IsWindowResized()) {
+                OnScreenResized();
+            }
             
             // Do Render
             UI.PreRender();
@@ -191,6 +198,11 @@ public static class Game {
         if (!evt.consumed) Renderer.Camera.OnInput(evt);
         
         UI.PostInput(evt);
+    }
+
+    public static void OnScreenResized() {
+        UI.OnScreenResized();
+        Renderer.OnScreenResized();
     }
 
     public static void OnGUI() {

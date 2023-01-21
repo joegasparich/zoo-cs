@@ -30,6 +30,10 @@ public class Window {
     public virtual void OnInput(InputEvent evt) {
         DoWindowContents();
     }
+
+    public virtual void OnScreenResized(int width, int height) {
+        
+    }
     
     public virtual void OnClose() {}
 
@@ -38,11 +42,11 @@ public class Window {
     }
     
     public float GetWidth() {
-        return AbsRect.width;
+        return Math.Min(AbsRect.width, Game.ScreenWidth - AbsRect.x);
     }
     
     public float GetHeight() {
-        return AbsRect.height;
+        return Math.Min(AbsRect.height, Game.ScreenHeight - AbsRect.y);
     }
 
     public Rectangle GetRect() {

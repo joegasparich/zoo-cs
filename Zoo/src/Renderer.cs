@@ -84,6 +84,13 @@ public class Renderer {
         blits.Clear();
     }
 
+    public void OnScreenResized() {
+        Raylib.UnloadRenderTexture(pickBuffer);
+        pickBuffer = Raylib.LoadRenderTexture(Game.ScreenWidth, Game.ScreenHeight);
+        
+        Camera.OnScreenResized();
+    }
+
     public float GetDepth(float yPos) {
         return Math.Clamp(yPos / World.LargerThanWorld, 0, 1) * -1 + (int)Depth.YSorting;
     }

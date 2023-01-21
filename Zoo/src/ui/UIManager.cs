@@ -135,6 +135,12 @@ public class UIManager {
         windowsToClose.Clear();
     }
 
+    public void OnScreenResized() {
+        foreach (var window in windowStack) {
+            window.OnScreenResized(Game.ScreenWidth, Game.ScreenHeight);
+        }
+    }
+
     public string PushWindow(Window window) {
         windowsToOpen.Add(window);
         openWindowMap.Add(window.Id, window);
