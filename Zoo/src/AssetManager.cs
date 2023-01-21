@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
+using Zoo.util;
 
 namespace Zoo;
 
@@ -33,13 +34,13 @@ public class AssetManager {
     }
 
     private void LoadTextures() {
-        foreach (var path in Directory.EnumerateFiles("assets/textures", "*.*", SearchOption.AllDirectories)) {
+        foreach (var path in FileUtility.GetFiles("assets/textures", "*.*", SearchOption.AllDirectories)) {
             if (!path.EndsWith(".png")) {
                 continue;
             }
 
             try {
-                GetTexture(path.Replace("\\", "/"));
+                GetTexture(path);
             } catch (Exception e) {
                 Debug.Error($"Failed to load texture with path: {path}", e);
                 textureMap.Remove(path);
@@ -50,13 +51,13 @@ public class AssetManager {
     private static Queue<JObject> GetDataQueue() {
         var dataQueue  = new Queue<JObject>();
         
-        foreach (var path in Directory.EnumerateFiles(DefPath, "*.*", SearchOption.AllDirectories)) {
+        foreach (var path in FileUtility.GetFiles(DefPath, "*.*", SearchOption.AllDirectories)) {
             if (!path.EndsWith(".json")) {
                 continue;
             }
 
             try {
-                var json = File.ReadAllText(path.Replace("\\", "/"));
+                var json = File.ReadAllText(path);
                 try {
                     // Try get as list of defs
                     var dataList = JsonConvert.DeserializeObject<List<JObject>>(json);

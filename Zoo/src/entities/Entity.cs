@@ -10,6 +10,7 @@ public enum EntityTag {
     All,
     Animal,
     TileObject,
+    Guest,
     Consumable
 }
 

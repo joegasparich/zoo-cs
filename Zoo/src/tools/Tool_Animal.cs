@@ -65,7 +65,7 @@ public class Tool_Animal : Tool {
                     SetAnimal(animal);
                 
                 // TODO: Write an icon helper for this
-                GUI.DrawSubTexture(buttonRect.ContractedBy(2), animal.GraphicData.Sprite, animal.GraphicData.GetCellBounds(0));
+                GUI.DrawSubTexture(buttonRect.ContractedBy(2), animal.GraphicData.Value.Sprite, animal.GraphicData.Value.GetCellBounds(0));
                 
                 i++;
             }
@@ -87,7 +87,7 @@ public class Tool_Animal : Tool {
         currentAnimal = data;
 
         if (currentAnimal != null) {
-            Ghost.Graphics = data.GraphicData.DeepCopy();
+            Ghost.Graphics = data.GraphicData;
             Ghost.Visible  = true;
         } else {
             Ghost.Visible = false;

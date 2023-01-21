@@ -40,4 +40,10 @@ public static class GenEntity {
 
         return CreateEntity<Animal>(pos, def);
     }
+
+    public static Guest? CreateGuest(Vector2 pos) {
+        var def = Find.AssetManager.GetDef<ActorDef>("Guest");
+
+        return CreateEntity<Guest>(pos, def);
+    }
 }

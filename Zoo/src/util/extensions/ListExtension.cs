@@ -27,6 +27,6 @@ public static class ListExtension {
         return list == null || list.Count == 0;
     }
     public static T RandomElement<T>(this List<T> list) {
-        return list[Rand.randInt(0, list.Count)];
+        return list[Rand.Int(0, list.Count)];
     }
 }

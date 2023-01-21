@@ -1,41 +1,24 @@
 using System.Numerics;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using Raylib_cs;
 using Zoo.util;
 
 namespace Zoo; 
 
-// This class is per objectType so can't be changed on a per object basis
-// Any per object changes need to be sent through the blit params
-public class GraphicData {
+public struct GraphicData {
     // Config
-    public  string    SpritePath;
-    public  Vector2   Origin = Vector2.Zero;
-    public  Vector2   Scale  = Vector2.One;
-    private int       cellWidth;
-    private int       cellHeight;
+    public                 string  SpritePath = "";
+    public                 Vector2 Origin     = Vector2.Zero;
+    public                 Vector2 Scale      = Vector2.One;
+    [JsonProperty] private int     cellWidth  = 0;
+    [JsonProperty] private int     cellHeight = 0;
 
     // Properties
     public Texture2D Sprite     => Find.AssetManager.GetTexture(SpritePath);
     public int       CellWidth  => cellWidth  == 0 ? Sprite.width : cellWidth;
     public int       CellHeight => cellHeight == 0 ? Sprite.height : cellHeight;
 
-    [JsonConstructor]
-    public GraphicData(string spritePath, int cellWidth, int cellHeight) {
-        SpritePath = spritePath;
-        
-        this.cellWidth  = cellWidth;
-        this.cellHeight = cellHeight;
-    }
-
-    public GraphicData DeepCopy()
-    {
-        return new GraphicData(SpritePath, cellWidth, cellHeight)
-        {
-            Origin = Origin,
-            Scale = Scale
-        };
-    }
+    public GraphicData() {}
 
     public void Blit(Vector2 pos, float depth, Color colour, int index = 0, int pickId = 0) {
         var source = GetCellBounds(index);

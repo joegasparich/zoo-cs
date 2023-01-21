@@ -24,6 +24,7 @@ public class Scene_Zoo : Scene {
 
         GenerateOuterWalls();
 
+        GenEntity.CreateGuest(new Vector2(3, 3));
         // var man = new Entity(new Vector2(0, 0));
         // var renderer = man.AddComponent<RenderComponent>();
         // renderer.Graphics.SetSprite(TEXTURES.KEEPER);

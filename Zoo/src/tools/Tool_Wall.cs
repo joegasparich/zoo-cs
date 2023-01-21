@@ -219,7 +219,7 @@ public class Tool_Wall : Tool {
         currentWall = data;
             
         if (currentWall != null) {
-            Ghost.Graphics = data.GraphicData.DeepCopy();
+            Ghost.Graphics = data.GraphicData;
             Ghost.Visible  = true;
         } else {
             Ghost.Visible = false;

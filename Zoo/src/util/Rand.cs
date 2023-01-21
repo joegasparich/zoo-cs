@@ -7,21 +7,29 @@ public class Rand {
     /// <param name="min"></param>
     /// <param name="max"></param>
     /// <returns></returns>
-    public static int randInt(int min, int max) {
+    public static int Int(int min, int max) {
         Random rand = new Random();
         int randomNum = rand.Next((max - min)) + min;
         return randomNum;
     }
     
-    public static byte randByte() {
+    public static byte Byte() {
         Random rand = new Random();
         byte randomNum = (byte)rand.Next(0, 255);
         return randomNum;
     }
     
-    public static float randFloat() {
+    public static float Float(float min, float max) {
         Random rand = new Random();
-        float randomNum = (float)rand.NextDouble();
+        float randomNum = (float)rand.NextDouble() * (max - min) + min;
         return randomNum;
+    }
+
+    public static bool Bool() {
+        return Int(0, 2) == 1;
+    }
+
+    public static bool Chance(float chance) {
+        return Float(0, 1) < chance;
     }
 }

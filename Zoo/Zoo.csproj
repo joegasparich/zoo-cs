@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <Content Include="assets\**\*.*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 

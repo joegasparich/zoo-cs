@@ -16,7 +16,7 @@ public class Area {
 
     public Area(string id) {
         Id             = id;
-        Colour         = new Color(Rand.randByte(), Rand.randByte(), Rand.randByte(), (byte)255);
+        Colour         = new Color(Rand.Byte(), Rand.Byte(), Rand.Byte(), (byte)255);
     }
     
     public void AddAreaConnection(Area area, Wall door) {

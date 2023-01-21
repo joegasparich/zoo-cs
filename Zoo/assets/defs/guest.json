@@ -1,0 +1,27 @@
+﻿{
+    "class": "ActorDef",
+    "id": "Guest",
+    "name": "guest",
+    "components": [
+        { "compClass": "PhysicsComponent" },
+        { "compClass": "ElevationComponent" },
+        { "compClass": "PathFollowComponent" },
+        { "compClass": "MoveComponent" },
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/people/body/body_adult_1.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.7
+                }
+            }
+        },
+        { 
+            "dataClass": "PersonComponentData"
+        }
+    ],
+    "tags": [
+        "Guest"
+    ]
+}

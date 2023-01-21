@@ -87,7 +87,7 @@ public class Tool_TileObject : Tool {
                     SetObject(obj);
                 
                 // TODO: Write an icon helper for this
-                GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.GraphicData.Sprite, obj.GraphicData.GetCellBounds(0));
+                GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.GraphicData.Value.Sprite, obj.GraphicData.Value.GetCellBounds(0));
 
                 i++;
             }
@@ -123,7 +123,7 @@ public class Tool_TileObject : Tool {
         currentObject = data;
 
         if (currentObject != null) {
-            Ghost.Graphics = data.GraphicData.DeepCopy();
+            Ghost.Graphics = data.GraphicData;
             Ghost.Offset   = data.Size / 2f;
             Ghost.Visible  = true;
         } else {
