@@ -16,7 +16,6 @@ public class UIManager {
     private List<Window>               windowsToOpen    = new();
     private HashSet<string>            windowsToClose   = new();
     private HashSet<string>            immediateWindows = new();
-    public  float                      UIScale          = 1f;
 
     private MouseCursor cursor;
     private string      hoveredWindowId;
@@ -26,6 +25,7 @@ public class UIManager {
     // Properties
     public UIEvent   CurrentEvent      { get; private set; }
     public Rectangle CurrentDrawBounds { get; private set; }
+    public float     UIScale           => Game.Settings.UIScale;
 
     public UIManager() {
         CurrentEvent = UIEvent.Draw;

@@ -1,9 +1,16 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.entities;
 using Zoo.ui;
 
 namespace Zoo;
+
+public class GameSettings {
+    public float UIScale = 1f;
+    public int ScreenWidth = 1280;
+    public int ScreenHeight = 720;
+}
 
 public static class Game {
     // Enums
@@ -18,6 +25,9 @@ public static class Game {
     private const int MsPerUpdate  = 10;
     private const int DefaultScreenWidth  = 1280;
     private const int DefaultScreenHeight = 720;
+    private const string SettingsFilePath = "settings.json";
+    
+    public static GameSettings Settings = new();
 
     // Managers
     public static InputManager Input        = new();
@@ -60,6 +70,10 @@ public static class Game {
         Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
         Raylib.InitWindow(DefaultScreenWidth, DefaultScreenHeight, "Zoo");
         Raylib.SetExitKey(KeyboardKey.KEY_NULL);
+
+        LoadSettings();
+        
+        Raylib.SetWindowSize(Settings.ScreenWidth, Settings.ScreenHeight);
         
         entitiesByTag[EntityTag.All] = new();
         
@@ -203,6 +217,10 @@ public static class Game {
     public static void OnScreenResized() {
         UI.OnScreenResized();
         Renderer.OnScreenResized();
+
+        Settings.ScreenWidth = ScreenWidth;
+        Settings.ScreenHeight = ScreenHeight;
+        SaveSettings();
     }
 
     public static void OnGUI() {
@@ -311,5 +329,18 @@ public static class Game {
 
         if (SaveManager.Mode == SerialiseMode.Loading)
             SceneManager.GetCurrentScene().PostLoad();
+    }
+    
+    public static void SaveSettings() {
+        File.WriteAllText(SettingsFilePath, JsonConvert.SerializeObject(Settings, Formatting.Indented));
+    }
+
+    public static void LoadSettings() {
+        if (!File.Exists(SettingsFilePath)) {
+            SaveSettings();
+            return;
+        }
+        
+        Settings = JsonConvert.DeserializeObject<GameSettings>(File.ReadAllText(SettingsFilePath));
     }
 }
