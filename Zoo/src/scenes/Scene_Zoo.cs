@@ -1,6 +1,5 @@
 using System.Numerics;
 using Raylib_cs;
-using Zoo.defs;
 using Zoo.entities;
 using Zoo.util;
 using Zoo.world;
@@ -23,19 +22,6 @@ public class Scene_Zoo : Scene {
         Zoo.Setup();
 
         GenerateOuterWalls();
-
-        var guest = GenEntity.CreateGuest(new Vector2(3, 3));
-        Game.RegisterEntity(guest);
-        // var man = new Entity(new Vector2(0, 0));
-        // var renderer = man.AddComponent<RenderComponent>();
-        // renderer.Graphics.SetSprite(TEXTURES.KEEPER);
-        // var pf = man.AddComponent<AreaPathFollowComponent>();
-        // pf.AccessibilityType = AccessibilityType.NoSolid;
-        // man.AddComponent<PhysicsComponent>();
-        // man.AddComponent<ElevationComponent>();
-        // man.AddComponent<MoveComponent>();
-        // man.AddComponent<TestControllableComponent>();
-        // Game.RegisterEntity(man);
     }
 
     public override void Stop() {
@@ -83,6 +69,9 @@ public class Scene_Zoo : Scene {
             Zoo.World.Walls.PlaceWallAtTile(WallDefOf.IronBarFence, new IntVec2(0,             i), Side.West, true);
             Zoo.World.Walls.PlaceWallAtTile(WallDefOf.IronBarFence, new IntVec2(Zoo.Width - 1, i), Side.East, true);
         }
+        
+        // Entrance
+        Zoo.World.Walls.PlaceDoor(Zoo.World.Walls.GetWallAtTile(Zoo.Entrance, Side.South));
     }
     
     public override void Serialise() {

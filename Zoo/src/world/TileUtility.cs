@@ -1,8 +1,12 @@
-﻿using Zoo.util;
+﻿using System.Numerics;
+using Zoo.util;
 
 namespace Zoo.world; 
 
 public static class TileUtility {
+    public static Vector2 TileCentre(this IntVec2 tile) {
+        return tile + new Vector2(0.5f, 0.5f);
+    }
     public static bool InMap(this IntVec2 tile) {
         return Find.World.IsPositionInMap(tile);
     }

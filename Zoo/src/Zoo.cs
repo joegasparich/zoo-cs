@@ -1,3 +1,5 @@
+using System.Numerics;
+using Zoo.entities;
 using Zoo.tools;
 using Zoo.util;
 using Zoo.world;
@@ -15,6 +17,9 @@ public static class DebugSettings {
 }
 
 public class Zoo : ISerialisable {
+    // Constants
+    private int GuestArrivalInterval = 600; // 10 seconds
+    
     // Config
     public int     Width  = 10;
     public int     Height = 10;
@@ -50,6 +55,11 @@ public class Zoo : ISerialisable {
     public void Update() {
         World.Update();
         Tools.Update();
+        
+        if (Game.Ticks % GuestArrivalInterval == 0) {
+            var guest = GenEntity.CreateGuest(Entrance.TileCentre());
+            Game.RegisterEntity(guest);
+        }
     }
 
     public void PostUpdate() {
