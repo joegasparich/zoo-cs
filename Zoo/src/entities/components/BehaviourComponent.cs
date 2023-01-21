@@ -1,26 +1,40 @@
+﻿using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Zoo.ai;
-using Zoo.defs;
 
-namespace Zoo.entities; 
+namespace Zoo.entities;
 
-public abstract class BehaviourComponent : Component {
+public class BehaviourComponentData : ComponentData {
+    public override Type CompClass => typeof(BehaviourComponent);
+
+    [JsonProperty]
+    private string behaviourGiverClass;
+
+    public Type BehaviourGiverClass;
+
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context) {
+        BehaviourGiverClass = Type.GetType("Zoo.ai." + behaviourGiverClass);
+    }
+}
+
+public class BehaviourComponent : Component {
     // State
     protected Behaviour? currentBehaviour;
-
+    
     // Properties
-    protected override Type[] Dependencies => new[] { typeof(PathFollowComponent) };
-    protected Actor Actor => entity as Actor;
-    public Behaviour CurrentBehaviour => currentBehaviour;
+    public             BehaviourComponentData Data             => (BehaviourComponentData)data;
+    protected override Type[]                      Dependencies     => new[] { typeof(PathFollowComponent) };
+    protected          Actor                       Actor            => entity as Actor;
+    public             Behaviour                   CurrentBehaviour => currentBehaviour;
 
-    public BehaviourComponent(Entity entity, ComponentData? data = null) : base(entity, data) {}
+    public BehaviourComponent(Entity entity, BehaviourComponentData? data) : base(entity, data) {}
 
     public override void Start() {
         base.Start();
         Debug.Assert(entity is Actor, "Non actor entity has behaviour component");
-
-        SetBehaviour(new IdleBehaviour(Actor));
     }
-
+    
     public override void Update() {
         // Check for expired
         if (currentBehaviour is { Expired: true }) {
@@ -41,7 +55,9 @@ public abstract class BehaviourComponent : Component {
 
     }
 
-    protected abstract Behaviour GetNewBehaviour();
+    private Behaviour GetNewBehaviour() {
+        return (Behaviour)Data.BehaviourGiverClass.GetMethod("Get")?.Invoke(null, new object[] { Actor })!;
+    }
     
     public void SetBehaviour(Behaviour? behaviour) {
         currentBehaviour?.OnComplete();

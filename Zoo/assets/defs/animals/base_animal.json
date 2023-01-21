@@ -7,7 +7,6 @@
         { "compClass": "ElevationComponent" },
         { "compClass": "PathFollowComponent" },
         { "compClass": "MoveComponent" },
-        { "compClass": "AnimalBehaviourComponent" },
         {
             "dataClass": "NeedsComponentData",
             "needs": [
@@ -15,6 +14,10 @@
                 "Thirst",
                 "Energy"
             ]
+        },
+        { 
+            "dataClass": "BehaviourComponentData",
+            "behaviourGiverClass": "AnimalBehaviourGiver"
         }
     ],
     "tags": [

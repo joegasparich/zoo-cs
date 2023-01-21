@@ -17,6 +17,10 @@
                 }
             }
         },
+        {
+            "dataClass": "BehaviourComponentData",
+            "behaviourGiverClass": "GuestBehaviourGiver"
+        },
         { 
             "dataClass": "PersonComponentData"
         }

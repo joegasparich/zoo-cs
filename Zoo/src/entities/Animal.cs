@@ -9,7 +9,7 @@ namespace Zoo.entities;
 public class Animal : Actor {
     // Properties
     public override AnimalDef Def => (AnimalDef)base.Def;
-    public bool IsAsleep => GetComponent<AnimalBehaviourComponent>().CurrentBehaviour is SleepBehaviour;
+    public bool IsAsleep => GetComponent<BehaviourComponent>().CurrentBehaviour is SleepBehaviour;
 
     public Animal(Vector2 pos, AnimalDef def) : base(pos, def) {}
 
