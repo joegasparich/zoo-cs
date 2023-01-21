@@ -163,7 +163,7 @@ public class ExhibitManager : ISerialisable {
             RegisterExhibit(animal.Area);
         }
         
-        animal.Exhibit.UpdateCache();
+        animal.Exhibit?.UpdateCache();
     }
 
     private void OnAnimalRemoved(object obj) {
