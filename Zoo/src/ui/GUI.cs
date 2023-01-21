@@ -29,6 +29,9 @@ public static class GUI {
     public static Color     TextColour = Color.BLACK;
     public static AlignMode TextAlign  = AlignMode.TopLeft;
     public static int       FontSize   = DefaultFontSize;
+    
+    // Properties
+    public static float UIScale => Find.UI.UIScale;
 
     public static void Reset() {
         TextColour = Color.BLACK;
@@ -141,12 +144,14 @@ public static class GUI {
     public static void Label(Rectangle rect, string text) {
         if (Find.UI.CurrentEvent != UIEvent.Draw) return;
 
+        var scaledFontSize = (FontSize * UIScale).RoundToInt(); // TODO: Cache
+
         var absRect   = Find.UI.GetAbsRect(rect);
-        var textWidth = Raylib.MeasureText(text, FontSize);
+        var textWidth = Raylib.MeasureText(text, scaledFontSize);
 
         Vector2 drawPos = GetTextAlignPos(absRect, textWidth);
         
-        Raylib.DrawText(text, drawPos.X.RoundToInt(), drawPos.Y.RoundToInt(), FontSize, TextColour);
+        Raylib.DrawText(text, drawPos.X.RoundToInt(), drawPos.Y.RoundToInt(), scaledFontSize, TextColour);
     }
     
     private static void DrawCaret(Rectangle rect, int textWidth) {

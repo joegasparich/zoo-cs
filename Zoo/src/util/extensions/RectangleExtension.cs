@@ -49,4 +49,7 @@ public static class RectangleExtension {
     public static Rectangle RightHalf(this Rectangle rect) {
         return rect.RightPct(0.5f);
     }
+    public static Rectangle Multiply(this Rectangle rect, float amt) {
+        return new Rectangle(rect.x * amt, rect.y * amt, rect.width * amt, rect.height * amt);
+    }
 }

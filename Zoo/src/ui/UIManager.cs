@@ -16,6 +16,7 @@ public class UIManager {
     private List<Window>               windowsToOpen    = new();
     private HashSet<string>            windowsToClose   = new();
     private HashSet<string>            immediateWindows = new();
+    public  float                      UIScale          = 1f;
 
     private MouseCursor cursor;
     private string      hoveredWindowId;
@@ -214,7 +215,7 @@ public class UIManager {
     }
 
     public Rectangle GetAbsRect(Rectangle rect) {
-        return new Rectangle(rect.x + CurrentDrawBounds.x, rect.y + CurrentDrawBounds.y, rect.width, rect.height);
+        return new Rectangle(rect.x + CurrentDrawBounds.x, rect.y + CurrentDrawBounds.y, rect.width, rect.height).Multiply(UIScale);
     }
 
     public bool IsMouseOverRect(Rectangle rect) {
