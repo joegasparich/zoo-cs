@@ -103,10 +103,10 @@ public class ExhibitManager : ISerialisable {
         Debug.Log($"Exhibit {exhibit.Name} unregistered");
     }
     
-    public Exhibit GetExhibitById(string areaId) {
-        if (!exhibits.ContainsKey(areaId)) return null;
+    public Exhibit GetExhibitById(string id) {
+        if (!exhibits.ContainsKey(id)) return null;
         
-        return exhibits[areaId];
+        return exhibits[id];
     }
 
     public Exhibit? GetExhibitByArea(Area area) {

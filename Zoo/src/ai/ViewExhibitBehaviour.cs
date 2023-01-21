@@ -65,6 +65,9 @@ public class ViewExhibitBehaviour : Behaviour {
     public override void Serialise() {
         base.Serialise();
         
+        // TODO: ArchiveReference
+        Find.SaveManager.ArchiveValue("exhibit", () => exhibit.Id, id => exhibit = Find.World.Exhibits.GetExhibitById(id));
+        
         Find.SaveManager.ArchiveValue("viewingTile", ref viewingTile);
         Find.SaveManager.ArchiveValue("startedViewingTick", ref startedViewingTick);
         Find.SaveManager.ArchiveValue("pathfindingAttempts", ref pathfindingAttempts);
