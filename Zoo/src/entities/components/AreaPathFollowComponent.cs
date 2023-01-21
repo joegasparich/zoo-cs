@@ -14,6 +14,9 @@ public class AreaPathFollowComponent : PathFollowComponent {
     private Vector2?    enterDoorPos;
     private bool        areaPathCompleted;
     
+    // Properties
+    public override bool ReachedDestination => areaPathCompleted;
+
     public AreaPathFollowComponent(Actor actor, ComponentData? data) : base(actor, data) {}
 
     public override void Update() {
@@ -45,7 +48,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
             // Head to door
             base.Update();
 
-            if (base.ReachedDestination()) {
+            if (base.ReachedDestination) {
                 // We've made it to the door
                 var doorTiles = currentDoor.GetAdjacentTiles();
                 enterDoorPos = doorTiles.First(tile => Find.World.Areas.GetAreaAtTile(tile) != currentArea) + new Vector2(0.5f, 0.5f);
@@ -103,10 +106,6 @@ public class AreaPathFollowComponent : PathFollowComponent {
         }
         
         return base.PathTo(target);
-    }
-
-    public override bool ReachedDestination() {
-        return areaPathCompleted;
     }
 
     private void ResetAreaPath() {

@@ -90,7 +90,8 @@ public class PersonComponent : Component {
         }
         
         // Pick outfit
-        PickOutfit(Data.AgeCategory, Data.Gender);
+        if (body == null)
+            PickOutfit(Data.AgeCategory, Data.Gender);
 
         renderer.Graphics.SpritePath = body;
         if (pants != null) renderer.AddAttachment(pants);
@@ -165,5 +166,16 @@ public class PersonComponent : Component {
         } catch (Exception e) {
             Debug.Error("Failed to load textures from " + path + ": " + e.Message);
         }
+    }
+
+    public override void Serialise() {
+        base.Serialise();
+        
+        Find.SaveManager.ArchiveValue("body", ref body);
+        Find.SaveManager.ArchiveValue("hair", ref hair);
+        Find.SaveManager.ArchiveValue("beard", ref beard);
+        Find.SaveManager.ArchiveValue("hat", ref hat);
+        Find.SaveManager.ArchiveValue("shirt", ref shirt);
+        Find.SaveManager.ArchiveValue("pants", ref pants);
     }
 }

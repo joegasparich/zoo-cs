@@ -6,6 +6,7 @@ namespace Zoo.world;
 
 public class Exhibit : ISerialisable {
     // State
+    public string Id;
     public string Name;
     public Area   Area;
     
@@ -14,7 +15,8 @@ public class Exhibit : ISerialisable {
     public List<Animal>     ContainedAnimals = new();
 
     public Exhibit() {}
-    public Exhibit(string name, Area area) {
+    public Exhibit(string id, string name, Area area) {
+        Id   = id;
         Name = name;
         Area = area;
         
@@ -37,6 +39,7 @@ public class Exhibit : ISerialisable {
     }
 
     public void Serialise() {
+        Find.SaveManager.ArchiveValue("id",       ref Id);
         Find.SaveManager.ArchiveValue("name",     ref Name);
         Find.SaveManager.ArchiveValue("areaTile", () => Area.Tiles[0], tile => Area = Find.World.Areas.GetAreaAtTile(tile));
     }
@@ -45,6 +48,7 @@ public class Exhibit : ISerialisable {
 public class ExhibitManager : ISerialisable {
     // Collections
     private Dictionary<string, Exhibit> exhibits = new();
+    private Dictionary<string, Exhibit> exhibitsByArea = new();
 
     // Listeners
     private string areaCreatedListener;
@@ -52,6 +56,9 @@ public class ExhibitManager : ISerialisable {
     private string areaRemovedListener;
     private string animalPlacedListener;
     private string animalRemovedListener;
+    
+    // Properties
+    public IEnumerable<Exhibit> Exhibits => exhibits.Values;
 
     public void Setup() {
         areaCreatedListener   = Messenger.On(EventType.AreaCreated, OnAreaCreated);
@@ -63,6 +70,7 @@ public class ExhibitManager : ISerialisable {
 
     public void Reset() {
         exhibits.Clear();
+        exhibitsByArea.Clear();
         
         Messenger.Off(EventType.AreaCreated, areaCreatedListener);
         Messenger.Off(EventType.AreaUpdated, areaUpdatedListener);
@@ -73,27 +81,38 @@ public class ExhibitManager : ISerialisable {
 
     public Exhibit? RegisterExhibit(Area area) {
         if (area.IsZooArea) return null;
-        
+
+        var id   = Guid.NewGuid().ToString();
         var name = Guid.NewGuid().ToString(); // TODO: Generate a cool name
-        exhibits.Add(area.Id, new Exhibit(name, area));
+        var exhibit = new Exhibit(id, name, area);
+        
+        exhibits.Add(id, exhibit);
+        exhibitsByArea.Add(area.Id, exhibit);
         
         Debug.Log($"Registered exhibit with name: {name}");
 
-        return exhibits[area.Id];
+        return exhibit;
     }
     
     public void UnregisterExhibit(Exhibit exhibit) {
-        if (!exhibits.ContainsKey(exhibit.Area.Id)) return;
+        if (!exhibits.ContainsKey(exhibit.Id)) return;
         
-        exhibits.Remove(exhibit.Area.Id);
+        exhibits.Remove(exhibit.Id);
+        exhibitsByArea.Remove(exhibit.Area.Id);
         
         Debug.Log($"Exhibit {exhibit.Name} unregistered");
     }
+    
+    public Exhibit GetExhibitById(string areaId) {
+        if (!exhibits.ContainsKey(areaId)) return null;
+        
+        return exhibits[areaId];
+    }
 
     public Exhibit? GetExhibitByArea(Area area) {
-        if (!exhibits.ContainsKey(area.Id)) return null;
+        if (!exhibitsByArea.ContainsKey(area.Id)) return null;
         
-        return exhibits[area.Id];
+        return exhibitsByArea[area.Id];
     }
     
     public void UpdateAllExhibitCaches() {
@@ -113,11 +132,13 @@ public class ExhibitManager : ISerialisable {
     private void OnAreaUpdated(object obj) {
         var area = obj as Area;
         
-        if (exhibits.ContainsKey(area.Id)) {
+        if (exhibitsByArea.ContainsKey(area.Id)) {
+            var exhibit = exhibitsByArea[area.Id];
+            
             if (area.GetContainedEntities(EntityTag.Animal).Any())
-                exhibits[area.Id].UpdateCache();
+                exhibit.UpdateCache();
             else {
-                exhibits.Remove(area.Id);
+                UnregisterExhibit(exhibit);
             }
         } else if (area.GetContainedEntities(EntityTag.Animal).Any()) {
             RegisterExhibit(area);
@@ -133,7 +154,7 @@ public class ExhibitManager : ISerialisable {
     private void OnAnimalPlaced(object obj) {
         var animal = obj as Animal;
 
-        if (exhibits.ContainsKey(animal.Area.Id)) {
+        if (exhibitsByArea.ContainsKey(animal.Area.Id)) {
             animal.Exhibit.UpdateCache();
             return;
         }
@@ -158,10 +179,15 @@ public class ExhibitManager : ISerialisable {
     public void Serialise() {
         Find.SaveManager.ArchiveCollection("exhibits", exhibits.Values, data => {
             foreach (JObject node in data) {
-                var area = Find.World.Areas.GetAreaAtTile(node["areaTile"].ToObject<IntVec2>());
-                exhibits.Add(area.Id, new Exhibit());
+                exhibits.Add(node["id"].Value<string>(), new Exhibit());
             }
             return exhibits.Values;
         });
+
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
+            foreach(var exhibit in exhibits.Values) {
+                exhibitsByArea.Add(exhibit.Area.Id, exhibit);
+            }
+        }
     }
 }

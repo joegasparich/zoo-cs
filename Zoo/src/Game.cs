@@ -213,7 +213,6 @@ public static class Game {
     public static int RegisterEntityNow(Entity entity, int id) {
         entity.Id = id;
 
-        entity.Setup();
         entities.Add(entity.Id, entity);
         entitiesByTag[EntityTag.All].Add(entity);
                 
@@ -235,6 +234,7 @@ public static class Game {
         foreach (var entity in entitiesToAdd) {
             try {
                 RegisterEntityNow(entity, entity.Id);
+                entity.Setup();
             }
             catch (Exception e) {
                 Debug.Error($"Failed to set up entity {entity.Id}:", e);

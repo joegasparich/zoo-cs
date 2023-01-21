@@ -29,6 +29,7 @@ public class Entity : ISerialisable {
     // Properties
     public         IEnumerable<Component> Components => components.Values;
     public virtual EntityDef              Def        => def;
+    public         IntVec2                TilePos    => Pos.Floor();
 
     public Entity(Vector2 pos, EntityDef? def) {
         Pos      = pos;

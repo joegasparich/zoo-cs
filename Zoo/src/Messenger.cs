@@ -12,26 +12,28 @@ public enum EventType {
 
 public static class Messenger {
     // State
-    private static readonly Dictionary<EventType, List<Action<object>>> listeners = new ();
+    private static readonly Dictionary<EventType, Dictionary<string, Action<object>>> listeners = new ();
     
     public static string On(EventType eventType, Action<object> callback) {
         var handle = Guid.NewGuid().ToString();
             
-        if (!listeners.ContainsKey(eventType)) {
-            listeners.Add(eventType, new List<Action<object>>());
-        }
+        if (!listeners.ContainsKey(eventType))
+            listeners.Add(eventType, new Dictionary<string, Action<object>>());
         
-        listeners[eventType].Add(callback);
+        listeners[eventType].Add(handle, callback);
         
         return handle;
     }
     
     public static void Off(EventType eventType, string handle) {
-        if (!listeners.ContainsKey(eventType)) {
+        if (handle == null)
             return;
-        }
+        if (!listeners.ContainsKey(eventType))
+            return;
+        if (!listeners[eventType].ContainsKey(handle))
+            return;
         
-        listeners[eventType].RemoveAll(callback => callback.Method.Name == handle);
+        listeners[eventType].Remove(handle);
     }
 
     public static void Fire(EventType eventType) {
@@ -39,11 +41,10 @@ public static class Messenger {
     }
     
     public static void Fire(EventType eventType, object data) {
-        if (!listeners.ContainsKey(eventType)) {
+        if (!listeners.ContainsKey(eventType))
             return;
-        }
         
-        foreach (var callback in listeners[eventType]) {
+        foreach (var callback in listeners[eventType].Values) {
             callback(data);
         }
     }

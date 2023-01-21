@@ -6,7 +6,7 @@
         { "compClass": "PhysicsComponent" },
         { "compClass": "ElevationComponent" },
         { "compClass": "MoveComponent" },
-        { "compClass": "PathFollowComponentData" },
+        { "compClass": "PathFollowComponent" },
         {
             "dataClass": "NeedsComponentData",
             "needs": [

@@ -17,7 +17,7 @@ public class IdleBehaviour : Behaviour {
     public override void Update() {
         base.Update();
         
-        if (Pather.ReachedDestination()) {
+        if (Pather.ReachedDestination) {
             completed = true;
         }
 

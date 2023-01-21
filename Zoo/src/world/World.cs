@@ -351,6 +351,7 @@ public class World : ISerialisable {
             tileObjectMap.Clear();
             
             Areas.Reset();
+            Exhibits.Reset();
         }
             
         Find.SaveManager.ArchiveValue("width", ref Width);
@@ -368,6 +369,7 @@ public class World : ISerialisable {
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             Areas.Setup(Find.Zoo.Entrance);
+            Exhibits.Setup();
             PopulateAccessibilityGrids();
         }
         

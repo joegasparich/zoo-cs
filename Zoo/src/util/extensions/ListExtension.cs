@@ -26,7 +26,9 @@ public static class ListExtension {
     public static bool NullOrEmpty<T>( this List<T>? list ) {
         return list == null || list.Count == 0;
     }
-    public static T RandomElement<T>(this List<T> list) {
+    public static T? RandomElement<T>(this List<T> list) {
+        if (list.NullOrEmpty()) return default;
+        
         return list[Rand.Int(0, list.Count)];
     }
 }

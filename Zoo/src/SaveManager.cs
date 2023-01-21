@@ -117,6 +117,8 @@ public class SaveManager {
     public void ArchiveValue<T>(string label, ref T? value) {
         switch (Mode) {
             case SerialiseMode.Saving:
+                if (value == null) return;
+                
                 CurrentSaveNode.Add(label, JToken.FromObject(value, serializer));
                 break;
             case SerialiseMode.Loading:

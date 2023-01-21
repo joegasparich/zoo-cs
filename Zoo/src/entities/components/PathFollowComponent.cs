@@ -16,10 +16,13 @@ public class PathFollowComponent : InputComponent {
     private   CancellationTokenSource cancelToken;
     private   string                  placeSolidHandle;
     protected bool                    pathCompleted;
+    protected bool                    failedToFindPath;
     
     // Properties
-    public    bool  HasPath => path != null && path.Count > 0;
-    protected Actor Actor   => entity as Actor;
+    public         bool  HasPath            => path != null && path.Count > 0;
+    public virtual bool  ReachedDestination => pathCompleted;
+    public         bool  NoPathFound        => failedToFindPath;
+    protected      Actor Actor              => entity as Actor;
 
     public PathFollowComponent(Actor actor, ComponentData? data) : base(actor, data) {}
 
@@ -69,9 +72,9 @@ public class PathFollowComponent : InputComponent {
     private bool CheckPathCompleted() {
         if (!path.NullOrEmpty()) return false;
         
-        InputVector    = Vector2.Zero;
-        pathCompleted  = true;
-        destination = null;
+        InputVector   = Vector2.Zero;
+        pathCompleted = true;
+        destination   = null;
 
         return true;
     }
@@ -112,26 +115,24 @@ public class PathFollowComponent : InputComponent {
         pathRequest = null;
         
         if (path.NullOrEmpty()) {
-            path = null;
+            failedToFindPath = true;
+            path             = null;
             return;
         }
         path!.Dequeue(); // Dequeue first node as it's the current position
         pathCompleted = false;
     }
 
-    private void ResetPath() {
-        InputVector    = Vector2.Zero;
-        path           = null;
-        pathCompleted  = false;
-        destination = null;
+    public void ResetPath() {
+        InputVector      = Vector2.Zero;
+        path             = null;
+        pathCompleted    = false;
+        failedToFindPath = false;
+        destination      = null;
         if (cancelToken != null)
             Find.World.Pathfinder.CancelPathRequest(cancelToken);
         pathRequest = null;
         cancelToken = null;
-    }
-    
-    public virtual bool ReachedDestination() {
-        return pathCompleted;
     }
     
     private Vector2? GetCurrentNode() {

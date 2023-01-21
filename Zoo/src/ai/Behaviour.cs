@@ -11,17 +11,22 @@ public abstract class Behaviour : ISerialisable {
     public int  expireTick = -1;
     
     // Properties
-    public bool Expired => expireTick > 0 && Game.Ticks > expireTick;
+    public bool                Expired => expireTick > 0 && Game.Ticks > expireTick;
+    public PathFollowComponent Pather  => actor.GetComponent<PathFollowComponent>();
 
     public Behaviour() {}
     public Behaviour(Actor actor) {
         this.actor = actor;
     }
 
-    public virtual void Start()     { }
-    public virtual void OnComplete()       { }
-    public virtual void OnExpire()         { }
-    public virtual void Update()    { }
+    public virtual void Start()      { }
+    public virtual void OnComplete() {
+        Pather.ResetPath();
+    }
+    public virtual void OnExpire() {
+        Pather.ResetPath();
+    }
+    public virtual void Update()     { }
     public virtual void Serialise() {
         Find.SaveManager.ArchiveValue("actor", () => actor.Id, id => actor = Game.GetEntityById(id) as Actor);
         Find.SaveManager.ArchiveValue("completed",  ref completed);

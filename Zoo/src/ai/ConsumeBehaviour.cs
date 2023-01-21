@@ -6,14 +6,12 @@ namespace Zoo.ai;
 
 public class ConsumeBehaviour : Behaviour {
     // Config
-    // TODO: Populate this
-    public NeedDef Need = NeedDefOf.Hunger;
+    private NeedDef need;
     
     // State
     private Entity? consumable;
     
     // Properties
-    public  PathFollowComponent  Pather     => actor.GetComponent<PathFollowComponent>();
     public  NeedsComponent       Needs      => actor.GetComponent<NeedsComponent>();
     private bool                 CanConsume => consumable != null && !consumable.Despawned && actor.Pos.InDistOf(consumable.Pos, 1);
     private ConsumableComponent? Consumable => consumable != null ? consumable.GetComponent<ConsumableComponent>() : null;
@@ -22,14 +20,14 @@ public class ConsumeBehaviour : Behaviour {
     public ConsumeBehaviour(Actor actor, NeedDef need) : base(actor) {
         Debug.Assert(Needs != null, "Consume behaviour requires the actor to have a needs component");
         
-        Need = need;
+        this.need = need;
     }
 
     public override void Update() {
         base.Update();
 
         if (consumable == null) {
-            consumable = GetClosestConsumableOfType(Need.Id);
+            consumable = GetClosestConsumableOfType(need.Id);
         } else {
             if (consumable.Despawned) {
                 completed = true;
