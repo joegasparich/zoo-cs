@@ -28,6 +28,11 @@ public class Rand {
     public static bool Bool() {
         return Int(0, 2) == 1;
     }
+    
+    public static T EnumValue<T>() {
+        var v = Enum.GetValues(typeof (T));
+        return (T) v.GetValue(Int(0, v.Length));
+    }
 
     public static bool Chance(float chance) {
         return Float(0, 1) < chance;

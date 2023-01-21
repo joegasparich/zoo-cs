@@ -18,11 +18,9 @@ public enum PersonGender {
 public class PersonComponentData : ComponentData {
     public override Type CompClass => typeof(PersonComponent);
 
-    public PersonAgeCategory AgeCategory;
-    public PersonGender      Gender;
-    public string?           ForcedShirt;
-    public string?           ForcedPants;
-    public string?           ForcedHat;
+    public string? ForcedShirt;
+    public string? ForcedPants;
+    public string? ForcedHat;
 }
 
 public class PersonComponent : Component {
@@ -43,10 +41,15 @@ public class PersonComponent : Component {
     private static List<string> ChildShirts     = new();
     private static List<string> ChildPants      = new();
     
+    // Constants
     // This is to prevent skin and hair colour being identical because of the colour palette, please don't cancel me!
     public static Dictionary<(string, string), string> HairSkinColourBlackList = new() {
         { ("4", "brown"), "black" }
     };
+    
+    // Config
+    public PersonAgeCategory AgeCategory;
+    public PersonGender      Gender;
 
     // References
     private RenderComponent renderer;
@@ -91,7 +94,7 @@ public class PersonComponent : Component {
         
         // Pick outfit
         if (body == null)
-            PickOutfit(Data.AgeCategory, Data.Gender);
+            PickOutfit(AgeCategory, Gender);
 
         renderer.Graphics.SpritePath = body;
         if (pants != null) renderer.AddAttachment(pants);
