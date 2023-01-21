@@ -5,8 +5,8 @@
     "components": [
         { "compClass": "PhysicsComponent" },
         { "compClass": "ElevationComponent" },
-        { "compClass": "PathFollowComponent" },
         { "compClass": "MoveComponent" },
+        { "compClass": "PathFollowComponentData" },
         {
             "dataClass": "NeedsComponentData",
             "needs": [

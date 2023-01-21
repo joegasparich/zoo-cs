@@ -32,6 +32,7 @@ public static class EntitySerialiseUtility {
             var pos  = entityData["pos"].ToObject<Vector2>();
 
             var entity = GenEntity.CreateEntity(type, pos, def);
+            Game.RegisterEntityNow(entity, entityData["id"].Value<int>());
             entity.Serialise();
         }
         

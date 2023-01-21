@@ -170,15 +170,31 @@ public class SaveManager {
                 break;
             case SerialiseMode.Loading:
                 CurrentSaveNode = parent[label] as JObject;
-                if (value == null) {
-                    var type = Type.GetType(CurrentSaveNode["className"].Value<string>());
-                    if (type == null || type.GetConstructor(Type.EmptyTypes) == null) {
-                        Debug.Warn($"Failed to load {label}, type {type} not found or has no default constructor");
-                        break;
-                    }
-                    value = (ISerialisable) Activator.CreateInstance(type);
-                }
                 value.Serialise();
+                break;
+        }
+        CurrentSaveNode = parent;
+    }
+    
+    public void ArchiveDeep(string label, Func<ISerialisable> get, Action<ISerialisable> set) {
+        var parent = CurrentSaveNode;
+        switch (Mode) {
+            case SerialiseMode.Saving:
+                CurrentSaveNode              = new JObject();
+                CurrentSaveNode["className"] = get().GetType().ToString(); 
+                get().Serialise();
+                parent[label] = CurrentSaveNode;
+                break;
+            case SerialiseMode.Loading:
+                CurrentSaveNode = parent[label] as JObject;
+                var type = Type.GetType(CurrentSaveNode["className"].Value<string>());
+                if (type == null || type.GetConstructor(Type.EmptyTypes) == null) {
+                    Debug.Warn($"Failed to load {label}, type {type} not found or has no default constructor");
+                    break;
+                }
+                var value = (ISerialisable) Activator.CreateInstance(type);
+                value.Serialise();
+                set(value);
                 break;
         }
         CurrentSaveNode = parent;
@@ -210,45 +226,18 @@ public class SaveManager {
         CurrentSaveNode = parent;
     }
 
-    // public void ArchiveListDeep<T>(string label, List<T> list) where T : ISerialisable, new() {
-    //     var parent = CurrentSaveNode;
+    // public JObject SerialiseToNode<T>(T value) where T : ISerialisable, new() {
+    //     var node = new JObject();
+    //     Find.SaveManager.CurrentSaveNode = node;
+    //     Find.SaveManager.Mode            = SerialiseMode.Saving;
+    //     Find.SaveManager.ArchiveDeep("key", value);
     //
-    //     switch (Mode) {
-    //         case SerialiseMode.Saving:
-    //             var saveData  = new JsonArray();
-    //             
-    //             foreach (var item in list) {
-    //                 var node = new JsonObject();
-    //                 CurrentSaveNode = node;
-    //                 item.Serialise();
-    //                 saveData.Add(node);
-    //             }
-    //             parent[label] = saveData;
-    //             break;
-    //         case SerialiseMode.Loading:
-    //             foreach (var item in parent[label].AsArray()) {
-    //                 var newItem = new T();
-    //                 CurrentSaveNode = (JsonObject)item;
-    //                 newItem.Serialise();
-    //                 list.Add(newItem);
-    //             }
-    //             break;
-    //     }
-    //     CurrentSaveNode = parent;
+    //     return node;
     // }
-
-    public JObject SerialiseToNode<T>(T value) where T : ISerialisable, new() {
-        var node = new JObject();
-        Find.SaveManager.CurrentSaveNode = node;
-        Find.SaveManager.Mode            = SerialiseMode.Saving;
-        Find.SaveManager.ArchiveDeep("key", value);
-
-        return node;
-    }
-
-    public void DeserialiseFromNode<T>(T value, JObject node) where T : ISerialisable, new() {
-        Find.SaveManager.CurrentSaveNode = node;
-        Find.SaveManager.Mode            = SerialiseMode.Loading;
-        Find.SaveManager.ArchiveDeep("key", value);
-    }
+    //
+    // public void DeserialiseFromNode<T>(T value, JObject node) where T : ISerialisable, new() {
+    //     Find.SaveManager.CurrentSaveNode = node;
+    //     Find.SaveManager.Mode            = SerialiseMode.Loading;
+    //     Find.SaveManager.ArchiveDeep("key", value);
+    // }
 }

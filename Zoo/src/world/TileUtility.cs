@@ -12,4 +12,7 @@ public static class TileUtility {
     public static Area? GetArea(this IntVec2 tile) {
         return Find.World.Areas.GetAreaAtTile(tile);
     }
+    public static FootPath? GetFootPath(this IntVec2 tile) {
+        return Find.World.FootPaths.GetFootPathAtTile(tile);
+    }
 }

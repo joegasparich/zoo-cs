@@ -210,6 +210,23 @@ public static class Game {
         return id;
     }
     
+    public static int RegisterEntityNow(Entity entity, int id) {
+        entity.Id = id;
+
+        entity.Setup();
+        entities.Add(entity.Id, entity);
+        entitiesByTag[EntityTag.All].Add(entity);
+                
+        foreach (var tag in entity.Tags) {
+            if (!entitiesByTag.ContainsKey(tag)) 
+                entitiesByTag.Add(tag, new List<Entity>());
+                    
+            entitiesByTag[tag].Add(entity);
+        }
+        
+        return id;
+    }
+    
     public static void UnregisterEntity(Entity entity) {
         entitiesToRemove.Add(entity);
     }
@@ -217,16 +234,7 @@ public static class Game {
     private static void DoEntityReg() {
         foreach (var entity in entitiesToAdd) {
             try {
-                entity.Setup();
-                entities.Add(entity.Id, entity);
-                entitiesByTag[EntityTag.All].Add(entity);
-                
-                foreach (var tag in entity.Tags) {
-                    if (!entitiesByTag.ContainsKey(tag)) 
-                        entitiesByTag.Add(tag, new List<Entity>());
-                    
-                    entitiesByTag[tag].Add(entity);
-                }
+                RegisterEntityNow(entity, entity.Id);
             }
             catch (Exception e) {
                 Debug.Error($"Failed to set up entity {entity.Id}:", e);
@@ -247,7 +255,9 @@ public static class Game {
         entitiesToRemove.Clear();
     }
     
-    public static Entity GetEntityById(int id) {
+    public static Entity? GetEntityById(int id) {
+        if (!entities.ContainsKey(id)) return null;
+        
         return entities[id];
     }
     

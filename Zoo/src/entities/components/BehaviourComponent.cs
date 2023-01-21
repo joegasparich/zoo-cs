@@ -24,9 +24,9 @@ public class BehaviourComponent : Component {
     
     // Properties
     public             BehaviourComponentData Data             => (BehaviourComponentData)data;
-    protected override Type[]                      Dependencies     => new[] { typeof(PathFollowComponent) };
-    protected          Actor                       Actor            => entity as Actor;
-    public             Behaviour                   CurrentBehaviour => currentBehaviour;
+    protected override Type[]                 Dependencies     => new[] { typeof(PathFollowComponent) };
+    protected          Actor                  Actor            => entity as Actor;
+    public             Behaviour              CurrentBehaviour => currentBehaviour;
 
     public BehaviourComponent(Entity entity, BehaviourComponentData? data) : base(entity, data) {}
 
@@ -52,7 +52,6 @@ public class BehaviourComponent : Component {
             SetBehaviour(GetNewBehaviour());
         
         currentBehaviour?.Update();
-
     }
 
     private Behaviour GetNewBehaviour() {
@@ -68,6 +67,6 @@ public class BehaviourComponent : Component {
     public override void Serialise() {
         base.Serialise();
         
-        Find.SaveManager.ArchiveDeep("currentBehaviour", currentBehaviour);
+        Find.SaveManager.ArchiveDeep("currentBehaviour", () => currentBehaviour, savedBehaviour => currentBehaviour = savedBehaviour as Behaviour);
     }
 }

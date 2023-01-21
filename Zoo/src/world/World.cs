@@ -175,6 +175,8 @@ public class World : ISerialisable {
     }
 
     private void PopulateAccessibilityGrids() {
+        accessibilityGrids.Clear();
+        
         foreach(var type in Enum.GetValues(typeof(AccessibilityType))) {
             var grid = new int[Width][];
             for (var x = 0; x < Width; x++) {
@@ -366,6 +368,7 @@ public class World : ISerialisable {
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             Areas.Setup(Find.Zoo.Entrance);
+            PopulateAccessibilityGrids();
         }
         
         Find.SaveManager.ArchiveDeep("exhibits", Exhibits);

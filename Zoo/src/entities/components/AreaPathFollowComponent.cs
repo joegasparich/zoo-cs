@@ -14,7 +14,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
     private Vector2?    enterDoorPos;
     private bool        areaPathCompleted;
     
-    public AreaPathFollowComponent(Entity entity, ComponentData? data) : base(entity, data) {}
+    public AreaPathFollowComponent(Actor actor, ComponentData? data) : base(actor, data) {}
 
     public override void Update() {
         if (areaPath.NullOrEmpty() && !enterDoorPos.HasValue) {
@@ -29,7 +29,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
             var nextArea = areaPath!.First();
             var minDistSquared = float.MaxValue;
             foreach (var door in currentArea.ConnectedAreas[nextArea]) {
-                var distSquared = entity.Pos.DistanceSquared(door.WorldPos);
+                var distSquared = Actor.Pos.DistanceSquared(door.WorldPos);
                 if (distSquared < minDistSquared) {
                     currentDoor    = door;
                     minDistSquared = distSquared;
@@ -54,9 +54,9 @@ public class AreaPathFollowComponent : PathFollowComponent {
 
         if (enterDoorPos.HasValue) {
             // We are going through the door
-            InputVector = (enterDoorPos!.Value - entity.Pos).Normalised();
+            InputVector = (enterDoorPos!.Value - Actor.Pos).Normalised();
 
-            if (entity.Pos.DistanceSquared(enterDoorPos.Value) < NodeReachedDist * NodeReachedDist) {
+            if (Actor.Pos.DistanceSquared(enterDoorPos.Value) < NodeReachedDist * NodeReachedDist) {
                 // We've made it through the door
                 enterDoorPos = null;
                 currentDoor  = null;
@@ -86,7 +86,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
 
         ResetAreaPath();
 
-        var curArea = Find.World.Areas.GetAreaAtTile(entity.Pos.Floor());
+        var curArea = Find.World.Areas.GetAreaAtTile(Actor.Pos.Floor());
         var targetArea = Find.World.Areas.GetAreaAtTile(target.Floor());
 
         Debug.Assert(curArea != null);

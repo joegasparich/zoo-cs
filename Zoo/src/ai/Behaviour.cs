@@ -23,7 +23,8 @@ public abstract class Behaviour : ISerialisable {
     public virtual void OnExpire()         { }
     public virtual void Update()    { }
     public virtual void Serialise() {
-        Find.SaveManager.ArchiveValue("completed", ref completed);
+        Find.SaveManager.ArchiveValue("actor", () => actor.Id, id => actor = Game.GetEntityById(id) as Actor);
+        Find.SaveManager.ArchiveValue("completed",  ref completed);
         Find.SaveManager.ArchiveValue("expireTick", ref expireTick);
     }
 }

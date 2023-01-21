@@ -37,8 +37,6 @@ public class Entity : ISerialisable {
         foreach (var tag in def.Tags) {
             Tags.Add(tag);
         }
-        
-        Game.RegisterEntity(this);
     }
 
     public virtual void Setup() {

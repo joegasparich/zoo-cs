@@ -42,6 +42,7 @@ public class Tool_TileObject : Tool {
 
             var obj = GenEntity.CreateTileObject(currentObject.Id, Ghost.Pos);
             if (obj == null) return;
+            Game.RegisterEntity(obj);
             
             obj.SetRotation(rotation);
 

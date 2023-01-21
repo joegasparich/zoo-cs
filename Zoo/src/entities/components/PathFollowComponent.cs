@@ -3,14 +3,11 @@ using Raylib_cs;
 using Zoo.util;
 using Zoo.world;
 
-namespace Zoo.entities; 
+namespace Zoo.entities;
 
 public class PathFollowComponent : InputComponent {
     // Constants
     protected const float NodeReachedDist = 0.2f;
-    
-    // Config
-    public AccessibilityType AccessibilityType = AccessibilityType.NoWater;
     
     // State
     private   IntVec2?                destination;
@@ -21,13 +18,15 @@ public class PathFollowComponent : InputComponent {
     protected bool                    pathCompleted;
     
     // Properties
-    public bool HasPath => path != null && path.Count > 0;
+    public    bool  HasPath => path != null && path.Count > 0;
+    protected Actor Actor   => entity as Actor;
 
-    public PathFollowComponent(Entity entity, ComponentData? data) : base(entity, data) {}
+    public PathFollowComponent(Actor actor, ComponentData? data) : base(actor, data) {}
 
     public override void Start() {
         base.Start();
         
+        Debug.Assert(entity is Actor, "Non actor entity has path follow component");
         placeSolidHandle = Messenger.On(EventType.PlaceSolid, OnSolidPlaced);
     }
 
@@ -56,7 +55,7 @@ public class PathFollowComponent : InputComponent {
         if (path == null) return;
         if (CheckPathCompleted()) return;
 
-        if (entity.Pos.DistanceSquared(GetCurrentNode()!.Value) < NodeReachedDist * NodeReachedDist) {
+        if (Actor.Pos.DistanceSquared(GetCurrentNode()!.Value) < NodeReachedDist * NodeReachedDist) {
             // TODO (optimisation): should we reverse the path so we can pop?
             path!.RemoveAt(0);
 
@@ -64,7 +63,7 @@ public class PathFollowComponent : InputComponent {
                 return;
         }
 
-        InputVector = (GetCurrentNode()!.Value - entity.Pos).Normalised();
+        InputVector = (GetCurrentNode()!.Value - Actor.Pos).Normalised();
     }
     
     private bool CheckPathCompleted() {
@@ -80,18 +79,24 @@ public class PathFollowComponent : InputComponent {
     public virtual bool PathTo(Vector2 targetPos) {
         ResetPath();
 
-        if (entity.Pos.Floor() == targetPos.Floor()) {
+        if (Actor.Pos.Floor() == targetPos.Floor()) {
             pathCompleted = true;
             return true;
         }
-        if (entity.Pos.Floor().GetArea() != targetPos.Floor().GetArea()) {
-            Debug.Warn($"Pather {entity.Id} tried to path outside of area");
+        if (Actor.Pos.Floor().GetArea() != targetPos.Floor().GetArea()) {
+            Debug.Warn($"Pather {Actor.Id} tried to path outside of area");
             pathCompleted = true;
             return false;
         }
 
-        destination                      = targetPos.Floor();
-        (pathRequest, cancelToken) = Find.World.Pathfinder.RequestPath(entity.Pos.Floor(), destination.Value, AccessibilityType) ?? (null, default);
+        var accesibility = Actor.Accessibility;
+
+        // Get back onto footpath
+        if (accesibility == AccessibilityType.PathsOnly && !Actor.Pos.Floor().GetFootPath().Exists)
+            accesibility = AccessibilityType.NoWater;
+
+        destination                = targetPos.Floor();
+        (pathRequest, cancelToken) = Find.World.Pathfinder.RequestPath(Actor.Pos.Floor(), destination.Value, accesibility) ?? (null, default);
 
         return true;
     }

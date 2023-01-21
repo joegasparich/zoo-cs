@@ -2,11 +2,12 @@
     "class": "ActorDef",
     "id": "Guest",
     "name": "guest",
+    "accessibility": "PathsOnly",
     "components": [
         { "compClass": "PhysicsComponent" },
         { "compClass": "ElevationComponent" },
-        { "compClass": "PathFollowComponent" },
         { "compClass": "MoveComponent" },
+        { "compClass": "PathFollowComponent" },
         {
             "dataClass": "RenderComponentData",
             "graphicData": {

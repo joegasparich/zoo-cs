@@ -152,7 +152,7 @@ public class FootPathGrid : ISerialisable {
         
         Find.SaveManager.ArchiveCollection("paths",
             GetAllFootPaths(),
-            paths => paths.Select(pathData => GetFootPathAtTile(pathData["pos"].Value<IntVec2>()))
+            paths => paths.Select(pathData => GetFootPathAtTile(pathData["pos"].ToObject<IntVec2>()))
         );
     }
 }

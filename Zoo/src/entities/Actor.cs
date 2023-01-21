@@ -11,7 +11,7 @@ public abstract class Actor : Entity {
     
     // Properties
     public override ActorDef          Def           => (ActorDef)base.Def;
-    public          AccessibilityType Accessibility => Def.RespectsPaths ? AccessibilityType.PathsOnly : Def.CanSwim ? AccessibilityType.NoSolidIgnorePaths : AccessibilityType.NoWaterIgnorePaths;
+    public          AccessibilityType Accessibility => Def.Accessibility;
     public          Area              Area          => Find.World.Areas.GetAreaAtTile(Pos.Floor());
     public          Exhibit           Exhibit       => Find.World.Exhibits.GetExhibitByArea(Area);
 

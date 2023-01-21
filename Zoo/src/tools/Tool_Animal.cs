@@ -37,6 +37,7 @@ public class Tool_Animal : Tool {
 
             var animal = GenEntity.CreateAnimal(currentAnimal.Id, Ghost.Pos);
             if (animal == null) return;
+            Game.RegisterEntity(animal);
             
             toolManager.PushAction(new ToolAction() {
                 Name = $"Place {currentAnimal.Name}",
