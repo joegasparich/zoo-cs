@@ -6,7 +6,7 @@ static class Root
 {
     public static void Main()
     {
-        Raylib.SetTraceLogLevel(TraceLogLevel.LOG_ALL);
+        Raylib.SetTraceLogLevel(TraceLogLevel.LOG_ERROR);
             
         Game.Run();
     }
