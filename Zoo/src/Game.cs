@@ -22,10 +22,10 @@ public static class Game {
     
     // Constants
     // TODO: Config options
-    private const int MsPerUpdate  = 10;
-    private const int DefaultScreenWidth  = 1280;
-    private const int DefaultScreenHeight = 720;
-    private const string SettingsFilePath = "settings.json";
+    private const int    MsPerUpdate         = 10;
+    private const int    DefaultScreenWidth  = 1280;
+    private const int    DefaultScreenHeight = 720;
+    private const string SettingsFilePath    = "settings.json";
     
     public static GameSettings Settings = new();
 

@@ -11,8 +11,10 @@ public class Dialog_NewZoo : Dialog {
     // State
     private string width = "100";
     private string height = "100";
-    
-    public Dialog_NewZoo() : base(Dimensions) {}
+
+    public Dialog_NewZoo() : base(Dimensions) {
+        ShowCloseX = true;
+    }
 
     public override void DoWindowContents() {
         base.DoWindowContents();

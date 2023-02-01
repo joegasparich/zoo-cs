@@ -253,9 +253,56 @@ public static class GUI {
         }
     }
 
+    public static void DropDown(Rectangle rect, string text, ref bool open, List<(string, Action)> opts) {
+        if (ButtonText(rect, text)) {
+            open = !open;
+        }
+        if (!open) return;
+
+        var i = 0;
+        foreach (var opt in opts) {
+            if (ButtonText(rect.OffsetBy(0, (i + 1) * rect.height), opt.Item1)) {
+                opt.Item2();
+                open = false;
+            }
+            i++;
+        }
+    }
+
     public static void HighlightMouseover(Rectangle rect) {
         if (HoverableArea(rect)) {
             DrawHighlight(rect);
         }
+    }
+}
+
+public struct TextBlock : IDisposable
+{
+    private AlignMode oldAlignMode;
+    private Color     oldColor;
+
+    public TextBlock(AlignMode newAlignMode) : this(newAlignMode, null) {}
+    public TextBlock(Color newColor) : this(null, newColor) {}
+
+    public TextBlock(AlignMode? newAlignMode, Color? newColor) {
+        oldAlignMode = GUI.TextAlign;
+        oldColor     = GUI.TextColour;
+
+        if (newAlignMode != null)
+            GUI.TextAlign = newAlignMode.Value;
+
+        if (newColor != null)
+            GUI.TextColour = newColor.Value;
+    }
+
+    public static TextBlock Default()
+    {
+        return new TextBlock(AlignMode.TopLeft, Color.BLACK);
+    }
+
+    public void Dispose()
+    {
+        GUI.TextAlign  = oldAlignMode;
+        GUI.TextColour = oldColor;
     }
 }

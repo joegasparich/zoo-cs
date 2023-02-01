@@ -6,11 +6,10 @@ namespace Zoo.ui;
 
 public class Dialog : Window {
     // Constants
-    private const string WindowNPatchPath       = "assets/textures/ui/window.png";
-    // private const string WindowHeaderNPatchPath = "assets/textures/ui/window_header.png";
-    public const  int    DefaultWindowHeaderHeight     = 18;
-    private const string CloseIcon = "assets/textures/ui/icons/close.png";
-    private const int CloseIconSize = 16;
+    public const  int    DefaultWindowHeaderHeight = 18;
+    private const string WindowNPatchPath          = "assets/textures/ui/window.png";
+    private const string CloseIcon                 = "assets/textures/ui/icons/close.png";
+    private const int    CloseIconSize             = 16;
     
     // Config
     public    string Title        { get; protected set; }
@@ -18,7 +17,7 @@ public class Dialog : Window {
     public    bool   Draggable    { get; protected set; }
     public    int    HeaderHeight { get; protected set; } = DefaultWindowHeaderHeight;
     private   bool   doBackground     = true;
-    protected Color  backgroundColour = Color.WHITE.WithAlpha(0.9f);
+    protected Color  backgroundColour = Color.WHITE;
     
     // State
     protected bool    headerHovered;
@@ -36,16 +35,13 @@ public class Dialog : Window {
             AbsRect = AbsRect with { x = newPos.X, y = newPos.Y };
         }
         
-        if (doBackground) {
-            // var backgroundTexture = !Title.NullOrEmpty() || Draggable ? WindowHeaderNPatchPath : WindowNPatchPath;
+        if (doBackground)
             GUI.DrawTextureNPatch(GetRect(), Find.AssetManager.GetTexture(WindowNPatchPath), 20, backgroundColour);
-        }
         
         var headerRect = new Rectangle(0, 0, GetWidth(), HeaderHeight);
         if (!Title.NullOrEmpty()) {
-            GUI.TextAlign = AlignMode.MiddleCenter;
-            GUI.Label(headerRect, Title);
-            GUI.TextAlign = AlignMode.TopLeft;
+            using (new TextBlock(AlignMode.MiddleCenter))
+                GUI.Label(headerRect, Title);
         }
         
         headerHovered = false;

@@ -52,4 +52,7 @@ public static class RectangleExtension {
     public static Rectangle Multiply(this Rectangle rect, float amt) {
         return new Rectangle(rect.x * amt, rect.y * amt, rect.width * amt, rect.height * amt);
     }
+    public static Rectangle OffsetBy(this Rectangle rect, float x, float y) {
+        return new Rectangle(rect.x + x, rect.y + y, rect.width, rect.height);
+    }
 }

@@ -29,18 +29,23 @@ public class Window_Menu : Window {
             Find.UI.PushWindow(new Dialog_NewZoo());
         }
         curY += ButtonHeight + GUI.GapSmall;
+        
         if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "Quickstart")) {
             Find.SaveManager.NewGame(10, 10);
         }
         curY += ButtonHeight + GUI.GapSmall;
+        
         if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "Load")) {
             showSaves = true;
         }
-
         if (showSaves) {
             DrawSaves(new Vector2((GetWidth() + ButtonWidth) / 2 + GUI.GapSmall, curY));
         }
         curY += ButtonHeight + GUI.GapSmall;
+        
+        if (GUI.ButtonText(new Rectangle((GetWidth() - ButtonWidth) / 2, curY, ButtonWidth, ButtonHeight), "Settings")) {
+            Find.UI.PushWindow(new Dialog_Settings());
+        }
         
         GUI.TextAlign = AlignMode.TopLeft;
     }

@@ -5,12 +5,17 @@ using Zoo.util;
 namespace Zoo.ui;
 
 public class Window {
+    
     // Config
-    public  string            Id      { get; }
-    public  Rectangle         AbsRect { get; protected set; }
+    public  string            Id { get; }
     public  bool              Immediate = false;
-    private Action<Rectangle> OnUI;
     public  bool              DismissOnRightClick { get; protected set; } = false;
+    public  Rectangle         AbsRect;
+    private Action<Rectangle> onUI;
+    
+    // Properties
+
+    public bool IsHovered => Find.UI.IsMouseOverRect(GetRect());
 
     public Window(Rectangle rect) {
         Id = Guid.NewGuid().ToString();
@@ -20,11 +25,11 @@ public class Window {
     public Window(string id, Rectangle rect, Action<Rectangle> onUi) {
         Id = id;
         AbsRect = rect;
-        OnUI = onUi;
+        onUI = onUi;
     }
 
     public virtual void DoWindowContents() {
-        if (OnUI != null) OnUI(GetRect());
+        if (onUI != null) onUI(GetRect());
     }
 
     public virtual void OnInput(InputEvent evt) {
