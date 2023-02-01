@@ -20,7 +20,8 @@ public class RenderComponent : Component {
     private List<GraphicData> attachments = new();
     
     // Properties
-    public RenderComponentData Data => (RenderComponentData)data;
+    public RenderComponentData Data    => (RenderComponentData)data;
+    public bool                Hovered => entity.Selectable && Find.Renderer.GetPickIdAtPos(Find.Input.GetMousePos()) == entity.Id;
 
     public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
         Graphics = data.GraphicData;
@@ -38,15 +39,16 @@ public class RenderComponent : Component {
             depth: Find.Renderer.GetDepth(entity.Pos.Y),
             colour: OverrideColour,
             index: SpriteIndex,
-            pickId: entity.Id
+            pickId: entity.Selectable ? entity.Id : null,
+            fragShader: Hovered ? Renderer.OutlineShader : null
         );
-
+        
         foreach (var attachment in attachments) {
             attachment.Blit(
                 pos: (entity.Pos + Offset) * World.WorldScale,
                 depth: Find.Renderer.GetDepth(entity.Pos.Y),
                 colour: OverrideColour,
-                pickId: entity.Id
+                pickId: entity.Selectable ? entity.Id : null
             );
         }
         

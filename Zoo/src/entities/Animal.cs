@@ -15,14 +15,16 @@ public class Animal : Actor {
 
     public override void Setup() {
         base.Setup();
-        
+
+        Find.Zoo.Animals.Add(this);
         Messenger.Fire(EventType.AnimalPlaced, this);
     }
 
     public override void Destroy() {
-        base.Destroy();
-        
         Messenger.Fire(EventType.AnimalRemoved, this);
+        Find.Zoo.Animals.Remove(this);
+        
+        base.Destroy();
     }
 
     public override List<InfoTab> GetInfoTabs() {
@@ -30,7 +32,7 @@ public class Animal : Actor {
         tabs.Add(new InfoTab("General", rect => {
             var listing = new Listing(rect);
             listing.Header(Def.Name.Capitalise());
-            listing.Label($"Exhibit: {Exhibit.Name}");
+            if (Exhibit != null) listing.Label($"Exhibit: {Exhibit.Name}");
             listing.Label($"Can swim: {Def.CanSwim.ToString().Capitalise()}");
         }));
         tabs.AddRange(base.GetInfoTabs());

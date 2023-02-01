@@ -7,9 +7,10 @@ namespace Zoo;
 
 public struct GraphicData {
     // Config
-    public                 string  SpritePath = "";
-    public                 Vector2 Origin     = Vector2.Zero;
-    public                 Vector2 Scale      = Vector2.One;
+    public string  SpritePath     = "";
+    public Vector2 Origin         = Vector2.Zero;
+    public Vector2 Scale          = Vector2.One;
+    
     [JsonProperty] private int     cellWidth  = 0;
     [JsonProperty] private int     cellHeight = 0;
 
@@ -20,7 +21,7 @@ public struct GraphicData {
 
     public GraphicData() {}
 
-    public void Blit(Vector2 pos, float depth, Color colour, int index = 0, int pickId = 0) {
+    public void Blit(Vector2 pos, float depth, Color colour, int index = 0, int? pickId = null, Shader? fragShader = null) {
         var source = GetCellBounds(index);
         
         Find.Renderer.Blit(
@@ -31,6 +32,7 @@ public struct GraphicData {
             origin: Origin,
             source: source,
             color: colour,
+            fragShader: fragShader,
             pickId: pickId
         );
     }

@@ -26,11 +26,19 @@ public class Zoo : ISerialisable {
     public IntVec2 Entrance;
     
     // State
-    public World       World;
-    public ToolManager Tools;
+    public World            World;
+    public ToolManager      Tools;
+    public SelectionManager Selection;
+    
+    public int Cash = 1000;
+    
+    // Caches
+    public readonly HashSet<Animal> Animals = new();
+    public readonly HashSet<Guest>  Guests  = new();
     
     public Zoo() {
         Tools = new ToolManager();
+        Selection = new SelectionManager();
 
         Entrance = new IntVec2(Width / 2, Height - 1);
     }
@@ -55,10 +63,12 @@ public class Zoo : ISerialisable {
     public void Update() {
         World.Update();
         Tools.Update();
-        
-        if (Game.Ticks % GuestArrivalInterval == 0) {
-            var guest = GenEntity.CreateGuest(Entrance.TileCentre());
-            Game.RegisterEntity(guest);
+
+        if (Animals.Count > 0) {
+            if (Game.Ticks % GuestArrivalInterval == 0) {
+                var guest = GenEntity.CreateGuest(Entrance.TileCentre());
+                Game.RegisterEntity(guest);
+            }
         }
     }
 
@@ -84,6 +94,7 @@ public class Zoo : ISerialisable {
     public void OnInput(InputEvent evt) {
         if (!evt.consumed) Tools.OnInput(evt);
         if (!evt.consumed) World.OnInput(evt);
+        if (!evt.consumed) Selection.OnInput(evt);
     }
 
     public void Serialise() {

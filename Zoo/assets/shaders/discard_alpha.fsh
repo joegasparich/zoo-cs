@@ -6,7 +6,6 @@ in vec4 fragColor;
 out vec4 finalColor;
 
 uniform sampler2D texture0;
-uniform vec4 colDiffuse;
 
 void main() {
     vec4 texelColor = texture(texture0, fragTexCoord);
@@ -15,5 +14,5 @@ void main() {
         discard;
     }
     
-    finalColor = texelColor * colDiffuse * fragColor;
+    finalColor = texelColor * fragColor;
 }

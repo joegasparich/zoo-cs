@@ -23,13 +23,14 @@ public class Entity : ISerialisable {
 
     // State
     public  Vector2 Pos;
-    private string  infoDialogId;
     public  bool    Despawned;
     
     // Properties
     public         IEnumerable<Component> Components => components.Values;
     public virtual EntityDef              Def        => def;
     public         IntVec2                TilePos    => Pos.Floor();
+    public         bool                   Selectable => HasComponent<SelectableComponent>();
+    public         bool                   Selected   => Find.Zoo.Selection.SelectedEntity == this;
 
     public Entity(Vector2 pos, EntityDef? def) {
         Pos      = pos;
@@ -102,14 +103,6 @@ public class Entity : ISerialisable {
             component.OnInput(evt);
 
             if (evt.consumed) return;
-        }
-        
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT && Find.Renderer.GetPickIdAtPos(evt.mousePos) == Id) {
-            if (!Find.UI.IsWindowOpen(infoDialogId)) {
-                infoDialogId = Find.UI.PushWindow(new Dialog_EntityInfo(this));
-            }
-                
-            evt.Consume();
         }
     }
     

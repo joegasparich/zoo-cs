@@ -24,6 +24,14 @@ public class Guest : Actor {
         }
 
         base.Setup();
+        
+        Find.Zoo.Guests.Add(this);
+    }
+
+    public override void Destroy() {
+        Find.Zoo.Guests.Remove(this);
+        
+        base.Destroy();
     }
 
     public override void Serialise() {

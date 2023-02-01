@@ -25,14 +25,16 @@ internal class Blit {
     public float     Rotation; 
     public float     PosZ;
     public Color     Tint;
-    public int       PickId;
+    public Shader?   FragShader;
+    public int?      PickId;
 }
 
 public class Renderer {
     // Constants
-    public const  int   PixelScale     = 2;
+    public const int PixelScale = 2;
     
     // Resources
+    public static  Shader OutlineShader      = Raylib.LoadShader(null, "assets/shaders/outline.fsh");
     private static Shader discardAlphaShader = Raylib.LoadShader(null, "assets/shaders/discard_alpha.fsh");
     private static Shader pickShader         = Raylib.LoadShader(null, "assets/shaders/pick.fsh");
     private static int    pickColourLoc      = Raylib.GetShaderLocation(pickShader, "pickColor");
@@ -43,12 +45,17 @@ public class Renderer {
     // State
     public  Camera          Camera = new();
     private RenderTexture2D pickBuffer;
+    private Image           pickImage;
     
     public Renderer() {
         Debug.Log("Initialising Renderer");
         Raylib.SetTargetFPS(60);
 
         pickBuffer = Raylib.LoadRenderTexture(Game.ScreenWidth, Game.ScreenHeight);
+        
+        // Set outline colour
+        int outlineColLoc = Raylib.GetShaderLocation(OutlineShader, "outlineCol");
+        Raylib.SetShaderValue(OutlineShader, outlineColLoc, new Vector4(0.4f, 0.7f, 1f, 1f), ShaderUniformDataType.SHADER_UNIFORM_VEC4);
         
         Rlgl.rlEnableDepthTest();
     }
@@ -75,6 +82,7 @@ public class Renderer {
         Raylib.EndMode3D();
         
         RenderPickIdsToBuffer();
+        pickImage = Raylib.LoadImageFromTexture(pickBuffer.texture);
         if (DebugSettings.DrawPickBuffer)
             RenderPickBuffer();
         
@@ -103,7 +111,8 @@ public class Renderer {
         Vector2?   origin = null,
         Rectangle? source = null,
         Color?     color  = null,
-        int        pickId = 0
+        Shader?    fragShader = null,
+        int?       pickId = null
     ) {
         scale  ??= new Vector2(texture.width, texture.height);
         origin ??= new Vector2(0, 0);
@@ -129,11 +138,18 @@ public class Renderer {
             Rotation = 0,
             PosZ = depth,
             Tint = color.Value,
+            FragShader = fragShader,
             PickId = pickId
         });
     }
 
-    private void DoBlit(Blit blit) {
+    private void DoBlit(Blit blit, bool picking = false) {
+        // TODO: Look into whether switching shaders is expensive
+        if (!picking && blit.FragShader.HasValue) {
+            Raylib.EndShaderMode();
+            Raylib.BeginShaderMode(blit.FragShader.Value);
+        }
+            
         Draw.DrawTexturePro3D(
             blit.Texture,
             blit.SourceRect,
@@ -143,6 +159,11 @@ public class Renderer {
             blit.PosZ,
             blit.Tint
         );
+        
+        if (!picking && blit.FragShader.HasValue) {
+            Raylib.EndShaderMode();
+            Raylib.BeginShaderMode(discardAlphaShader);
+        }
     }
     
     // Picking //
@@ -153,9 +174,11 @@ public class Renderer {
         Raylib.BeginMode3D(Camera.Cam);
         {
             foreach (var blit in blits) {
+                if (!blit.PickId.HasValue) continue;
+                
                 Raylib.BeginShaderMode(pickShader);
-                Raylib.SetShaderValue(pickShader, pickColourLoc, Colour.IntToColour(blit.PickId).ToVector3(), ShaderUniformDataType.SHADER_UNIFORM_VEC3);
-                DoBlit(blit);
+                Raylib.SetShaderValue(pickShader, pickColourLoc, Colour.IntToColour(blit.PickId.Value).ToVector3(), ShaderUniformDataType.SHADER_UNIFORM_VEC3);
+                DoBlit(blit, true);
                 Raylib.EndShaderMode();
             }
         }
@@ -166,8 +189,8 @@ public class Renderer {
     public void RenderPickBuffer() {
         Raylib.DrawTexturePro(
             pickBuffer.texture,
-            new Rectangle(0, 0,                       pickBuffer.texture.width, -pickBuffer.texture.height),
-            new Rectangle(0, Game.ScreenHeight - 112, 173,                      112),
+            new Rectangle(0, 0, pickBuffer.texture.width, -pickBuffer.texture.height),
+            new Rectangle(0, Game.ScreenHeight - 112, 173, 112),
             new Vector2(0, 0),
             0,
             Color.WHITE
@@ -175,8 +198,8 @@ public class Renderer {
     }
     
     public int GetPickIdAtPos(Vector2 screenPos) {
-        var image = Raylib.LoadImageFromTexture(pickBuffer.texture);
-        var pixel = Raylib.GetImageColor(image, screenPos.X.FloorToInt(), Game.ScreenHeight - screenPos.Y.FloorToInt());
+        var pixel = Raylib.GetImageColor(pickImage, screenPos.X.FloorToInt(), Game.ScreenHeight - screenPos.Y.FloorToInt());
+        if (pixel.Equals(Color.WHITE)) return -1;
         return Colour.ColourToInt(pixel);
     }
     
