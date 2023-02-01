@@ -20,10 +20,11 @@ public static class GUI {
     // Constants
     public const            int   GapTiny         = 6;
     public const            int   GapSmall        = 10;
-    public const            int   DefaultFontSize = 10;
-    public const            int   HeaderFontSize  = 20;
-    private static readonly Color HighlightColor  = new Color(255, 255, 255, 150);
-    public static readonly  Color UIButtonColour  = new Color(230, 230, 230, 255);
+    public const            int   DefaultFontSize = 14;
+    public const            int   HeaderFontSize  = 24;
+    private static readonly Color HighlightColor  = new(255, 255, 255, 150);
+    public static readonly  Color UIButtonColour  = new(230, 230, 230, 255);
+    private const           float FontSpacing     = 0.3f;
 
     // Config
     public static Color     TextColour = Color.BLACK;
@@ -144,14 +145,14 @@ public static class GUI {
     public static void Label(Rectangle rect, string text) {
         if (Find.UI.CurrentEvent != UIEvent.Draw) return;
 
-        var scaledFontSize = (FontSize * UIScale).RoundToInt(); // TODO: Cache
+        var scaledFontSize = FontSize * UIScale;
 
         var absRect   = Find.UI.GetAbsRect(rect);
-        var textWidth = Raylib.MeasureText(text, scaledFontSize);
+        var textWidth = Raylib.MeasureTextEx(Find.UI.DefaultFont, text, scaledFontSize, FontSpacing).X;
 
-        Vector2 drawPos = GetTextAlignPos(absRect, textWidth);
+        Vector2 drawPos = GetTextAlignPos(absRect, textWidth.FloorToInt());
         
-        Raylib.DrawText(text, drawPos.X.RoundToInt(), drawPos.Y.RoundToInt(), scaledFontSize, TextColour);
+        Raylib.DrawTextEx(Find.UI.DefaultFont, text, drawPos.Floor(), scaledFontSize, FontSpacing, TextColour);
     }
     
     private static void DrawCaret(Rectangle rect, int textWidth) {

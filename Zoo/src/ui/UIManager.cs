@@ -10,6 +10,12 @@ public enum UIEvent {
 }
 
 public class UIManager {
+    // Constants
+    private const string DefaultFontPath = "assets/fonts/Roboto-Regular.ttf";
+    
+    // Resources
+    public Font DefaultFont;
+    
     // State
     private List<Window>               windowStack      = new();
     private Dictionary<string, Window> openWindowMap    = new();
@@ -34,6 +40,9 @@ public class UIManager {
 
     public void Init() {
         Debug.Log("Initializing UI");
+
+        DefaultFont = Raylib.LoadFont(DefaultFontPath);
+        Raylib.SetTextureFilter(DefaultFont.texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
     }
 
     public void OnInput(InputEvent evt) {
