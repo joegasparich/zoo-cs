@@ -144,7 +144,7 @@ public class Tool_FootPath : Tool {
                 if (GUI.ButtonEmpty(buttonRect, selected: currentFootPath != null && currentFootPath.Id == footPath.Id))
                     SetFootPath(footPath);
                 
-                GUI.DrawSubTexture(buttonRect, footPath.GraphicData.Sprite, footPath.GraphicData.GetCellBounds(0).BottomHalf());
+                GUI.DrawSubTexture(buttonRect, footPath.GraphicData.Texture, footPath.GraphicData.GetCellBounds(0).BottomHalf());
                 
                 i++;
             }

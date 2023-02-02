@@ -8,6 +8,7 @@
         { "compClass": "ElevationComponent" },
         { "compClass": "MoveComponent" },
         { "compClass": "PathFollowComponent" },
+        { "compClass": "SelectableComponent" },
         {
             "dataClass": "RenderComponentData",
             "graphicData": {

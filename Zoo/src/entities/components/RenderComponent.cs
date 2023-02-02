@@ -16,25 +16,28 @@ public class RenderComponent : Component {
     public  Vector2           Offset         = Vector2.Zero;
     public  Color             OverrideColour = Color.WHITE;
     public  int               SpriteIndex    = 0; // TODO: move this shit into graphics now that they are per instance
-    public  GraphicData       Graphics;
+    public  GraphicData       BaseGraphic;
+    private GraphicData       bakedGraphic;
     private List<GraphicData> attachments = new();
-    
+
     // Properties
     public RenderComponentData Data    => (RenderComponentData)data;
     public bool                Hovered => entity.Selectable && Find.Renderer.GetPickIdAtPos(Find.Input.GetMousePos()) == entity.Id;
 
     public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
-        Graphics = data.GraphicData;
+        BaseGraphic = data.GraphicData;
     }
 
     public override void Start() {
         base.Start();
         
-        Debug.Assert(!Graphics.Sprite.Empty(), "Sprite missing from render component");
+        Debug.Assert(!BaseGraphic.Texture.Empty(), "Sprite missing from render component");
+
+        BakeGraphics();
     }
 
     public override void Render() {
-        Graphics.Blit(
+        bakedGraphic.Blit(
             pos: (entity.Pos + Offset) * World.WorldScale,
             depth: Find.Renderer.GetDepth(entity.Pos.Y),
             colour: OverrideColour,
@@ -42,26 +45,46 @@ public class RenderComponent : Component {
             pickId: entity.Selectable ? entity.Id : null,
             fragShader: Hovered ? Renderer.OutlineShader : null
         );
-        
-        foreach (var attachment in attachments) {
-            attachment.Blit(
-                pos: (entity.Pos + Offset) * World.WorldScale,
-                depth: Find.Renderer.GetDepth(entity.Pos.Y),
-                colour: OverrideColour,
-                pickId: entity.Selectable ? entity.Id : null
-            );
-        }
-        
+
         OverrideColour = Color.WHITE;
     }
 
     public void AddAttachment(string spritePath) {
-        var attachment = Graphics;
-        attachment.SpritePath = spritePath;
+        var attachment = BaseGraphic;
+        attachment.SetSprite(spritePath);
         attachments.Add(attachment);
+
+        BakeGraphics();
     }
 
-    public void AddAttachment(GraphicData graphic) {
-        attachments.Add(graphic);
+    private void BakeGraphics()
+    {
+        // Bake the attachments into the texture
+        // Currently assumes that the attachment will have the exact same dimensions as the main sprite
+        var renderTexture = Raylib.LoadRenderTexture(BaseGraphic.Texture.width, BaseGraphic.Texture.height);
+
+        Raylib.BeginTextureMode(renderTexture);
+        Raylib.ClearBackground(new Color(0, 0, 0, 0));
+        Raylib.DrawTexturePro(
+            BaseGraphic.Texture,
+            new Rectangle(0, 0, BaseGraphic.Texture.width, -BaseGraphic.Texture.height),
+            new Rectangle(0, 0, BaseGraphic.Texture.width, BaseGraphic.Texture.height),
+            new Vector2(0, 0),
+            0,
+            Color.WHITE
+        );
+        foreach (var att in attachments) {
+            Raylib.DrawTexturePro(
+                att.Texture,
+                new Rectangle(0, 0, BaseGraphic.Texture.width, -BaseGraphic.Texture.height),
+                new Rectangle(0, 0, BaseGraphic.Texture.width, BaseGraphic.Texture.height),
+                new Vector2(0, 0),
+                0,
+                Color.WHITE
+            );
+        }
+        Raylib.EndTextureMode();
+
+        bakedGraphic.Texture = renderTexture.texture;
     }
 }

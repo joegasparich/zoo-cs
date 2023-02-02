@@ -96,7 +96,7 @@ public class PersonComponent : Component {
         if (body == null)
             PickOutfit(AgeCategory, Gender);
 
-        renderer.Graphics.SpritePath = body;
+        renderer.BaseGraphic.SetSprite(body);
         if (pants != null) renderer.AddAttachment(pants);
         if (shirt != null) renderer.AddAttachment(shirt);
         if (beard != null) renderer.AddAttachment(beard);
@@ -119,7 +119,7 @@ public class PersonComponent : Component {
                     if (Rand.Chance(0.9f)) hair = Rand.Bool() ? MaleHair.RandomElement() : FemaleHair.RandomElement();
                 break;
             case PersonAgeCategory.Elder:
-                body = AdultBodies.RandomElement();
+                body = ElderBodies.RandomElement();
                 shirt = AdultShirts.RandomElement();
                 pants = AdultPants.RandomElement();
                 if (gender == PersonGender.Male || gender == PersonGender.NonBinary)

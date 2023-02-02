@@ -155,7 +155,7 @@ public class Tool_Wall : Tool {
                 if (GUI.ButtonEmpty(buttonRect, selected: currentWall != null && currentWall.Id == wall.Id))
                     SetWall(wall);
                 
-                GUI.DrawSubTexture(buttonRect, wall.GraphicData.Sprite, wall.GraphicData.GetCellBounds(0).BottomPct(0.25f));
+                GUI.DrawSubTexture(buttonRect, wall.GraphicData.Texture, wall.GraphicData.GetCellBounds(0).BottomPct(0.25f));
                 
                 i++;
             }

@@ -198,12 +198,10 @@ public class UIManager {
 
         if (!found) {
             Window window;
-            if (dialog) {
+            if (dialog)
                 window = new Dialog(id, initialRect, onUI);
-            }
-            else {
+            else
                 window = new Window(id, initialRect, onUI);
-            }
             window.Immediate = true;
             PushWindow(window);
         }

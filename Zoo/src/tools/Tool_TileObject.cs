@@ -88,7 +88,7 @@ public class Tool_TileObject : Tool {
                     SetObject(obj);
                 
                 // TODO: Write an icon helper for this
-                GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.GraphicData.Value.Sprite, obj.GraphicData.Value.GetCellBounds(0));
+                GUI.DrawSubTexture(buttonRect.ContractedBy(2), obj.GraphicData.Value.Texture, obj.GraphicData.Value.GetCellBounds(0));
 
                 i++;
             }

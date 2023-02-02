@@ -66,7 +66,7 @@ public class Tool_Animal : Tool {
                     SetAnimal(animal);
                 
                 // TODO: Write an icon helper for this
-                GUI.DrawSubTexture(buttonRect.ContractedBy(2), animal.GraphicData.Value.Sprite, animal.GraphicData.Value.GetCellBounds(0));
+                GUI.DrawSubTexture(buttonRect.ContractedBy(2), animal.GraphicData.Value.Texture, animal.GraphicData.Value.GetCellBounds(0));
                 
                 i++;
             }
