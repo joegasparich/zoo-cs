@@ -25,7 +25,8 @@ public class RenderComponent : Component {
     public bool                Hovered => entity.Selectable && Find.Renderer.GetPickIdAtPos(Find.Input.GetMousePos()) == entity.Id;
 
     public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
-        BaseGraphic = data.GraphicData;
+        BaseGraphic  = data.GraphicData;
+        bakedGraphic = BaseGraphic;
     }
 
     public override void Start() {
