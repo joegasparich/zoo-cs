@@ -1,4 +1,7 @@
-﻿using Raylib_cs;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Raylib_cs;
+using Zoo.ui;
 using Zoo.util;
 
 namespace Zoo.entities;
@@ -24,8 +27,9 @@ public class PersonComponentData : ComponentData {
 }
 
 public class PersonComponent : Component {
-    // Static cache
+    // Static cache TODO: Move this somewhere
     private static bool         loadedIntoCache = false;
+
     private static List<string> AdultBodies     = new();
     private static List<string> ElderBodies     = new();
     private static List<string> ChildBodies     = new();
@@ -40,6 +44,10 @@ public class PersonComponent : Component {
     private static List<string> AdultPants      = new();
     private static List<string> ChildShirts     = new();
     private static List<string> ChildPants      = new();
+
+    private static List<string> MaleNames = new();
+    private static List<string> FemaleNames = new();
+    private static List<string> LastNames  = new();
     
     // Constants
     // This is to prevent skin and hair colour being identical because of the colour palette, please don't cancel me!
@@ -55,6 +63,9 @@ public class PersonComponent : Component {
     private RenderComponent renderer;
     
     // State
+    private string firstName;
+    private string lastName;
+
     private string? body;
     private string? hair;
     private string? beard;
@@ -65,6 +76,7 @@ public class PersonComponent : Component {
     // Properties
     public PersonComponentData Data => (PersonComponentData)data;
     protected override Type[] Dependencies => new[] { typeof(RenderComponent) };
+    public string FullName => $"{firstName.Capitalise()} {lastName.Capitalise()}";
 
     public PersonComponent(Entity entity, PersonComponentData? data) : base(entity, data) {}
 
@@ -89,8 +101,24 @@ public class PersonComponent : Component {
             LoadTextures(ChildShirts,     "assets/textures/people/shirts/child");
             LoadTextures(AdultPants,      "assets/textures/people/pants");
             LoadTextures(ChildPants,      "assets/textures/people/pants/child");
+
+            var json = File.ReadAllText("assets/lang/names.json");
+            var data = JsonConvert.DeserializeObject<JObject>(json)!;
+            MaleNames   = data["maleFirstNames"].ToObject<List<String>>();
+            FemaleNames = data["femaleFirstNames"].ToObject<List<String>>();
+            LastNames   = data["lastNames"].ToObject<List<String>>();
+
             loadedIntoCache = true;
         }
+
+        // Generate name
+
+        firstName = Gender switch {
+            PersonGender.Male      => MaleNames.RandomElement(),
+            PersonGender.Female    => FemaleNames.RandomElement(),
+            PersonGender.NonBinary => Rand.Bool() ? MaleNames.RandomElement() : FemaleNames.RandomElement(),
+        };
+        lastName = LastNames.RandomElement();
         
         // Pick outfit
         if (body == null)
@@ -169,6 +197,13 @@ public class PersonComponent : Component {
         } catch (Exception e) {
             Debug.Error("Failed to load textures from " + path + ": " + e.Message);
         }
+    }
+
+    public override InfoTab? GetInfoTab() {
+        return new InfoTab("Needs", rect => {
+            var listing = new Listing(rect);
+            listing.Label(FullName);
+        });
     }
 
     public override void Serialise() {
