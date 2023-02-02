@@ -8,5 +8,6 @@
         "cellHeight": 32,
         "cellWidth": 16
     },
-    "solid": true
+    "solid": true,
+    "cost": 2
 }

@@ -1,10 +1,11 @@
 {
-  "class": "FootPathDef",
-  "id": "DirtPath",
-  "name": "Dirt Path",
-  "graphicData": {
-    "spritePath": "assets/textures/paths/dirt_path.png",
-    "cellHeight": 32,
-    "cellWidth": 16
-  }
+    "class": "FootPathDef",
+    "id": "DirtPath",
+    "name": "Dirt Path",
+    "graphicData": {
+        "spritePath": "assets/textures/paths/dirt_path.png",
+        "cellHeight": 32,
+        "cellWidth": 16
+    },
+    "cost": 1
 }

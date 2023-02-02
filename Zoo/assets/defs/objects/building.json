@@ -12,6 +12,7 @@
     "canPlaceOnSlopes": false,
     "canPlaceInWater": false,
     "canRotate": true,
+    "cost": 100,
     "type": "building",
     "components": [
         {

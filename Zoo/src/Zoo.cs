@@ -19,7 +19,8 @@ public static class DebugSettings {
 
 public class Zoo : ISerialisable {
     // Constants
-    private int GuestArrivalInterval = 600; // 10 seconds
+    private const int GuestArrivalInterval = 600; // 10 seconds
+    private const int EntryFee             = 20; // TODO: Make this configurable
     
     // Config
     public int     Width  = 10;
@@ -32,7 +33,7 @@ public class Zoo : ISerialisable {
     public  SelectionManager Selection;
     private string           infoWidgetHandle;
     
-    public int Cash = 1000;
+    public int Funds = 1000;
     
     // Caches
     public readonly HashSet<Animal> Animals = new();
@@ -75,6 +76,7 @@ public class Zoo : ISerialisable {
             if (Game.Ticks % GuestArrivalInterval == 0) {
                 var guest = GenEntity.CreateGuest(Entrance.TileCentre());
                 Game.RegisterEntity(guest);
+                AddFunds(EntryFee);
             }
         }
     }
@@ -103,6 +105,14 @@ public class Zoo : ISerialisable {
         if (!evt.consumed) Tools.OnInput(evt);
         if (!evt.consumed) World.OnInput(evt);
         if (!evt.consumed) Selection.OnInput(evt);
+    }
+
+    public void DeductFunds(int amount) {
+        Funds -= amount;
+    }
+
+    public void AddFunds(int amount) {
+        Funds += amount;
     }
 
     public void Serialise() {

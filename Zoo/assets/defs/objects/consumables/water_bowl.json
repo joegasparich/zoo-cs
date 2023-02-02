@@ -3,6 +3,7 @@
     "id": "WaterBowl",
     "name": "water bowl",
     "inherits": "BaseConsumable",
+    "cost": 5,
     "components": [
         {
             "dataClass": "RenderComponentData",

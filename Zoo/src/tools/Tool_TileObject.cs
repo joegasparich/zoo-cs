@@ -46,10 +46,15 @@ public class Tool_TileObject : Tool {
             
             obj.SetRotation(rotation);
 
-            toolManager.PushAction(new ToolAction() {
+            Find.Zoo.DeductFunds(currentObject.Cost);
+
+            toolManager.PushAction(new ToolAction {
                 Name = $"Place {currentObject.Name}",
                 Data = obj.Id,
-                Undo = data => obj.Destroy(),
+                Undo = _ => {
+                    Find.Zoo.AddFunds(obj.Def.Cost);
+                    obj.Destroy();
+                }
             });
             
             evt.Consume();

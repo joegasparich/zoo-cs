@@ -6,6 +6,7 @@
     "solid": true,
     "canPlaceOnSlopes": true,
     "canPlaceInWater": false,
+    "cost": 5,
     "type": "foliage",
     "components": [
         {

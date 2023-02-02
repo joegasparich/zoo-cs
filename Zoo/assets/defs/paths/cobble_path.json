@@ -1,10 +1,11 @@
 {
-  "class": "FootPathDef",
-  "id": "CobblePath",
-  "name": "Cobble Path",
-  "graphicData": {
-    "spritePath": "assets/textures/paths/cobble_path.png",
-    "cellHeight": 32,
-    "cellWidth": 16
-  }
+    "class": "FootPathDef",
+    "id": "CobblePath",
+    "name": "Cobble Path",
+    "graphicData": {
+        "spritePath": "assets/textures/paths/cobble_path.png",
+        "cellHeight": 32,
+        "cellWidth": 16
+    },
+    "cost": 2
 }

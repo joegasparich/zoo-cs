@@ -8,4 +8,5 @@ public class WallDef : Def {
     public WallType    Type;
     public GraphicData GraphicData;
     public bool        Solid = true;
+    public int         Cost  = 1;
 }

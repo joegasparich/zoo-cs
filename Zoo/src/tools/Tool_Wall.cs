@@ -57,6 +57,8 @@ public class Tool_Wall : Tool {
             
             List<(IntVec2, Side)> undoData = new();
 
+            Find.Zoo.DeductFunds(currentWall.Cost * ghosts.Count);
+
             while (ghosts.Any()) {
                 var ghost = ghosts.Pop();
                 if (ghost.CanPlace) {
@@ -65,11 +67,16 @@ public class Tool_Wall : Tool {
                 }
             }
             
-            toolManager.PushAction(new ToolAction() {
+            toolManager.PushAction(new ToolAction {
                 Name = "Place walls",
                 Data = undoData,
-                Undo = (data) => {
-                    foreach (var (tile, side) in (List<(IntVec2, Side)>) data) {
+                Undo = data => {
+                    var dataList = (List<(IntVec2, Side)>)data;
+                    var wallType = Find.World.Walls.GetWallAtTile(dataList[0].Item1, dataList[0].Item2).Data;
+
+                    Find.Zoo.AddFunds(wallType.Cost * dataList.Count);
+
+                    foreach (var (tile, side) in dataList) {
                         Find.World.Walls.RemoveWallAtTile(tile, side);
                     }
                 }
@@ -91,6 +98,7 @@ public class Tool_Wall : Tool {
         var mousePos      = Find.Input.GetMouseWorldPos();
         var mouseQuadrant = World.GetQuadrantAtPos(mousePos);
 
+        // TODO: Investigate making Ls
         if (isDragging) {
             // Dragging
             Ghost.Visible = false;

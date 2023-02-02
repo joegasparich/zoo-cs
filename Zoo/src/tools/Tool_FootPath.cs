@@ -50,6 +50,8 @@ public class Tool_FootPath : Tool {
 
             List<IntVec2> undoData = new();
 
+            Find.Zoo.DeductFunds(currentFootPath.Cost * ghosts.Count);
+
             while (ghosts.Any()) {
                 var ghost = ghosts.Pop();
                 if (ghost.CanPlace) {
@@ -61,8 +63,13 @@ public class Tool_FootPath : Tool {
             toolManager.PushAction(new ToolAction() {
                 Name = "Place paths",
                 Data = undoData,
-                Undo = (data) => {
-                    foreach (var tile in (List<IntVec2>) data) {
+                Undo = data => {
+                    var dataList = (List<IntVec2>)data;
+                    var pathType = Find.World.FootPaths.GetFootPathAtTile(dataList[0]).Data;
+
+                    Find.Zoo.AddFunds(pathType.Cost * dataList.Count);
+
+                    foreach (var tile in dataList) {
                         Find.World.FootPaths.RemovePathAtTile(tile);
                     }
                 }
@@ -81,7 +88,8 @@ public class Tool_FootPath : Tool {
     public override void Update() {
         if (currentFootPath == null) return;
         var mousePos = Find.Input.GetMouseWorldPos();
-        
+
+        // TODO: Investigate making Ls
         if (isDragging) {
             // Dragging
             Ghost.Visible = false;

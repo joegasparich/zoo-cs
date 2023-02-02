@@ -3,6 +3,7 @@
     "id": "Hay",
     "name": "hay",
     "inherits": "BaseConsumable",
+    "cost": 5,
     "components": [
         {
             "dataClass": "RenderComponentData",

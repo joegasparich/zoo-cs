@@ -22,7 +22,7 @@ public class Widget_ZooInfo : Window {
 
         using (new TextBlock(AlignMode.MiddleCenter)) {
             var curX = 0;
-            GUI.Label(new Rectangle(curX, 0, 50, Height), $"${Find.Zoo.Cash}");
+            GUI.Label(new Rectangle(curX, 0, 50, Height), $"${Find.Zoo.Funds}");
             curX += 50 + GUI.GapSmall;
 
             if (GUI.ButtonIcon(new Rectangle(curX, 4, 16, 16), Pause.Texture))
