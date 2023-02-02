@@ -7,26 +7,36 @@ namespace Zoo.entities;
 public static class GenEntity {
     public static T? CreateEntity<T>(Vector2 pos, EntityDef def) where T : Entity {
         if (!Find.World.IsPositionInMap(pos)) return null;
-        
-        var entity = Activator.CreateInstance(typeof(T), pos, def) as T;
 
-        foreach (var compData in def.Components) {
-            entity.AddComponent(compData.CompClass, compData);
+        try {
+            var entity = Activator.CreateInstance(typeof(T), pos, def) as T;
+
+            foreach (var compData in def.Components) {
+                entity.AddComponent(compData.CompClass, compData);
+            }
+
+            return entity;
+        } catch (Exception e) {
+            Debug.Error($"Failed to create entity of type {typeof(T).Name} at {pos} with def {def.Id}: ", e);
+            return null;
         }
-
-        return entity;
     }
     
     public static Entity CreateEntity(Type type, Vector2 pos, EntityDef def) {
         if (!Find.World.IsPositionInMap(pos)) return null;
         
-        var entity = Activator.CreateInstance(type, pos, def) as Entity;
+        try {
+            var entity = Activator.CreateInstance(type, pos, def) as Entity;
 
-        foreach (var compData in def.Components) {
-            entity.AddComponent(compData.CompClass, compData);
+            foreach (var compData in def.Components) {
+                entity.AddComponent(compData.CompClass, compData);
+            }
+
+            return entity;
+        } catch (Exception e) {
+            Debug.Error($"Failed to create entity of type {type.Name} at {pos} with def {def.Id}: ", e);
+            return null;
         }
-
-        return entity;
     }
     
     public static TileObject? CreateTileObject(string objectId, Vector2 pos) {
@@ -42,8 +52,6 @@ public static class GenEntity {
     }
 
     public static Guest? CreateGuest(Vector2 pos) {
-        var def = Find.AssetManager.GetDef<ActorDef>("Guest");
-
-        return CreateEntity<Guest>(pos, def);
+        return CreateEntity<Guest>(pos, ActorDefOf.Guest);
     }
 }

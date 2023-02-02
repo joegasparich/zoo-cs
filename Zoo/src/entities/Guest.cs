@@ -12,17 +12,9 @@ public class Guest : Actor {
     // Properties
     public PersonComponent Person => GetComponent<PersonComponent>();
     
-    public Guest(Vector2 pos, EntityDef? def) : base(pos, def) {}
+    public Guest(Vector2 pos, ActorDef? def) : base(pos, def) {}
 
     public override void Setup() {
-        Person.AgeCategory = Rand.EnumValue<PersonAgeCategory>();
-
-        if (Rand.Chance(0.05f)) {
-            Person.Gender = PersonGender.NonBinary;
-        } else {
-            Person.Gender = Rand.Bool() ? PersonGender.Male : PersonGender.Female;
-        }
-
         base.Setup();
         
         Find.Zoo.Guests.Add(this);

@@ -8,24 +8,27 @@ namespace Zoo;
 
 public static class Debug {
     public static void Log(string message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string? file = null, [CallerMemberName] string? caller = null) {
-        var fileName = file.Substring(file.LastIndexOf('\\') + 1);
+        var finalSlash = Math.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
+        var fileName   = file.Substring(finalSlash + 1);
             
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("{0,-10}{1,-150}{2} {3}", "[info]", message, fileName, $"{caller}:{lineNumber}");
+        Console.WriteLine("{0,-10}{1,-120}{2} {3}", "[info]", message, fileName, $"{caller}:{lineNumber}");
     }
 
     public static void Warn(string message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string? file = null, [CallerMemberName] string? caller = null) {
-        var fileName = file.Substring(file.LastIndexOf('\\') + 1);
+        var finalSlash = Math.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
+        var fileName   = file.Substring(finalSlash + 1);
         
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("{0,-10}{1,-150}{2} {3}", "[warn]", message, fileName, $"{caller}:{lineNumber}");
+        Console.WriteLine("{0,-10}{1,-120}{2} {3}", "[warn]", message, fileName, $"{caller}:{lineNumber}");
     }
     
     public static void Error(string message, Exception? e = null, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string? file = null, [CallerMemberName] string? caller = null) {
-        var fileName = file.Substring(file.LastIndexOf('\\') + 1);
+        var finalSlash = Math.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
+        var fileName   = file.Substring(finalSlash + 1);
         
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("{0,-10}{1,-150}{2} {3}", "[error]", message, fileName, $"{caller}:{lineNumber}");
+        Console.WriteLine("{0,-10}{1,-120}{2} {3}", "[error]", message, fileName, $"{caller}:{lineNumber}");
         if (e != null) Console.WriteLine(e);
     }
 

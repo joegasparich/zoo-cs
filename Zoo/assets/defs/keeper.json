@@ -1,0 +1,36 @@
+{
+    "class": "ActorDef",
+    "id": "Keeper",
+    "name": "keeper",
+    "accessibility": "NoWater",
+    "components": [
+        { "compClass": "PhysicsComponent" },
+        { "compClass": "ElevationComponent" },
+        { "compClass": "MoveComponent" },
+        { "compClass": "PathFollowComponent" },
+        {
+            "dataClass": "RenderComponentData",
+            "graphicData": {
+                "spritePath": "assets/textures/people/body/body_adult_1.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.7
+                }
+            }
+        },
+        {
+            "dataClass": "BehaviourComponentData",
+            "behaviourGiverClass": "KeeperBehaviourGiver"
+        },
+        {
+            "dataClass": "PersonComponentData",
+            "age": "Adult",
+            "shirt": "assets/textures/people/shirts/specialised/shirt_keeper.png",
+            "pants": "assets/textures/people/pants/specialised/pants_keeper.png",
+            "hat": "assets/textures/people/hats/specialised/hat_keeper.png"
+        }
+    ],
+    "tags": [
+        "Staff"
+    ]
+}

@@ -11,7 +11,8 @@ public enum EntityTag {
     Animal,
     TileObject,
     Guest,
-    Consumable
+    Consumable,
+    Staff,
 }
 
 public class Entity : ISerialisable {

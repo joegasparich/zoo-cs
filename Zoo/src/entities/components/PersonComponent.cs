@@ -21,9 +21,15 @@ public enum PersonGender {
 public class PersonComponentData : ComponentData {
     public override Type CompClass => typeof(PersonComponent);
 
-    public string? ForcedShirt;
-    public string? ForcedPants;
-    public string? ForcedHat;
+    // Overrides Random
+    public PersonGender?      Gender;
+    public PersonAgeCategory? Age;
+    public string?            Body;
+    public string?            Hair;
+    public string?            Beard;
+    public string?            Shirt;
+    public string?            Pants;
+    public string?            Hat;
 }
 
 public class PersonComponent : Component {
@@ -110,9 +116,19 @@ public class PersonComponent : Component {
 
             loadedIntoCache = true;
         }
+        
+        // Age
+        AgeCategory = Data.Age ?? Rand.EnumValue<PersonAgeCategory>();
+
+        // Gender
+        if (Data.Gender != null)
+            Gender = Data.Gender.Value;
+        else if (Rand.Chance(0.05f))
+            Gender = PersonGender.NonBinary;
+        else
+            Gender = Rand.Bool() ? PersonGender.Male : PersonGender.Female;
 
         // Generate name
-
         firstName = Gender switch {
             PersonGender.Male      => MaleNames.RandomElement(),
             PersonGender.Female    => FemaleNames.RandomElement(),
@@ -187,6 +203,13 @@ public class PersonComponent : Component {
             }
         }
 
+        // Override if specified in data
+        if (Data.Body  != null) body  = Data.Body;
+        if (Data.Hair  != null) hair  = Data.Hair;
+        if (Data.Beard != null) beard = Data.Beard;
+        if (Data.Shirt != null) shirt = Data.Shirt;
+        if (Data.Pants != null) pants = Data.Pants;
+        if (Data.Hat   != null) hat   = Data.Hat;
     } 
 
     private void LoadTextures(List<string> list, string path) {

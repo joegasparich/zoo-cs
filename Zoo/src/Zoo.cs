@@ -53,6 +53,8 @@ public class Zoo : ISerialisable {
         Tools.Setup();
 
         infoWidgetHandle = Find.UI.PushWindow(new Widget_ZooInfo());
+        
+        Game.RegisterEntity(GenEntity.CreateEntity<Actor>(new Vector2(5, 5), ActorDefOf.Keeper));
     }
 
     public void Cleanup() {

@@ -29,7 +29,10 @@ public static class DefUtility {
             var fields = type.GetFields();
 
             foreach (var field in fields) {
-                if (field.FieldType.BaseType != typeof(Def)) continue;
+                if (!typeof(Def).IsAssignableFrom(field.FieldType.BaseType)) {
+                    Debug.Warn($"Failed to load DefOf for {field.Name}");
+                    continue;
+                };
                 
                 field.SetValue(null, Find.AssetManager.GetDef(field.FieldType, field.Name));
             }
@@ -52,4 +55,10 @@ public static class NeedDefOf {
     public static NeedDef Hunger;
     public static NeedDef Thirst;
     public static NeedDef Energy;
+}
+
+[DefOf]
+public static class ActorDefOf {
+    public static ActorDef Guest;
+    public static ActorDef Keeper;
 }

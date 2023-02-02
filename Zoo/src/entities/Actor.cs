@@ -5,7 +5,7 @@ using Zoo.world;
 
 namespace Zoo.entities; 
 
-public abstract class Actor : Entity {
+public class Actor : Entity {
     // Components
     protected RenderComponent Renderer => GetComponent<RenderComponent>()!;
     
@@ -15,7 +15,7 @@ public abstract class Actor : Entity {
     public          Area              Area          => Find.World.Areas.GetAreaAtTile(Pos.Floor());
     public          Exhibit?          Exhibit       => Find.World.Exhibits.GetExhibitByArea(Area);
 
-    protected Actor(Vector2 pos, EntityDef? def) : base(pos, def) {}
+    public Actor(Vector2 pos, ActorDef? def) : base(pos, def) {}
 
     public Need? GetNeed(NeedDef def) => GetComponent<NeedsComponent>()?.Needs[def.Id];
 
