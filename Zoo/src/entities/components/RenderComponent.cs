@@ -21,8 +21,9 @@ public class RenderComponent : Component {
     private List<GraphicData> attachments = new();
 
     // Properties
-    public RenderComponentData Data    => (RenderComponentData)data;
-    public bool                Hovered => entity.Selectable && Find.Renderer.GetPickIdAtPos(Find.Input.GetMousePos()) == entity.Id;
+    public RenderComponentData Data => (RenderComponentData)data;
+    public GraphicData Graphics => bakedGraphic;
+    public bool Hovered => entity.Selectable && Find.Renderer.GetPickIdAtPos(Find.Input.GetMousePos()) == entity.Id;
 
     public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
         BaseGraphic  = data.GraphicData;
@@ -34,7 +35,7 @@ public class RenderComponent : Component {
         
         Debug.Assert(!BaseGraphic.Texture.Empty(), "Sprite missing from render component");
 
-        BakeGraphics();
+        BakeAttachments();
     }
 
     public override void Render() {
@@ -55,11 +56,13 @@ public class RenderComponent : Component {
         attachment.SetSprite(spritePath);
         attachments.Add(attachment);
 
-        BakeGraphics();
+        BakeAttachments();
     }
 
-    private void BakeGraphics()
+    private void BakeAttachments()
     {
+        if (attachments.NullOrEmpty()) return;
+
         // Bake the attachments into the texture
         // Currently assumes that the attachment will have the exact same dimensions as the main sprite
         var renderTexture = Raylib.LoadRenderTexture(BaseGraphic.Texture.width, BaseGraphic.Texture.height);

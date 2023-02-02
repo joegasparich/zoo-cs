@@ -29,6 +29,7 @@ public class Entity : ISerialisable {
     public         IEnumerable<Component> Components => components.Values;
     public virtual EntityDef              Def        => def;
     public         IntVec2                TilePos    => Pos.Floor();
+    public         GraphicData            Graphics   => GetComponent<RenderComponent>().Graphics;
     public         bool                   Selectable => HasComponent<SelectableComponent>();
     public         bool                   Selected   => Find.Zoo.Selection.SelectedEntity == this;
 

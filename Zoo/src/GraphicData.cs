@@ -40,14 +40,14 @@ public struct GraphicData {
         Texture = Find.AssetManager.GetTexture(spritePath);
     }
 
-    public void Blit(Vector2 pos, float depth, Color colour, int index = 0, int? pickId = null, Shader? fragShader = null) {
+    public void Blit(Vector2 pos, float depth, Color colour, int scale = 1, int index = 0, int? pickId = null, Shader? fragShader = null) {
         var source = GetCellBounds(index);
         
         Find.Renderer.Blit(
             texture: Texture,
             pos: pos,
             depth: depth,
-            scale: new Vector2(Texture.width * source.width, Texture.height * source.height) * Renderer.PixelScale,
+            scale: new Vector2(Texture.width * source.width, Texture.height * source.height) * scale,
             origin: Origin,
             source: source,
             color: colour,

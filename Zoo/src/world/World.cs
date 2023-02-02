@@ -33,7 +33,7 @@ public enum TileCost {
 
 public class World : ISerialisable {
     // Constants
-    public const int WorldScale      = 32;
+    public const int WorldScale      = 16;
     public const int LargerThanWorld = 10000;
 
     // Config

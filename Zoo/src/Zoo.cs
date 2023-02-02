@@ -80,6 +80,7 @@ public class Zoo : ISerialisable {
     public void Render() {
         World.Render();
         Tools.Render();
+        Selection.Render();
     }
 
     public void RenderLate() {

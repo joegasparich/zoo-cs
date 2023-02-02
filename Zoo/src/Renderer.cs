@@ -30,9 +30,6 @@ internal class Blit {
 }
 
 public class Renderer {
-    // Constants
-    public const int PixelScale = 2;
-    
     // Resources
     public static  Shader OutlineShader      = Raylib.LoadShader(null, "assets/shaders/outline.fsh");
     private static Shader discardAlphaShader = Raylib.LoadShader(null, "assets/shaders/discard_alpha.fsh");
@@ -111,6 +108,7 @@ public class Renderer {
         Vector2?   scale  = null,
         Vector2?   origin = null,
         Rectangle? source = null,
+        float      rotation = 0,
         Color?     color  = null,
         Shader?    fragShader = null,
         int?       pickId = null
@@ -136,7 +134,7 @@ public class Renderer {
             SourceRect = src,
             DestRect = new Rectangle(pos.X, pos.Y, scale.Value.X, scale.Value.Y),
             Origin = new Vector3(scaledOrigin.X, scaledOrigin.Y, 0),
-            Rotation = 0,
+            Rotation = rotation,
             PosZ = depth,
             Tint = color.Value,
             FragShader = fragShader,
