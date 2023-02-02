@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-using Raylib_cs;
-using Zoo.util;
+﻿using Raylib_cs;
 
 namespace Zoo.ui;
 
@@ -36,9 +34,7 @@ public class Window {
         DoWindowContents();
     }
 
-    public virtual void OnScreenResized(int width, int height) {
-        
-    }
+    public virtual void OnScreenResized(int width, int height) {}
     
     public virtual void OnClose() {}
 
