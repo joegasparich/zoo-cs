@@ -82,6 +82,7 @@ public class Renderer {
         Raylib.EndMode3D();
         
         RenderPickIdsToBuffer();
+        Raylib.UnloadImage(pickImage);
         pickImage = Raylib.LoadImageFromTexture(pickBuffer.texture);
         if (DebugSettings.DrawPickBuffer)
             RenderPickBuffer();
