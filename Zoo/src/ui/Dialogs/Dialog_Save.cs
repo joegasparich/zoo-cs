@@ -20,17 +20,17 @@ public class Dialog_Save : Dialog {
         GUI.Header(new Rectangle(0, curY, GetWidth(), 20), "Save Game");
         curY += 20 + GUI.GapSmall;
 
-        GUI.TextAlign = AlignMode.MiddleLeft;
-        GUI.TextInput(new Rectangle(GUI.GapSmall, curY, GetWidth() - GUI.GapSmall * 2, 30), ref saveName, "saveName");
-        curY += 30 + GUI.GapSmall;
+        using (new TextBlock(AlignMode.MiddleLeft)) {
+            GUI.TextInput(new Rectangle(GUI.GapSmall, curY, GetWidth() - GUI.GapSmall * 2, 30), ref saveName, "saveName");
+            curY += 30 + GUI.GapSmall;
 
-        GUI.TextAlign = AlignMode.MiddleCenter;
-        if (GUI.ButtonText(new Rectangle(PanelWidth / 2 - 100, curY, 200, 30), "Save")) {
-            if (saveName.Length > 0) {
-                Find.SaveManager.SaveGame(saveName);
-                Close();
+            GUI.TextAlign = AlignMode.MiddleCenter;
+            if (GUI.ButtonText(new Rectangle(PanelWidth / 2 - 100, curY, 200, 30), "Save")) {
+                if (saveName.Length > 0) {
+                    Find.SaveManager.SaveGame(saveName);
+                    Close();
+                }
             }
         }
-        GUI.Reset();
     }
 }

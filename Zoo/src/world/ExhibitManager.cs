@@ -168,11 +168,13 @@ public class ExhibitManager : ISerialisable {
 
     private void OnAnimalRemoved(object obj) {
         var animal = obj as Animal;
-        
-        animal.Exhibit.UpdateCache();
 
-        if (animal.Exhibit.ContainedAnimals.NullOrEmpty()) {
-            UnregisterExhibit(animal.Exhibit);
+        if (animal.Exhibit != null) {
+            animal.Exhibit.UpdateCache();
+
+            if (animal.Exhibit.ContainedAnimals.NullOrEmpty()) {
+                UnregisterExhibit(animal.Exhibit);
+            }
         }
     }
 

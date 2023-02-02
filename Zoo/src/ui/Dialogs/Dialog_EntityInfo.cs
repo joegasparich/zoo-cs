@@ -61,13 +61,13 @@ public class Dialog_EntityInfo : Dialog {
         if (tabs.Count == 1) {
             tabs[0].drawTabContents(GetRect().ContractedBy(GUI.GapTiny));
         } else {
-            GUI.TextAlign = AlignMode.MiddleCenter;
-            for (var i = 0; i < tabs.Count; i++) {
-                var tab = tabs[i];
-                if (GUI.ButtonText(new Rectangle(i * TabWidth, 0, TabWidth, TabHeight), tab.tabName, selected: currentTabIndex == i))
-                    currentTabIndex = i;
+            using (new TextBlock(AlignMode.MiddleCenter)) {
+                for (var i = 0; i < tabs.Count; i++) {
+                    var tab = tabs[i];
+                    if (GUI.ButtonText(new Rectangle(i * TabWidth, 0, TabWidth, TabHeight), tab.tabName, selected: currentTabIndex == i))
+                        currentTabIndex = i;
+                }
             }
-            GUI.Reset();
             tabs[currentTabIndex].drawTabContents(new Rectangle(0, TabHeight, GetWidth(), GetHeight() - TabHeight).ContractedBy(GUI.GapTiny));
         }
     }

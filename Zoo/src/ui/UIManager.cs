@@ -11,7 +11,8 @@ public enum UIEvent {
 
 public class UIManager {
     // Constants
-    private const string DefaultFontPath = "assets/fonts/Roboto-Regular.ttf";
+    private const string DefaultFontPath = "assets/fonts/Pixeltype.ttf";
+    public const  int    DefaultFontSize = 10;
     
     // Resources
     public Font DefaultFont;
@@ -41,8 +42,9 @@ public class UIManager {
     public void Init() {
         Debug.Log("Initializing UI");
 
-        DefaultFont = Raylib.LoadFont(DefaultFontPath);
-        Raylib.SetTextureFilter(DefaultFont.texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+        // DefaultFont = Raylib.LoadFont(DefaultFontPath);
+        DefaultFont = Raylib.LoadFontEx(DefaultFontPath, DefaultFontSize, null, 0);
+        Raylib.SetTextureFilter(DefaultFont.texture, TextureFilter.TEXTURE_FILTER_POINT);
     }
 
     public void OnInput(InputEvent evt) {

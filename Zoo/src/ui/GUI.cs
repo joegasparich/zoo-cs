@@ -20,25 +20,18 @@ public static class GUI {
     // Constants
     public const            int   GapTiny         = 6;
     public const            int   GapSmall        = 10;
-    public const            int   DefaultFontSize = 14;
-    public const            int   HeaderFontSize  = 24;
+    public const            int   HeaderFontSize  = 20;
     private static readonly Color HighlightColor  = new(255, 255, 255, 150);
     public static readonly  Color UIButtonColour  = new(230, 230, 230, 255);
-    private const           float FontSpacing     = 0.3f;
+    private const           float FontSpacing     = 0f;
 
     // Config
     public static Color     TextColour = Color.BLACK;
     public static AlignMode TextAlign  = AlignMode.TopLeft;
-    public static int       FontSize   = DefaultFontSize;
+    public static int       FontSize   = UIManager.DefaultFontSize;
     
     // Properties
     public static float UIScale => Find.UI.UIScale;
-
-    public static void Reset() {
-        TextColour = Color.BLACK;
-        TextAlign  = AlignMode.TopLeft;
-        FontSize   = DefaultFontSize;
-    }
 
     private static Rectangle MaintainAspectRatio(Rectangle rect, Texture2D texture, Rectangle? source = null) {
         source ??= new Rectangle(0, 0, 1, 1);
@@ -177,12 +170,8 @@ public static class GUI {
     
     // Widgets
     public static void Header(Rectangle rect, string text) {
-        var prevAlign = TextAlign;
-        TextAlign = AlignMode.TopCenter;
-        FontSize  = 20;
-        Label(rect, text);
-        FontSize  = DefaultFontSize;
-        TextAlign = prevAlign;
+        using (new TextBlock(AlignMode.TopCenter, 20))
+            Label(rect, text);
     }
 
     public static bool ButtonEmpty(Rectangle rect, Color? col = null, bool selected = false) {
@@ -281,19 +270,28 @@ public struct TextBlock : IDisposable
 {
     private AlignMode oldAlignMode;
     private Color     oldColor;
+    private int       oldFontSize;
 
-    public TextBlock(AlignMode newAlignMode) : this(newAlignMode, null) {}
-    public TextBlock(Color newColor) : this(null, newColor) {}
+    public TextBlock(AlignMode newAlignMode) : this(newAlignMode, null, null) {}
+    public TextBlock(Color newColor) : this(null, newColor, null) {}
+    public TextBlock(int newFontSize) : this(null, null, newFontSize) {}
+    public TextBlock(AlignMode newAlignMode, Color newColor) : this(newAlignMode, newColor, null) {}
+    public TextBlock(AlignMode newAlignMode, int newFontSize) : this(newAlignMode, null, newFontSize) {}
+    public TextBlock(Color newColor, int newFontSize) : this(null, newColor, newFontSize) {}
 
-    public TextBlock(AlignMode? newAlignMode, Color? newColor) {
+    public TextBlock(AlignMode? newAlignMode, Color? newColor, int? newFontSize) {
         oldAlignMode = GUI.TextAlign;
         oldColor     = GUI.TextColour;
+        oldFontSize  = GUI.FontSize;
 
         if (newAlignMode != null)
             GUI.TextAlign = newAlignMode.Value;
 
         if (newColor != null)
             GUI.TextColour = newColor.Value;
+
+        if (newFontSize != null)
+            GUI.FontSize = newFontSize.Value;
     }
 
     public static TextBlock Default()
@@ -305,5 +303,6 @@ public struct TextBlock : IDisposable
     {
         GUI.TextAlign  = oldAlignMode;
         GUI.TextColour = oldColor;
+        GUI.FontSize   = oldFontSize;
     }
 }

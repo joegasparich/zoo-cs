@@ -53,11 +53,6 @@ public class Scene_Zoo : Scene {
 
     public override void OnInput(InputEvent evt) {
         Zoo.OnInput(evt);
-
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
-            foreach (var entity in Zoo.World.GetEntitiesAtTile(evt.mouseWorldPos.Floor()))
-                Debug.Log(entity.Def.Name);
-        }
     }
 
     private void GenerateOuterWalls() {

@@ -63,6 +63,7 @@ public class Zoo : ISerialisable {
     public void Update() {
         World.Update();
         Tools.Update();
+        Selection.Update();
 
         if (Animals.Count > 0) {
             if (Game.Ticks % GuestArrivalInterval == 0) {

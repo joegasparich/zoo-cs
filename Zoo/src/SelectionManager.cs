@@ -17,6 +17,11 @@ public class SelectionManager {
     public  Entity? SelectedEntity;
     private string  infoDialogId;
 
+    public void Update() {
+        if (SelectedEntity is { Despawned: true })
+            Select(null);
+    }
+
     public void OnInput(InputEvent evt) {
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             var pickId = Find.Renderer.GetPickIdAtPos(evt.mousePos);

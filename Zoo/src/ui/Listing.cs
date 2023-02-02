@@ -9,7 +9,7 @@ public class Listing {
     private float     elementHeight;
     private float     gap;
 
-    public Listing(Rectangle rect, float elementHeight = GUI.DefaultFontSize, float gap = GUI.GapTiny) {
+    public Listing(Rectangle rect, float elementHeight = UIManager.DefaultFontSize, float gap = GUI.GapTiny) {
         this.rect          = rect;
         listingY           = rect.y;
         this.elementHeight = elementHeight;
@@ -17,10 +17,9 @@ public class Listing {
     }
 
     public void Header(string text) {
-        GUI.FontSize = GUI.HeaderFontSize;
-        GUI.Label(new Rectangle(rect.x, listingY, rect.width, GUI.HeaderFontSize), text);
+        using (new TextBlock(GUI.HeaderFontSize))
+            GUI.Label(new Rectangle(rect.x, listingY, rect.width, GUI.HeaderFontSize), text);
         listingY += GUI.HeaderFontSize + gap;
-        GUI.Reset();
     }
 
     public void Label(string text, float? height = null) {
