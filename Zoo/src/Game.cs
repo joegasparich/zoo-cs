@@ -14,7 +14,7 @@ public class GameSettings {
 
 public static class Game {
     // Enums
-    private enum TickRate {
+    public enum TickRate {
         Normal = 1,
         Fast = 2,
         Faster = 4
@@ -310,6 +310,17 @@ public static class Game {
         entities.Clear();
         entitiesToAdd.Clear();
         entitiesToRemove.Clear();
+    }
+
+    public static void Pause(bool pause) {
+        paused = pause;
+    }
+    public static void TogglePause() {
+        paused = !paused;
+    }
+    public static void SetTickRate(TickRate rate) {
+        tickRate = rate;
+        paused   = false;
     }
 
     public static void Serialise() {

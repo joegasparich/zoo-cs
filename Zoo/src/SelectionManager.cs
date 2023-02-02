@@ -8,10 +8,9 @@ using Zoo.world;
 namespace Zoo; 
 
 public class SelectionManager {
-    private const string SelectionBracketCornerPath = "assets/textures/ui/selection_bracket_corner.png";
-    private const int    offset = 2;
-
-    private Texture2D SelectionBracketCorner => Find.AssetManager.GetTexture(SelectionBracketCornerPath);
+    // Constants
+    private static readonly CachedTexture SelectionBracketCorner = new("assets/textures/ui/selection_bracket_corner.png");
+    private const           int           offset                 = 2;
 
     // State
     public  Entity? SelectedEntity;
@@ -38,10 +37,10 @@ public class SelectionManager {
     public void Render() {
         if (SelectedEntity != null) {
             var (width, height) = SelectedEntity.Graphics.Texture.Dimensions();
-            Find.Renderer.Blit(SelectionBracketCorner, SelectedEntity.Pos * World.WorldScale + new Vector2(-width * SelectedEntity.Graphics.Origin.X       - offset, -height * SelectedEntity.Graphics.Origin.Y       - offset), (int)Depth.UI);
-            Find.Renderer.Blit(SelectionBracketCorner, SelectedEntity.Pos * World.WorldScale + new Vector2(width  * (1 - SelectedEntity.Graphics.Origin.X) + offset, -height * SelectedEntity.Graphics.Origin.Y       - offset), (int)Depth.UI, rotation: 90);
-            Find.Renderer.Blit(SelectionBracketCorner, SelectedEntity.Pos * World.WorldScale + new Vector2(width  * (1 - SelectedEntity.Graphics.Origin.X) + offset, height  * (1 - SelectedEntity.Graphics.Origin.Y) + offset), (int)Depth.UI, rotation: 180);
-            Find.Renderer.Blit(SelectionBracketCorner, SelectedEntity.Pos * World.WorldScale + new Vector2(-width * SelectedEntity.Graphics.Origin.X       - offset, height  * (1 - SelectedEntity.Graphics.Origin.Y) + offset), (int)Depth.UI, rotation: 270);
+            Find.Renderer.Blit(SelectionBracketCorner.Texture, SelectedEntity.Pos * World.WorldScale + new Vector2(-width * SelectedEntity.Graphics.Origin.X       - offset, -height * SelectedEntity.Graphics.Origin.Y       - offset), (int)Depth.UI);
+            Find.Renderer.Blit(SelectionBracketCorner.Texture, SelectedEntity.Pos * World.WorldScale + new Vector2(width  * (1 - SelectedEntity.Graphics.Origin.X) + offset, -height * SelectedEntity.Graphics.Origin.Y       - offset), (int)Depth.UI, rotation: 90);
+            Find.Renderer.Blit(SelectionBracketCorner.Texture, SelectedEntity.Pos * World.WorldScale + new Vector2(width  * (1 - SelectedEntity.Graphics.Origin.X) + offset, height  * (1 - SelectedEntity.Graphics.Origin.Y) + offset), (int)Depth.UI, rotation: 180);
+            Find.Renderer.Blit(SelectionBracketCorner.Texture, SelectedEntity.Pos * World.WorldScale + new Vector2(-width * SelectedEntity.Graphics.Origin.X       - offset, height  * (1 - SelectedEntity.Graphics.Origin.Y) + offset), (int)Depth.UI, rotation: 270);
         }
     }
 

@@ -11,7 +11,7 @@ public static class RaylibExtension {
     public static Vector2 Dimensions(this Texture2D tex) {
         return new(tex.width, tex.height);
     }
-    
+
     // Key //
     public static bool IsAlphanumeric(this KeyboardKey key) {
         return key is >= KeyboardKey.KEY_APOSTROPHE and <= KeyboardKey.KEY_GRAVE;

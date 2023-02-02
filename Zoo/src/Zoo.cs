@@ -1,6 +1,7 @@
 using System.Numerics;
 using Zoo.entities;
 using Zoo.tools;
+using Zoo.ui;
 using Zoo.util;
 using Zoo.world;
 
@@ -26,9 +27,10 @@ public class Zoo : ISerialisable {
     public IntVec2 Entrance;
     
     // State
-    public World            World;
-    public ToolManager      Tools;
-    public SelectionManager Selection;
+    public  World            World;
+    public  ToolManager      Tools;
+    public  SelectionManager Selection;
+    private string           infoWidgetHandle;
     
     public int Cash = 1000;
     
@@ -48,11 +50,15 @@ public class Zoo : ISerialisable {
         
         World.Setup();
         Tools.Setup();
+
+        infoWidgetHandle = Find.UI.PushWindow(new Widget_ZooInfo());
     }
 
     public void Cleanup() {
         World.Reset();
         Tools.Cleanup();
+
+        Find.UI.CloseWindow(infoWidgetHandle);
     }
 
     public void PreUpdate() {
