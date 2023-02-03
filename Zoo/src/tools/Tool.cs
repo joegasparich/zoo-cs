@@ -31,9 +31,7 @@ public abstract class Tool {
 
     public virtual void Set() {}
     public virtual void Unset() {}
-    public virtual void PreUpdate() {}
     public virtual void Update() {}
-    public virtual void PostUpdate() {}
     public virtual void Render() {}
     public virtual void RenderLate() {}
     public virtual void OnGUI() {}

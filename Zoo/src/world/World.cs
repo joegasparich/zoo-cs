@@ -109,9 +109,7 @@ public class World : ISerialisable {
     }
     public void Update() {}
 
-    public void PostUpdate() {
-        Terrain.PostUpdate();
-    }
+    public void PostUpdate() {}
 
     public void Render() {
         Terrain.Render();

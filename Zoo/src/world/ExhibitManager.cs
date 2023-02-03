@@ -108,8 +108,10 @@ public class ExhibitManager : ISerialisable {
 
     private void OnAreaRemoved(object obj) {
         var area = obj as Area;
-        
-        UnregisterExhibit(GetExhibitByArea(area));
+
+        var exhibit = GetExhibitByArea(area);
+        if (exhibit != null)
+            UnregisterExhibit(exhibit);
     }
 
     private void OnAnimalPlaced(object obj) {

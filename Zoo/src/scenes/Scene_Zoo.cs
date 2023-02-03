@@ -40,6 +40,10 @@ public class Scene_Zoo : Scene {
         Zoo.PostUpdate();
     }
 
+    public override void ConstantUpdate() {
+        Zoo.ConstantUpdate();
+    }
+
     public override void Render() {
         Zoo.Render();
     }

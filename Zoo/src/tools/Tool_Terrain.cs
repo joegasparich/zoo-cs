@@ -84,7 +84,7 @@ public class Tool_Terrain : Tool {
 
     public override void Update() {
         if (currentTerrain == null) return;
-        if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
+        if (!isDragging) return;
 
         var pos = Find.Input.GetMouseWorldPos() * TerrainGrid.TerrainScale;
         

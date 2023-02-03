@@ -94,21 +94,24 @@ public static class Game {
         while (!Raylib.WindowShouldClose()) {
             var currentTime = Raylib.GetTime() * 1000;
 
-            if (!paused) {
-                var elapsed = currentTime - lastTime;
-                lag += elapsed;
-                
-                var msPerUpdate = MsPerUpdate / (int) tickRate;
-                
-                while (lag >= msPerUpdate) {
+            var elapsed = currentTime - lastTime;
+            lag += elapsed;
+
+            var msPerUpdate = MsPerUpdate / (int) tickRate;
+
+            while (lag >= msPerUpdate) {
+                if (!paused) {
                     // Do Update
                     PreUpdate();
                     Update();
                     PostUpdate();
-                    
-                    lag -= msPerUpdate;
+
                     ticksSinceGameStart++;
                 }
+
+                ConstantUpdate();
+
+                lag -= msPerUpdate;
             }
             
             lastTime = currentTime;
@@ -158,6 +161,14 @@ public static class Game {
                 Debug.Error($"Error in entity PostUpdate {entity.Id}", e);
             }
         }
+    }
+
+    /// <summary>
+    /// Runs every tick, regardless of pause state
+    /// Occurs after PostUpdate
+    /// </summary>
+    public static void ConstantUpdate() {
+        SceneManager.GetCurrentScene()?.ConstantUpdate();
 
         DoEntityReg();
     }

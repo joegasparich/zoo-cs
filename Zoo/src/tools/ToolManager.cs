@@ -33,16 +33,8 @@ public class ToolManager {
         Find.UI.CloseWindow(toolbarHandle);
     }
 
-    public void PreUpdate() {
-        activeTool.PreUpdate();
-    }
-    
-    public void Update() {
+    public void ConstantUpdate() {
         activeTool.Update();
-    }
-    
-    public void PostUpdate() {
-        activeTool.PostUpdate();
     }
 
     public void Render() {

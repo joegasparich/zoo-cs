@@ -79,7 +79,7 @@ public class Tool_Elevation : Tool {
 
     public override void Update() {
         if (!currentElevation.HasValue) return;
-        if (!isDragging || Game.Ticks % PlaceIntervalTicks != 0) return;
+        if (!isDragging) return;
         
         var oldPoints = Find.World.Elevation.SetElevationInCircle(Find.Input.GetMouseWorldPos(), radius, currentElevation.Value);
 

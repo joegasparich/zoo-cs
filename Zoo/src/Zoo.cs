@@ -67,12 +67,11 @@ public class Zoo : ISerialisable {
 
     public void PreUpdate() {
         World.PreUpdate();
-        Tools.PreUpdate();
     }
 
     public void Update() {
         World.Update();
-        Tools.Update();
+        Tools.ConstantUpdate();
         Selection.Update();
 
         // if (Animals.Count > 0) {
@@ -86,7 +85,10 @@ public class Zoo : ISerialisable {
 
     public void PostUpdate() {
         World.PostUpdate();
-        Tools.PostUpdate();
+    }
+
+    public void ConstantUpdate() {
+        Tools.ConstantUpdate();
     }
 
     public void Render() {
@@ -124,4 +126,5 @@ public class Zoo : ISerialisable {
     public void PostLoad() {
         World.PostLoad();
     }
+
 }

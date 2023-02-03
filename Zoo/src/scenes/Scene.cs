@@ -12,6 +12,7 @@ public abstract class Scene : ISerialisable {
     public virtual void PreUpdate()             {}
     public virtual void Update()                {}
     public virtual void PostUpdate()            {}
+    public virtual void ConstantUpdate()              {}
     public virtual void Render()                {}
     public virtual void RenderLate()            {}
     public virtual void OnGUI()                 {}
@@ -20,7 +21,8 @@ public abstract class Scene : ISerialisable {
     public virtual void Stop() {
         Game.ClearEntities();
     }
-    
+
     public virtual void Serialise() {}
-    public virtual void PostLoad() {}
+    public virtual void PostLoad()  {}
+
 }

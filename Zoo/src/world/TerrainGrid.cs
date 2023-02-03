@@ -78,18 +78,16 @@ public class TerrainGrid : ISerialisable {
         isSetup = false;
     }
 
-    public void PostUpdate() {
-        if (chunkRegenQueue.Count > 0) {
-            var chunkToRegen = chunkRegenQueue.Dequeue();
-            chunkToRegen.RegenerateMeshNow();
-        }
-    }
-
     public void Render() {
         foreach (var row in chunkGrid) {
             foreach (var chunk in row) {
                 chunk.Render();
             }
+        }
+
+        if (chunkRegenQueue.Count > 0) {
+            var chunkToRegen = chunkRegenQueue.Dequeue();
+            chunkToRegen.RegenerateMeshNow();
         }
     }
 
