@@ -207,15 +207,15 @@ public static class Game {
                 evt.Consume();
             }
             if (evt.inputDown == InputType.NormalSpeed) {
-                tickRate = TickRate.Normal;
+                SetTickRate(TickRate.Normal);
                 evt.Consume();
             }
             if (evt.inputDown == InputType.FastSpeed) {
-                tickRate = TickRate.Fast;
+                SetTickRate(TickRate.Fast);
                 evt.Consume();
             }
             if (evt.inputDown == InputType.FasterSpeed) {
-                tickRate = TickRate.Faster;
+                SetTickRate(TickRate.Faster);
                 evt.Consume();
             }
         }

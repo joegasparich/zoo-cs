@@ -17,10 +17,7 @@ public class IdleBehaviour : Behaviour {
     public override void Start() {
         base.Start();
 
-        if (actor.CanUseDoors)
-            wanderTile = LocationUtility.RandomAccessibleCellInRadius(actor.Pos.Floor(), 5, actor.AccessibleAreas, actor.Accessibility);
-        else
-            wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Pos.Floor(), 5, actor.Area, actor.Accessibility);
+        wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Pos.Floor(), 5, actor.Area, actor.Accessibility);
     }
 
     public override IEnumerable<Step> GetSteps() {

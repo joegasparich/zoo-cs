@@ -11,7 +11,7 @@ public class Area {
     public Color  Colour { get; }
     
     // Cache
-    public List<IntVec2> EntranceTiles { get; private set; } = new();
+    public List<Wall> Entrances = new();
 
     // State
     public List<IntVec2>                   Tiles          { get; set; } = new();
@@ -77,7 +77,6 @@ public class Area {
     }
     
     private void CacheEntranceTiles() {
-        // Check out this monstrosity that Rider has generated for me
-        EntranceTiles = ConnectedAreas.Values.SelectMany(doors => from door in doors from tile in door.GetAdjacentTiles() where tile.GetArea() == this select tile).ToList();
+        Entrances = ConnectedAreas.Values.SelectMany(doors => doors).ToList();
     }
 }

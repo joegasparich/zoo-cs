@@ -5,19 +5,24 @@ namespace Zoo.world;
 
 
 public class Exhibit : ISerialisable {
+    // Constants
+    private const int MaintenanceCooldown = 300; // 5 seconds
+
     // State
     public string Id;
     public string Name;
     public Area   Area;
-    public bool   Exists = true;
+    public bool   Exists         = true;
+    public int    LastMaintainedTick = -99999;
     
     // Cache
     public HashSet<IntVec2> ViewingTiles     = new();
     public List<Animal>     ContainedAnimals = new();
     
     // Properties
-    public bool MissingFood => ContainedAnimals.Any(animal => animal.MissingFoodSource);
-    public bool MissingWater => ContainedAnimals.Any(animal => animal.MissingWaterSource);
+    public bool MissingFood      => ContainedAnimals.Any(animal => animal.MissingFoodSource);
+    public bool MissingWater     => ContainedAnimals.Any(animal => animal.MissingWaterSource);
+    public bool NeedsMaintenance => (MissingFood || MissingWater) && LastMaintainedTick + MaintenanceCooldown < Game.Ticks;
 
     public Exhibit() {}
     public Exhibit(string id, string name, Area area) {
@@ -47,5 +52,6 @@ public class Exhibit : ISerialisable {
         Find.SaveManager.ArchiveValue("id",       ref Id);
         Find.SaveManager.ArchiveValue("name",     ref Name);
         Find.SaveManager.ArchiveValue("areaTile", () => Area.Tiles[0], tile => Area = Find.World.Areas.GetAreaAtTile(tile));
+        Find.SaveManager.ArchiveValue("lastMaintained",   ref LastMaintainedTick);
     }
 }
