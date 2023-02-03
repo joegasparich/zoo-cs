@@ -7,6 +7,10 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public class Animal : Actor {
+    // Cache
+    public bool MissingFoodSource = false;
+    public bool MissingWaterSource = false;
+    
     // Properties
     public override AnimalDef Def => (AnimalDef)base.Def;
     public bool IsAsleep => GetComponent<BehaviourComponent>().CurrentBehaviour is SleepBehaviour;

@@ -1,4 +1,6 @@
 ﻿using System.Numerics;
+using Raylib_cs;
+using Zoo.defs;
 using Zoo.util;
 
 namespace Zoo.world; 
@@ -18,5 +20,25 @@ public static class TileUtility {
     }
     public static FootPath? GetFootPath(this IntVec2 tile) {
         return Find.World.FootPaths.GetFootPathAtTile(tile);
+    }
+
+    public static bool CanPlace(ObjectDef obj, IntVec2 tile) {
+        for (int i = 0; i < obj.Size.X; i++) {
+            for (int j = 0; j < obj.Size.Y; j++) {
+                var t = (tile + new Vector2(i, j)).Floor();
+                
+                if (Find.World.GetTileObjectAtTile(t) != null) return false;
+                if (Find.World.Elevation.IsTileWater(t)) return false;
+                if (!Find.World.IsPositionInMap(t)) return false;
+                
+                foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(t)) {
+                    if (!wall.Exists) continue;
+                    var placementBounds = new Rectangle(t.X, t.Y, obj.Size.X, obj.Size.Y);
+                    if (placementBounds.ContractedBy(0.1f).Contains(wall.WorldPos)) return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

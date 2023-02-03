@@ -102,23 +102,8 @@ public class Tool_TileObject : Tool {
 
     public override bool CanPlace(ToolGhost ghost) {
         if (currentObject == null) return false;
-        
-        for (int i = 0; i < currentObject.Size.X; i++) {
-            for (int j = 0; j < currentObject.Size.Y; j++) {
-                var tile = (ghost.Pos + new Vector2(i, j)).Floor();
-                
-                if (Find.World.GetTileObjectAtTile(tile) != null) return false;
-                if (Find.World.Elevation.IsTileWater(tile)) return false;
-                if (!Find.World.IsPositionInMap(tile)) return false;
-                
-                foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(tile)) {
-                    if (!wall.Exists) continue;
-                    if (GetPlacementBounds(ghost).ContractedBy(0.1f).Contains(wall.WorldPos)) return false;
-                }
-            }
-        }
 
-        return true;
+        return TileUtility.CanPlace(currentObject, ghost.Pos.Floor());
     }
 
     private Rectangle GetPlacementBounds(ToolGhost ghost) {

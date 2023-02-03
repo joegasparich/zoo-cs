@@ -5,6 +5,9 @@ using Zoo.util;
 namespace Zoo.ai; 
 
 public class ConsumeBehaviour : Behaviour {
+    // Constants
+    private int EatTicks = 300; // 5 seconds
+    
     // Config
     private NeedDef need;
     
@@ -23,33 +26,28 @@ public class ConsumeBehaviour : Behaviour {
         this.need = need;
     }
 
-    public override void Update() {
-        base.Update();
-
-        if (consumable == null) {
-            consumable = GetClosestConsumableOfType(need.Id);
-        } else {
-            if (consumable.Despawned) {
-                completed = true;
-                return;
-            }
-            
-            if (!Pather.HasPath) {
-                Pather.PathTo(consumable.Pos);
-            }
-
-            if (CanConsume) {
-                Needs.ModifyNeed(Consumable.Data.Need.Def.Id, Consumable.Consume());
-                
-                if (Needs.Needs[Consumable.Data.Need.Def.Id].Full) {
-                    completed = true;
-                    return;
-                }
-            }
-        }
-
+    public override void Start() {
+        base.Start();
+        
+        consumable = GetClosestConsumableOfType(need.Id);
     }
-    
+
+    public override IEnumerable<Step> GetSteps() {
+        // Go to consumable
+        yield return Steps_General.GoTo(consumable.Pos)
+            .FailOn(() => consumable.Despawned);
+
+        // Eat for a while
+        yield return Steps_General.Wait(EatTicks)
+            .FailOn(() => consumable.Despawned);
+
+        // Modify need
+        yield return Steps_General.Do(() => {
+            var amount = Consumable.Consume(1 - Needs.Needs[Consumable.Data.Need.Def.Id].Value);
+            Needs.ModifyNeed(Consumable.Data.Need.Def.Id, amount);
+        });
+    }
+
     private Entity? GetClosestConsumableOfType(string needDefId) {
         Entity? closest            = null;
         var     closestDistSquared = float.PositiveInfinity;
@@ -72,6 +70,7 @@ public class ConsumeBehaviour : Behaviour {
     public override void Serialise() {
         base.Serialise();
         
+        Find.SaveManager.ArchiveDef("need", ref need);
         Find.SaveManager.ArchiveValue("consumable", () => consumable.Id, id => consumable = Game.GetEntityById(id));
     }
 }

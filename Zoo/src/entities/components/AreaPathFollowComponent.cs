@@ -22,7 +22,8 @@ public class AreaPathFollowComponent : PathFollowComponent {
     public override void Update() {
         if (areaPath.NullOrEmpty() && !enterDoorPos.HasValue) {
             base.Update();
-            currentDoor = null;
+            areaPathCompleted = pathCompleted;
+            currentDoor       = null;
             return;
         }
 
@@ -115,6 +116,9 @@ public class AreaPathFollowComponent : PathFollowComponent {
         destination       = null;
         enterDoorPos      = null;
         deferredTargetPos = null;
+        areaPathCompleted = false;
+        
+        ResetPath();
     }
 
     public override void Serialise() {

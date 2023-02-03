@@ -14,21 +14,17 @@ public class IdleBehaviour : Behaviour {
     public IdleBehaviour() {}
     public IdleBehaviour(Actor actor) : base(actor) {}
 
-    public override void Update() {
-        base.Update();
+    public override void Start() {
+        base.Start();
         
-        if (Pather.ReachedDestination) {
-            completed = true;
-        }
+        wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Area, actor.Pos.Floor(), 5, actor.Accessibility);
+    }
 
-        if (wanderTile == null || !Pather.HasPath) {
-            wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Area, actor.Pos.Floor(), 5, actor.Accessibility);
-
-            if (wanderTile.HasValue) {
-                if (!Pather.PathTo(wanderTile.Value)) 
-                    wanderTile = null;
-            }
-        }
+    public override IEnumerable<Step> GetSteps() {
+        if (!wanderTile.HasValue)
+            yield break;
+        
+        yield return Steps_General.GoTo(wanderTile.Value);
     }
 
     public override void Serialise() {

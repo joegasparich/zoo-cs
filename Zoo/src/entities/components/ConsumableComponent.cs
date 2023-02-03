@@ -6,7 +6,6 @@ public class ConsumableComponentData : ComponentData {
     public override Type CompClass => typeof(ConsumableComponent);
     
     public DefRef<NeedDef> Need;
-    public float           QuantityConsumedPerTick;
     public float           MaxQuantity;
 }
 
@@ -21,8 +20,9 @@ public class ConsumableComponent : Component {
         quantity = Data.MaxQuantity;
     }
 
-    public float Consume() {
-        var consumed = MathF.Min(Data.QuantityConsumedPerTick, quantity);
+    public float Consume(float requestedAmount) {
+        var consumed = MathF.Min(requestedAmount, quantity);
+        
         quantity -= consumed;
         if (quantity <= 0) {
             entity.Destroy();

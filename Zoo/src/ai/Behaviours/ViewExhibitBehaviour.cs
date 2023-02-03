@@ -24,42 +24,28 @@ public class ViewExhibitBehaviour : Behaviour {
     public ViewExhibitBehaviour(Actor actor, Exhibit exhibit) : base(actor) {
         this.exhibit = exhibit;
     }
-    
-    public override void Update() {
-        base.Update();
+
+    public override void Start() {
+        base.Start();
         
-        if (pathfindingAttempts >= MaxPathfindAttempts) {
-            completed = true;
-            // TODO: Add this to a can't reach cache that gets cleared every so often
-            return;
-        }
+        // TODO: Add this to a can't reach cache that gets cleared every so often
+        viewingTile = exhibit.ViewingTiles.RandomElement();
+    }
+
+    public override IEnumerable<Step> GetSteps() {
+        if (!viewingTile.HasValue)
+            yield break;
+
+        // Go to viewing tile
+        yield return Steps_General.GoTo(viewingTile.Value);
         
-        // Viewing exhibit 
-        if (startedViewingTick > 0) {
-            if (startedViewingTick + ViewTicks < Game.Ticks) {
-                Guest.ExhibitsViewed.Add(exhibit);
-                completed = true;
-            }
-            
-            return;
-        }
-
-        // Reached view tile
-        if (Pather.ReachedDestination) {
-            startedViewingTick = Game.Ticks;
-            return;
-        }
-
-        // Viewing tile could not be pathed to
-        if (Pather.NoPathFound)
-            viewingTile = null;
-
-        // Go to view tile
-        if (!viewingTile.HasValue) {
-            viewingTile = exhibit.ViewingTiles.RandomElement();
-            Pather.PathTo(viewingTile.Value);
-            pathfindingAttempts++;
-        }
+        // View exhibit
+        yield return Steps_General.Wait(ViewTicks);
+        
+        // Mark exhibit viewed
+        yield return Steps_General.Do(() => {
+            Guest.ExhibitsViewed.Add(exhibit);
+        });
     }
 
     public override void Serialise() {

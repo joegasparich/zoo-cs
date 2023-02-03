@@ -4,47 +4,6 @@ using Zoo.util;
 
 namespace Zoo.world;
 
-public class Exhibit : ISerialisable {
-    // State
-    public string Id;
-    public string Name;
-    public Area   Area;
-    
-    // Cache
-    public HashSet<IntVec2> ViewingTiles     = new();
-    public List<Animal>     ContainedAnimals = new();
-
-    public Exhibit() {}
-    public Exhibit(string id, string name, Area area) {
-        Id   = id;
-        Name = name;
-        Area = area;
-        
-        UpdateCache();
-    }
-
-    public void UpdateCache() {
-        ViewingTiles.Clear();
-        ContainedAnimals.Clear();
-
-        ContainedAnimals = Area.GetContainedEntities(EntityTag.Animal).Cast<Animal>().ToList();
-
-        foreach (var tile in Area.Tiles) {
-            foreach (var neighbour in Find.World.GetAdjacentTiles(tile)) {
-                if (neighbour.GetArea().IsZooArea) {
-                    ViewingTiles.Add(neighbour);
-                }
-            }
-        }
-    }
-
-    public void Serialise() {
-        Find.SaveManager.ArchiveValue("id",       ref Id);
-        Find.SaveManager.ArchiveValue("name",     ref Name);
-        Find.SaveManager.ArchiveValue("areaTile", () => Area.Tiles[0], tile => Area = Find.World.Areas.GetAreaAtTile(tile));
-    }
-}
-
 public class ExhibitManager : ISerialisable {
     // Collections
     private Dictionary<string, Exhibit> exhibits = new();
@@ -99,6 +58,8 @@ public class ExhibitManager : ISerialisable {
         
         exhibits.Remove(exhibit.Id);
         exhibitsByArea.Remove(exhibit.Area.Id);
+
+        exhibit.Exists = false;
         
         Debug.Log($"Exhibit {exhibit.Name} unregistered");
     }

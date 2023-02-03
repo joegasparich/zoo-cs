@@ -28,7 +28,7 @@ public static class EntitySerialiseUtility {
         foreach (JObject entityData in data) {
             Find.SaveManager.CurrentSaveNode = entityData;
             var type = Type.GetType(entityData["type"].Value<string>());
-            var def  = Find.AssetManager.GetDef(entityData["defId"].Value<string>()) as EntityDef;
+            var def  = Find.AssetManager.GetDef(entityData["def"].Value<string>()) as EntityDef;
             var pos  = entityData["pos"].ToObject<Vector2>();
 
             var entity = GenEntity.CreateEntity(type, pos, def);

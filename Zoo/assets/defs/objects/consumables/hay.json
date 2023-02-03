@@ -18,8 +18,7 @@
         {
             "dataClass": "ConsumableComponentData",
             "need": "Hunger",
-            "quantityConsumedPerTick": 0.002,
-            "maxQuantity": 500
+            "maxQuantity": 5
         }
     ]
 }

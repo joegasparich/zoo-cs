@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Zoo.defs;
 using Zoo.util;
 
 namespace Zoo;
@@ -143,6 +144,25 @@ public class SaveManager {
                 var value = default(T);
                 ArchiveValue(label, ref value);
                 set(value);
+                break;
+            }
+        }
+    }
+
+    public void ArchiveDef<T>(string label, ref T def) where T : Def {
+        switch (Mode) {
+            case SerialiseMode.Saving: {
+                if (def == null) return;
+                
+                CurrentSaveNode.Add(label, JToken.FromObject(def.Id, serializer));
+                break;
+            }
+            case SerialiseMode.Loading: {
+                if (CurrentSaveNode[label] == null)
+                    break;
+                
+                var id = CurrentSaveNode[label]!.Value<string>();
+                def = Find.AssetManager.GetDef<T>(id);
                 break;
             }
         }

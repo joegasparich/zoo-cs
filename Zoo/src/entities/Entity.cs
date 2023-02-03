@@ -192,10 +192,7 @@ public class Entity : ISerialisable {
             data => EntitySerialiseUtility.LoadComponents(this, data)
         );
         
-        Find.SaveManager.ArchiveValue("defId",
-            () => def.Id,
-            id => def = Find.AssetManager.GetDef(id) as EntityDef
-        );
+        Find.SaveManager.ArchiveDef("def", ref def);
     }
 
     public virtual List<InfoTab> GetInfoTabs() {

@@ -88,7 +88,8 @@ public class PathFollowComponent : InputComponent {
         }
         if (Actor.Pos.Floor().GetArea() != targetPos.Floor().GetArea()) {
             Debug.Warn($"Pather {Actor.Id} tried to path outside of area");
-            pathCompleted = true;
+            failedToFindPath = true;
+            path             = null;
             return false;
         }
 

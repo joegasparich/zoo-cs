@@ -8,6 +8,7 @@ namespace Zoo.entities;
 public class Actor : Entity {
     // Components
     protected RenderComponent Renderer => GetComponent<RenderComponent>()!;
+    public PathFollowComponent Pather => GetComponent<PathFollowComponent>()!;
     
     // Properties
     public override ActorDef          Def           => (ActorDef)base.Def;

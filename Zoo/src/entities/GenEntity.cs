@@ -42,12 +42,20 @@ public static class GenEntity {
     public static TileObject? CreateTileObject(string objectId, Vector2 pos) {
         var def = Find.AssetManager.GetDef<ObjectDef>(objectId);
 
+        return CreateTileObject(def, pos);
+    }
+    
+    public static TileObject? CreateTileObject(ObjectDef def, Vector2 pos) {
         return CreateEntity<TileObject>(pos + def.Size / 2f, def);
     }
     
     public static Animal? CreateAnimal(string animalId, Vector2 pos) {
         var def = Find.AssetManager.GetDef<AnimalDef>(animalId);
 
+        return CreateAnimal(def, pos);
+    }
+    
+    public static Animal? CreateAnimal(AnimalDef def, Vector2 pos) {
         return CreateEntity<Animal>(pos, def);
     }
 

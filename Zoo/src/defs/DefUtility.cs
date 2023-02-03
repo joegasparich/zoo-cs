@@ -62,3 +62,9 @@ public static class ActorDefOf {
     public static ActorDef Guest;
     public static ActorDef Keeper;
 }
+
+[DefOf]
+public static class ObjectDefOf {
+    public static ObjectDef WaterBowl;
+    public static ObjectDef Hay;
+}

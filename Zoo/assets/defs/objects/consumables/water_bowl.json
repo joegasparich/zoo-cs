@@ -18,8 +18,7 @@
         {
             "dataClass": "ConsumableComponentData",
             "need": "Thirst",
-            "quantityConsumedPerTick": 0.002,
-            "maxQuantity": 500
+            "maxQuantity": 5
         }
     ]
 }

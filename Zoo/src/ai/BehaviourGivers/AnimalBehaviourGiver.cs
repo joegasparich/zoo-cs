@@ -16,15 +16,26 @@ public static class AnimalBehaviourGiver {
         // TODO: Is there a better factoring for this? I kind of hate it but I don't want a JobGiver equivalent
         
         // Thirst
-        if (animal.GetNeed(NeedDefOf.Thirst).Value < ThirstThreshold 
-         && animal.Area.GetContainedEntities(EntityTag.Consumable).Any(e => e.GetComponent<ConsumableComponent>().Data.Need.Def == NeedDefOf.Thirst)) {
-            priorityQueue.Enqueue(() => new ConsumeBehaviour(animal, NeedDefOf.Thirst), (1 - animal.GetNeed(NeedDefOf.Thirst).Value) * ThirstPriority);
+        if (animal.GetNeed(NeedDefOf.Thirst).Value < ThirstThreshold) {
+            if (animal.Area.GetContainedEntities(EntityTag.Consumable).Any(e => e.GetComponent<ConsumableComponent>().Data.Need.Def == NeedDefOf.Thirst)) {
+                priorityQueue.Enqueue(() => new ConsumeBehaviour(animal, NeedDefOf.Thirst), (1 - animal.GetNeed(NeedDefOf.Thirst).Value) * ThirstPriority);
+                animal.MissingWaterSource = false;
+            } else {
+                animal.MissingWaterSource = true;
+            }
+
         }
+
         // Hunger
-        if (animal.GetNeed(NeedDefOf.Hunger).Value < HungerThreshold 
-         && animal.Area.GetContainedEntities(EntityTag.Consumable).Any(e => e.GetComponent<ConsumableComponent>().Data.Need.Def == NeedDefOf.Hunger)) {
-            priorityQueue.Enqueue(() => new ConsumeBehaviour(animal, NeedDefOf.Hunger), (1  - animal.GetNeed(NeedDefOf.Hunger).Value) * HungerPriority);
+        if (animal.GetNeed(NeedDefOf.Hunger).Value < HungerThreshold) {
+            if (animal.Area.GetContainedEntities(EntityTag.Consumable).Any(e => e.GetComponent<ConsumableComponent>().Data.Need.Def == NeedDefOf.Hunger)) {
+                priorityQueue.Enqueue(() => new ConsumeBehaviour(animal, NeedDefOf.Hunger), (1 - animal.GetNeed(NeedDefOf.Hunger).Value) * HungerPriority);
+                animal.MissingFoodSource = false;
+            } else {
+                animal.MissingFoodSource = true;
+            }
         }
+        
         // Energy
         if (animal.GetNeed(NeedDefOf.Energy).Value < EnergyThreshold) {
             priorityQueue.Enqueue(() => new SleepBehaviour(animal), (1  - animal.GetNeed(NeedDefOf.Energy).Value) * EnergyPriority);

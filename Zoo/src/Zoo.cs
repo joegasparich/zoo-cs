@@ -38,6 +38,7 @@ public class Zoo : ISerialisable {
     // Caches
     public readonly HashSet<Animal> Animals = new();
     public readonly HashSet<Guest>  Guests  = new();
+    public readonly HashSet<Staff>  Staff   = new();
     
     public Zoo() {
         Tools = new ToolManager();
@@ -54,7 +55,7 @@ public class Zoo : ISerialisable {
 
         infoWidgetHandle = Find.UI.PushWindow(new Widget_ZooInfo());
         
-        Game.RegisterEntity(GenEntity.CreateEntity<Actor>(new Vector2(5, 5), ActorDefOf.Keeper));
+        Game.RegisterEntity(GenEntity.CreateEntity<Staff>(new Vector2(5, 5), ActorDefOf.Keeper));
     }
 
     public void Cleanup() {
@@ -74,13 +75,13 @@ public class Zoo : ISerialisable {
         Tools.Update();
         Selection.Update();
 
-        if (Animals.Count > 0) {
-            if (Game.Ticks % GuestArrivalInterval == 0) {
-                var guest = GenEntity.CreateGuest(Entrance.TileCentre());
-                Game.RegisterEntity(guest);
-                AddFunds(EntryFee);
-            }
-        }
+        // if (Animals.Count > 0) {
+        //     if (Game.Ticks % GuestArrivalInterval == 0) {
+        //         var guest = GenEntity.CreateGuest(Entrance.TileCentre());
+        //         Game.RegisterEntity(guest);
+        //         AddFunds(EntryFee);
+        //     }
+        // }
     }
 
     public void PostUpdate() {

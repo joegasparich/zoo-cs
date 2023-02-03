@@ -187,6 +187,13 @@ public class AssetManager {
 
     public Def? GetDef(Type type, string id) {
         if (!defMap.ContainsKey(type)) {
+            // Try get it from the flat map if it's a subclass
+            if (defMapFlat.ContainsKey(id)) {
+                var def = defMapFlat[id];
+                if (def.DefType.IsSubclassOf(type))
+                    return def;
+            }
+            
             Debug.Error($"Failed to get def of type {type}, no defs of that type have been loaded");
             return null;
         }
@@ -201,6 +208,13 @@ public class AssetManager {
 
     public T? GetDef<T>(string id) where T : Def {
         if (!defMap.ContainsKey(typeof(T))) {
+            // Try get it from the flat map if it's a subclass
+            if (defMapFlat.ContainsKey(id)) {
+                var def = defMapFlat[id];
+                if (def.DefType.IsSubclassOf(typeof(T)))
+                    return def as T;
+            }
+            
             Debug.Error($"Failed to get def of type {typeof(T)}, no defs of that type have been loaded");
             return null;
         }

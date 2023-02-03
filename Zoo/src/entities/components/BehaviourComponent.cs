@@ -42,7 +42,7 @@ public class BehaviourComponent : Component {
             currentBehaviour = null;
         }
         // Check for completed
-        if (currentBehaviour is { completed: true }) {
+        if (currentBehaviour is { Completed: true }) {
             currentBehaviour.OnComplete();
             currentBehaviour = null;
         }

@@ -7,7 +7,7 @@
         { "compClass": "PhysicsComponent" },
         { "compClass": "ElevationComponent" },
         { "compClass": "MoveComponent" },
-        { "compClass": "PathFollowComponent" },
+        { "compClass": "AreaPathFollowComponent" },
         {
             "dataClass": "RenderComponentData",
             "graphicData": {
