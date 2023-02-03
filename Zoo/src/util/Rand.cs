@@ -18,6 +18,11 @@ public class Rand {
         byte randomNum = (byte)rand.Next(0, 255);
         return randomNum;
     }
+
+    public static float Float() {
+        Random rand = new Random();
+        return (float)rand.NextDouble();
+    }
     
     public static float Float(float min, float max) {
         Random rand = new Random();

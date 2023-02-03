@@ -6,7 +6,7 @@ namespace Zoo.ai;
 
 public class IdleBehaviour : Behaviour {
     // State
-    private IntVec2?            wanderTile;
+    private IntVec2? wanderTile;
 
     // Properties
     public PathFollowComponent Pather => actor.GetComponent<PathFollowComponent>();
@@ -16,8 +16,11 @@ public class IdleBehaviour : Behaviour {
 
     public override void Start() {
         base.Start();
-        
-        wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Area, actor.Pos.Floor(), 5, actor.Accessibility);
+
+        if (actor.CanUseDoors)
+            wanderTile = LocationUtility.RandomAccessibleCellInRadius(actor.Pos.Floor(), 5, actor.AccessibleAreas, actor.Accessibility);
+        else
+            wanderTile = LocationUtility.RandomWalkableCellInAreaInRadius(actor.Pos.Floor(), 5, actor.Area, actor.Accessibility);
     }
 
     public override IEnumerable<Step> GetSteps() {
