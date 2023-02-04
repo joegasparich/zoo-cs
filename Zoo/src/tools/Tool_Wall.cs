@@ -51,28 +51,50 @@ public class Tool_Wall : Tool {
         if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = false;
 
-            // Reverse so we are going from drag start to drag end
-            // This is to make sure we don't constantly check for loops (From memory?)
-            ghosts.Reverse();
-            
-            List<(IntVec2, Side)> undoData = new();
-            HashSet<IntVec2> affectedTiles = new();
+            TryPlaceGhosts();
 
-            Find.Zoo.DeductFunds(currentWall.Cost * ghosts.Count);
+            ghosts.Clear();
 
-            while (ghosts.Any()) {
-                var ghost = ghosts.Pop();
-                if (ghost.CanPlace) {
-                    var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
-                    foreach (var tile in wall.GetAdjacentTiles())
-                        affectedTiles.Add(tile);
+            evt.Consume();
+        }
+        
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentWall != null) {
+            SetWall(null);
+            evt.Consume();
+        }
 
-                    undoData.Add((ghost.Pos.Floor(), dragQuadrant));
-                }
+    }
+
+    private void TryPlaceGhosts() {
+        // Return if can't afford
+        if (currentWall.Cost * ghosts.Count > Find.Zoo.Funds) return;
+
+        // Reverse so we are going from drag start to drag end
+        // This is to make sure we don't constantly check for loops (From memory?)
+        ghosts.Reverse();
+
+        List<(IntVec2, Side)> undoData      = new();
+        HashSet<IntVec2>      affectedTiles = new();
+
+        var placed = 0;
+
+        while (ghosts.Any()) {
+            var ghost = ghosts.Pop();
+            if (ghost.CanPlace) {
+                var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
+                foreach (var tile in wall.GetAdjacentTiles())
+                    affectedTiles.Add(tile);
+
+                undoData.Add((ghost.Pos.Floor(), dragQuadrant));
+                placed++;
             }
+        }
+
+        if (placed > 0) {
+            Find.Zoo.DeductFunds(currentWall.Cost * placed);
 
             Messenger.Fire(EventType.PlaceSolid, affectedTiles.ToList());
-            
+
             toolManager.PushAction(new ToolAction {
                 Name = "Place walls",
                 Data = undoData,
@@ -87,15 +109,7 @@ public class Tool_Wall : Tool {
                     }
                 }
             });
-
-            evt.Consume();
         }
-        
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentWall != null) {
-            SetWall(null);
-            evt.Consume();
-        }
-
     }
 
     public override void Update() {
@@ -178,19 +192,27 @@ public class Tool_Wall : Tool {
 
     public override bool CanPlace(ToolGhost ghost) {
         if (currentWall == null) return false;
+
+        // Can't afford
+        var ghostCount = Math.Max(ghosts.Count, 1);
+        if (currentWall.Cost * ghostCount > Find.Zoo.Funds) return false;
         
         var tile     = ghost.Pos.Floor();
         var quadrant = ghost.Side;
         
         var wall = Find.World.Walls.GetWallAtTile(tile, quadrant);
 
+        // Invalid wall position
         if (wall == null) return false;
+        // Wall already exists
         if (wall.Exists) return false;
-        
+
+        // Water
         var (v1, v2) = wall.GetVertices();
         if (Find.World.Elevation.GetElevationAtPos(v1) < 0) return false;
         if (Find.World.Elevation.GetElevationAtPos(v2) < 0) return false;
-        
+
+        // Tile object
         var    tiles       = wall.GetAdjacentTiles();
         Entity blockingObj = null;
         foreach(var t in tiles) {

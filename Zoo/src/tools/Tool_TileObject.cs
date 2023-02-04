@@ -103,6 +103,9 @@ public class Tool_TileObject : Tool {
     public override bool CanPlace(ToolGhost ghost) {
         if (currentObject == null) return false;
 
+        // Can't afford
+        if (currentObject.Cost > Find.Zoo.Funds) return false;
+
         return TileUtility.CanPlace(currentObject, ghost.Pos.Floor());
     }
 

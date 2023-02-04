@@ -108,9 +108,14 @@ public class Zoo : ISerialisable {
     }
 
     public void OnInput(InputEvent evt) {
-        if (!evt.consumed) Tools.OnInput(evt);
-        if (!evt.consumed) Selection.OnInput(evt);
-        if (!evt.consumed) World.OnInput(evt);
+        try {
+            if (!evt.consumed) Tools.OnInput(evt);
+            if (!evt.consumed) Selection.OnInput(evt);
+            if (!evt.consumed) World.OnInput(evt);
+        }
+        catch (Exception e) {
+            Debug.Error("Error during input", e);
+        }
     }
 
     public void DeductFunds(int amount) {

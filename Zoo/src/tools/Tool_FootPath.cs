@@ -48,18 +48,38 @@ public class Tool_FootPath : Tool {
         if (evt.mouseUp == MouseButton.MOUSE_BUTTON_LEFT) {
             isDragging = false;
 
-            List<IntVec2> undoData = new();
+            TryPlaceGhosts();
 
-            Find.Zoo.DeductFunds(currentFootPath.Cost * ghosts.Count);
+            evt.Consume();
+        }
+        
+        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentFootPath != null) {
+            SetFootPath(null);
+            evt.Consume();
+        }
 
-            while (ghosts.Any()) {
-                var ghost = ghosts.Pop();
-                if (ghost.CanPlace) {
-                    Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor());
-                    undoData.Add(ghost.Pos.Floor());
-                }
+    }
+
+    private void TryPlaceGhosts() {
+        // Return if can't afford
+        if (currentFootPath.Cost * ghosts.Count > Find.Zoo.Funds) return;
+
+        List<IntVec2> undoData = new();
+
+        var placed = 0;
+
+        while (ghosts.Any()) {
+            var ghost = ghosts.Pop();
+            if (ghost.CanPlace) {
+                Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor());
+                undoData.Add(ghost.Pos.Floor());
+                placed++;
             }
-            
+        }
+
+        if (placed > 0) {
+            Find.Zoo.DeductFunds(currentFootPath.Cost * placed);
+
             toolManager.PushAction(new ToolAction() {
                 Name = "Place paths",
                 Data = undoData,
@@ -74,15 +94,7 @@ public class Tool_FootPath : Tool {
                     }
                 }
             });
-
-            evt.Consume();
         }
-        
-        if (evt.mouseDown == MouseButton.MOUSE_BUTTON_RIGHT && currentFootPath != null) {
-            SetFootPath(null);
-            evt.Consume();
-        }
-
     }
 
     public override void Update() {
@@ -160,11 +172,19 @@ public class Tool_FootPath : Tool {
     }
 
     public override bool CanPlace(ToolGhost ghost) {
+        // Can't afford
+        var ghostCount = Math.Max(ghosts.Count, 1);
+        if (currentFootPath.Cost * ghostCount > Find.Zoo.Funds) return false;
+
         var path = Find.World.FootPaths.GetFootPathAtTile(ghost.Pos.Floor());
 
+        // Path location invalid
         if (path == null) return false;
+        // Path already exists
         if (path.Exists) return false;
+        // Can't place on slope corner
         if (Find.World.Elevation.IsPositionSlopeCorner(path.Pos)) return false;
+        // Can't place on water
         if (Find.World.Elevation.IsTileWater(path.Pos)) return false;
 
         return true;
