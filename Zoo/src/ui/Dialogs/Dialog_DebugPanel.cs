@@ -44,6 +44,10 @@ public class Dialog_DebugPanel : Dialog {
             DebugSettings.PathfindingGrid =  !DebugSettings.PathfindingGrid;
         curY += ButtonHeight + GUI.GapSmall;
 
+        if (GUI.ButtonText(new Rectangle(10, curY, ButtonWidth, ButtonHeight), "Draw Paths", DebugSettings.DrawPaths ? EnabledColor : DisabledColor))
+            DebugSettings.DrawPaths = !DebugSettings.DrawPaths;
+        curY += ButtonHeight + GUI.GapSmall;
+
         if (GUI.ButtonText(new Rectangle(10, curY, ButtonWidth, ButtonHeight), "Entity Locations", DebugSettings.EntityLocations ? EnabledColor : DisabledColor))
             DebugSettings.EntityLocations =  !DebugSettings.EntityLocations;
         curY += ButtonHeight + GUI.GapSmall;

@@ -53,6 +53,10 @@ public class SaveManager {
             return;
         }
 
+        // Create save folder if it doesn't exist
+        if (!Directory.Exists(SaveDir))
+            Directory.CreateDirectory(SaveDir);
+
         var fileName = name.ToSnakeCase();
 
         if (!overwrite) {

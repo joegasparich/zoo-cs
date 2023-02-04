@@ -9,10 +9,11 @@ namespace Zoo;
 
 public static class DebugSettings {
     public static bool CellGrid        = false;
-    public static bool TerrainChunks     = false;
+    public static bool TerrainChunks   = false;
     public static bool ElevationGrid   = false;
     public static bool AreaGrid        = false;
     public static bool PathfindingGrid = false;
+    public static bool DrawPaths       = false;
     public static bool EntityLocations = false;
     public static bool DrawPickBuffer  = false;
 }

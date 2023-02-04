@@ -56,16 +56,22 @@ public class Tool_Wall : Tool {
             ghosts.Reverse();
             
             List<(IntVec2, Side)> undoData = new();
+            HashSet<IntVec2> affectedTiles = new();
 
             Find.Zoo.DeductFunds(currentWall.Cost * ghosts.Count);
 
             while (ghosts.Any()) {
                 var ghost = ghosts.Pop();
                 if (ghost.CanPlace) {
-                    Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
+                    var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
+                    foreach (var tile in wall.GetAdjacentTiles())
+                        affectedTiles.Add(tile);
+
                     undoData.Add((ghost.Pos.Floor(), dragQuadrant));
                 }
             }
+
+            Messenger.Fire(EventType.PlaceSolid, affectedTiles.ToList());
             
             toolManager.PushAction(new ToolAction {
                 Name = "Place walls",

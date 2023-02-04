@@ -17,6 +17,7 @@ public class PathFollowComponent : InputComponent {
     private   string                  placeSolidHandle;
     protected bool                    pathCompleted;
     protected bool                    failedToFindPath;
+    private   bool                    needNewPath;
     
     // Properties
     public         bool  HasPath            => path != null && path.Count > 0;
@@ -40,11 +41,10 @@ public class PathFollowComponent : InputComponent {
         // TODO (optimisation): Avoid allocating every time this event goes off
         var affectedTiles = (List<IntVec2>)data;
 
-        if (affectedTiles.Contains(destination.Value)) {
-            ResetPath();
-        }
+        // I think there's a chance here that the path could be empty while the path request is still going
+        // Which could cause the actor to path through the solid
         if (path.Any(tile => affectedTiles.Contains(tile))) {
-            PathTo(path.Last());
+            needNewPath = true;
         }
     }
 
@@ -54,12 +54,16 @@ public class PathFollowComponent : InputComponent {
     }
 
     public override void Update() {
+        if (needNewPath) {
+            needNewPath = false;
+            PathTo(destination!.Value);
+        }
         if (pathRequest != null) CheckPathRequest();
         if (path == null) return;
         if (CheckPathCompleted()) return;
 
         if (Actor.Pos.DistanceSquared(GetCurrentNode()!.Value) < NodeReachedDist * NodeReachedDist) {
-            // TODO (optimisation): should we reverse the path so we can pop?
+            // TODO (optimisation): should we reverse the path so we can pop? or make it a stack
             path!.RemoveAt(0);
 
             if (CheckPathCompleted())
@@ -68,7 +72,13 @@ public class PathFollowComponent : InputComponent {
 
         InputVector = (GetCurrentNode()!.Value - Actor.Pos).Normalised();
     }
-    
+
+    public override void Render() {
+        if (DebugSettings.DrawPaths) {
+            DrawPath();
+        }
+    }
+
     private bool CheckPathCompleted() {
         if (!path.NullOrEmpty()) return false;
         
@@ -146,11 +156,31 @@ public class PathFollowComponent : InputComponent {
         return path;
     }
 
+    public void DrawPath() {
+        if (!path.NullOrEmpty()) {
+            Debug.DrawLine(
+                entity.Pos,
+                path[0] + new Vector2(0.5f, 0.5f),
+                Color.RED,
+                true
+            );
+
+            for (var i = 1; i < path.Count; i++) {
+                Debug.DrawLine(
+                    path[i - 1] + new Vector2(0.5f, 0.5f),
+                    path[i]     + new Vector2(0.5f, 0.5f),
+                    Color.RED,
+                    true
+                );
+            }
+        }
+    }
+
     public override void Serialise() {
         base.Serialise();
         
         Find.SaveManager.ArchiveValue("destination", ref destination);
-        
+
         if (Find.SaveManager.Mode == SerialiseMode.Loading && destination.HasValue)
             PathTo(destination.Value);
     }
