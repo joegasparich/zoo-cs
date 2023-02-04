@@ -75,13 +75,13 @@ public class Zoo : ISerialisable {
         Tools.ConstantUpdate();
         Selection.Update();
 
-        // if (Animals.Count > 0) {
-        //     if (Game.Ticks % GuestArrivalInterval == 0) {
-        //         var guest = GenEntity.CreateGuest(Entrance.TileCentre());
-        //         Game.RegisterEntity(guest);
-        //         AddFunds(EntryFee);
-        //     }
-        // }
+        if (Animals.Count > 0) {
+            if (Game.Ticks % GuestArrivalInterval == 0) {
+                var guest = GenEntity.CreateGuest(Entrance.TileCentre());
+                Game.RegisterEntity(guest);
+                AddFunds(EntryFee);
+            }
+        }
     }
 
     public void PostUpdate() {
