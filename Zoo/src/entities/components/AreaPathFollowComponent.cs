@@ -103,6 +103,8 @@ public class AreaPathFollowComponent : PathFollowComponent {
                 destination = target;
                 return true;
             }
+
+            failedToFindPath = true;
             return false;
         }
         
