@@ -336,7 +336,7 @@ public class WallGrid : ISerialisable {
     public List<Wall> GetWallsSurroundingPoint(IntVec2 point) {
         var walls = new List<Wall>();
 
-        if (!IsWallGridPosInMap(point)) return walls;
+        if (point.X < 0 || point.X > Find.World.Width || point.Y < 0 || point.Y > Find.World.Height) return walls;
 
         if (GetWallAtTile(point,               Side.North) != null) walls.Add(GetWallAtTile(point,               Side.North)!);
         if (GetWallAtTile(point,               Side.West)  != null) walls.Add(GetWallAtTile(point,               Side.West)!);
