@@ -3,18 +3,25 @@ using Zoo.util;
 
 namespace Zoo.ai;
 
+public enum CompleteState {
+    Incomplete,
+    Success,
+    Failed,
+    Interrupted,
+    Expired,
+}
+
 public abstract class Behaviour : ISerialisable {
     // References
     protected Actor actor;
     
     // State
-    public  bool  Completed;
-    private int   expireTick = -1;
-    private int   stepIndex  = 0;
-    private Step? currentStep;
+    public  CompleteState State;
+    private int           expireTick = -1;
+    private int           stepIndex  = 0;
+    private Step?         currentStep;
     
     // Properties
-    public bool                Expired => expireTick > 0 && Game.Ticks > expireTick;
     public PathFollowComponent Pather  => actor.GetComponent<PathFollowComponent>();
 
     public Behaviour() {}
@@ -22,7 +29,9 @@ public abstract class Behaviour : ISerialisable {
         this.actor = actor;
     }
 
-    public virtual void Start()      { }
+    public virtual void Start() {
+        State = CompleteState.Incomplete;
+    }
     public virtual void OnComplete() {
         Pather.ResetPath();
     }
@@ -48,13 +57,19 @@ public abstract class Behaviour : ISerialisable {
         
         // A step failed, end the behaviour
         if (currentStep is { Failed: true }) {
-            Completed = true;
+            State = CompleteState.Failed;
+            return;
+        }
+        
+        // Expired, end the behaviour
+        if (expireTick != -1 && Game.Ticks >= expireTick) {
+            State = CompleteState.Expired;
             return;
         }
 
-        // Completed all steps
+        // Completed all steps, end the behaviour
         if (stepIndex >= GetSteps().Count()) {
-            Completed = true;
+            State = CompleteState.Success;
             return;
         }
         
@@ -68,8 +83,8 @@ public abstract class Behaviour : ISerialisable {
     }
         
     public virtual void Serialise() {
-        Find.SaveManager.ArchiveValue("actor", () => actor.Id, id => actor = Game.GetEntityById(id) as Actor);
-        Find.SaveManager.ArchiveValue("completed",  ref Completed);
+        Find.SaveManager.ArchiveValue("actor",      () => actor.Id, id => actor = Game.GetEntityById(id) as Actor);
+        Find.SaveManager.ArchiveValue("state",      ref State);
         Find.SaveManager.ArchiveValue("expireTick", ref expireTick);
         Find.SaveManager.ArchiveValue("stepIndex",  ref stepIndex);
     }

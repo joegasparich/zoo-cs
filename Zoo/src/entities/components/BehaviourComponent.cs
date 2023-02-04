@@ -37,18 +37,16 @@ public class BehaviourComponent : Component {
     
     public override void Update() {
         // Check for expired
-        if (currentBehaviour is { Expired: true }) {
+        if (currentBehaviour is { State: CompleteState.Expired }) {
             currentBehaviour.OnExpire();
-            currentBehaviour = null;
         }
         // Check for completed
-        if (currentBehaviour is { Completed: true }) {
+        if (currentBehaviour is { State: CompleteState.Success or CompleteState.Failed or CompleteState.Interrupted }) {
             currentBehaviour.OnComplete();
-            currentBehaviour = null;
         }
         
-        // Get new behaviour
-        if (currentBehaviour == null)
+        // Get new behaviour if completed
+        if (currentBehaviour is null or not { State: CompleteState.Incomplete })
             SetBehaviour(GetNewBehaviour());
         
         currentBehaviour?.Update();

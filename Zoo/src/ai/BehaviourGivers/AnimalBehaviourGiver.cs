@@ -3,11 +3,15 @@
 namespace Zoo.ai; 
 
 public static class AnimalBehaviourGiver {
-    public static readonly float ThirstPriority  = 0.5f;
-    public static readonly float ThirstThreshold = 0.5f;
-    public static readonly float HungerPriority  = 0.75f;
+    // Modifiers for the priority of the behaviour
+    public static readonly float ThirstPriority  = 0.75f;
+    public static readonly float HungerPriority  = 0.65f;
+    public static readonly float EnergyPriorityAwake  = 0.3f;
+    public static readonly float EnergyPriorityAsleep  = 2.0f;
+    
+    // Thresholds where entity will start prioritising the behaviour
     public static readonly float HungerThreshold = 0.5f;
-    public static readonly float EnergyPriority  = 0.3f;
+    public static readonly float ThirstThreshold = 0.5f;
     public static readonly float EnergyThreshold = 0.2f;
     
     public static Behaviour Get(Animal animal) {
@@ -37,8 +41,9 @@ public static class AnimalBehaviourGiver {
         }
         
         // Energy
-        if (animal.GetNeed(NeedDefOf.Energy).Value < EnergyThreshold) {
-            priorityQueue.Enqueue(() => new SleepBehaviour(animal), (1  - animal.GetNeed(NeedDefOf.Energy).Value) * EnergyPriority);
+        var energyPriority = animal.IsAsleep ?  EnergyPriorityAsleep : EnergyPriorityAwake;
+        if (animal.IsAsleep || animal.GetNeed(NeedDefOf.Energy).Value < EnergyThreshold) {
+            priorityQueue.Enqueue(() => new SleepBehaviour(animal), (1  - animal.GetNeed(NeedDefOf.Energy).Value) * energyPriority);
         }
         
         priorityQueue.Enqueue(() => new IdleBehaviour(animal), 0f);

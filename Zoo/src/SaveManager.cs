@@ -5,6 +5,9 @@ using Zoo.util;
 
 namespace Zoo;
 
+public interface ISerialisable {
+    public void Serialise();
+}
 public enum SerialiseMode {
     Saving,
     Loading
