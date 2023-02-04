@@ -4,9 +4,8 @@
     "name": "hay",
     "inherits": "BaseConsumable",
     "cost": 5,
-    "components": [
-        {
-            "dataClass": "RenderComponentData",
+    "components": {
+        "RenderComponent": {
             "graphicData": {
                 "spritePath": "assets/textures/objects/consumables/hay.png",
                 "origin": {
@@ -15,10 +14,9 @@
                 }
             }
         },
-        {
-            "dataClass": "ConsumableComponentData",
+        "ConsumableComponent": {
             "need": "Hunger",
             "maxQuantity": 5
         }
-    ]
+    }
 }

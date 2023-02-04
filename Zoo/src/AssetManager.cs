@@ -89,6 +89,11 @@ public class AssetManager {
         
         while (dataQueue.Count > 0) {
             var data = dataQueue.Dequeue();
+            if (!data.HasValues) {
+                Debug.Warn("Empty def found, ignoring");
+                continue;
+            }
+
             var id   = data["id"]!.Value<string>();
             
             if (!data.ContainsKey("abstract"))

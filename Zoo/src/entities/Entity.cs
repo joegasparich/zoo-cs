@@ -20,7 +20,7 @@ public class Entity : ISerialisable {
     public  int                         Id;
     private Dictionary<Type, Component> components = new();
     private EntityDef                   def;
-    public  HashSet<EntityTag>         Tags { get; } = new();
+    public  HashSet<EntityTag>          Tags { get; } = new();
 
     // State
     public  Vector2 Pos;

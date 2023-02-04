@@ -4,9 +4,8 @@
     "name": "Plains Zebra",
     "inherits": "BaseAnimal",
     "canSwim": false,
-    "components": [
-        {
-            "dataClass": "RenderComponentData",
+    "components": {
+        "RenderComponent": {
             "graphicData": {
                 "spritePath": "assets/textures/animals/zebra.png",
                 "origin": {
@@ -15,5 +14,5 @@
                 }
             }
         }
-    ]
+    }
 }

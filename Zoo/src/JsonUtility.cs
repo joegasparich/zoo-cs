@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Zoo.defs;
@@ -38,14 +36,36 @@ public class CompJsonConverter : JsonConverter {
     });
 
     public override bool CanConvert(Type objectType) {
-        return objectType == typeof(ComponentData);
+        return objectType == typeof(List<ComponentData>);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
-        var obj           = JObject.Load(reader);
-        var dataClassName = obj["dataClass"]?.Value<string>() ?? "ComponentData";
-        var componentType = Type.GetType($"Zoo.entities.{dataClassName}");
-        return obj.ToObject(componentType, internalSerializer);
+        var tokenReader = reader as JTokenReader;
+        var token       = tokenReader.CurrentToken;
+        var components  = new List<ComponentData>();
+
+        foreach (JProperty child in token) {
+            var compType = Type.GetType($"Zoo.entities.{child.Name}");
+
+            if (!compType.IsAssignableTo(typeof(Component))) {
+                Debug.Warn("Component type not found: " + child.Name);
+                continue;
+            }
+
+            var compDataType = compType.GetProperty("DataType")?.GetValue(null) as Type;
+            ComponentData componentData;
+            if (compDataType != null) {
+                componentData = child.Value.ToObject(compDataType, internalSerializer) as ComponentData;
+            } else {
+                componentData = child.Value.ToObject(typeof(ComponentData), internalSerializer) as ComponentData;
+                var compClassProp = componentData.GetType().GetField("compClass", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                compClassProp.SetValue(componentData, child.Name);
+            }
+            components.Add(componentData);
+        }
+
+        reader.Skip();
+        return components;
     }
 
     public override bool CanWrite => false;

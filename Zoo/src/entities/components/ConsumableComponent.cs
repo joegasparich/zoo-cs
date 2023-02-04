@@ -10,6 +10,8 @@ public class ConsumableComponentData : ComponentData {
 }
 
 public class ConsumableComponent : Component {
+    public static Type DataType => typeof(ConsumableComponentData);
+
     // State
     private float quantity;
     

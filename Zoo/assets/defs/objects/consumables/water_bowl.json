@@ -4,9 +4,8 @@
     "name": "water bowl",
     "inherits": "BaseConsumable",
     "cost": 5,
-    "components": [
-        {
-            "dataClass": "RenderComponentData",
+    "components": {
+        "RenderComponent": {
             "graphicData": {
                 "spritePath": "assets/textures/objects/consumables/water_bowl.png",
                 "origin": {
@@ -15,10 +14,9 @@
                 }
             }
         },
-        {
-            "dataClass": "ConsumableComponentData",
+        "ConsumableComponent": {
             "need": "Thirst",
             "maxQuantity": 5
         }
-    ]
+    }
 }

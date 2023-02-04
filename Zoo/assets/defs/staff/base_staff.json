@@ -1,14 +1,13 @@
 ﻿{
     "class": "ActorDef",
-    "id": "Guest",
-    "name": "guest",
-    "accessibility": "PathsOnly",
+    "id": "BaseStaff",
+    "abstract": true,
+    "accessibility": "NoWater",
     "components": {
         "PhysicsComponent": {},
         "ElevationComponent": {},
         "MoveComponent": {},
-        "PathFollowComponent": {},
-        "SelectableComponent": {},
+        "AreaPathFollowComponent": {},
         "RenderComponent": {
             "graphicData": {
                 "spritePath": "assets/textures/people/body/body_adult_1.png",
@@ -18,12 +17,11 @@
                 }
             }
         },
-        "BehaviourComponent": {
-            "behaviourGiverClass": "GuestBehaviourGiver"
-        },
-        "PersonComponent": {}
+        "PersonComponent": {
+            "age": "Adult"
+        }
     },
     "tags": [
-        "Guest"
+        "Staff"
     ]
 }

@@ -8,9 +8,8 @@
     "canPlaceInWater": false,
     "cost": 5,
     "type": "foliage",
-    "components": [
-        {
-            "dataClass": "RenderComponentData",
+    "components": {
+        "RenderComponent": {
             "graphicData": {
                 "spritePath": "assets/textures/objects/tree.png",
                 "origin": {
@@ -19,5 +18,5 @@
                 }
             }
         }
-    ]
+    }
 }

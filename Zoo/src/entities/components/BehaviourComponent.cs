@@ -19,6 +19,8 @@ public class BehaviourComponentData : ComponentData {
 }
 
 public class BehaviourComponent : Component {
+    public static Type DataType => typeof(BehaviourComponentData);
+
     // State
     protected Behaviour? currentBehaviour;
     

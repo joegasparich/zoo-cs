@@ -2,11 +2,14 @@
     "class": "ObjectDef",
     "id": "BaseObject",
     "abstract": true,
-    "components": [
-        {
-            "compClass":  "ElevationComponent"
+    "components": {
+        "ElevationComponent": {},
+        "RenderComponent": {
+            "graphicData": {
+                "spritePath": "assets/textures/placeholder.png"
+            }
         }
-    ],
+    },
     "tags": [
         "TileObject"
     ]

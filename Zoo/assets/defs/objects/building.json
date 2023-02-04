@@ -14,9 +14,8 @@
     "canRotate": true,
     "cost": 100,
     "type": "building",
-    "components": [
-        {
-            "dataClass": "RenderComponentData",
+    "components": {
+        "RenderComponent": {
             "graphicData": {
                 "spritePath": "assets/textures/objects/building.png",
                 "cellHeight": 32,
@@ -31,5 +30,5 @@
                 }
             }
         }
-    ]
+    }
 }

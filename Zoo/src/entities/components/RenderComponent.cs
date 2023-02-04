@@ -12,6 +12,8 @@ public class RenderComponentData : ComponentData {
 }
 
 public class RenderComponent : Component {
+    public static Type DataType => typeof(RenderComponentData);
+
     // State
     public  Vector2           Offset         = Vector2.Zero;
     public  Color             OverrideColour = Color.WHITE;

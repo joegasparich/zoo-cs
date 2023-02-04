@@ -24,6 +24,8 @@ public class NeedsComponentData : ComponentData {
 }
 
 public class NeedsComponent : Component {
+    public static Type DataType => typeof(NeedsComponentData);
+
     // State
     public Dictionary<string, Need> Needs = new();
     

@@ -1,0 +1,17 @@
+{
+    "class": "ActorDef",
+    "id": "Keeper",
+    "name": "keeper",
+    "inherits": "BaseStaff",
+    "components": {
+        "BehaviourComponent": {
+            "behaviourGiverClass": "KeeperBehaviourGiver"
+        },
+        "PersonComponent": {
+            "age": "Adult",
+            "shirt": "assets/textures/people/shirts/specialised/shirt_keeper.png",
+            "pants": "assets/textures/people/pants/specialised/pants_keeper.png",
+            "hat": "assets/textures/people/hats/specialised/hat_keeper.png"
+        }
+    }
+}

@@ -2,25 +2,32 @@
     "class": "AnimalDef",
     "id": "BaseAnimal",
     "abstract": true,
-    "components": [
-        { "compClass": "PhysicsComponent" },
-        { "compClass": "ElevationComponent" },
-        { "compClass": "MoveComponent" },
-        { "compClass": "PathFollowComponent" },
-        { "compClass": "SelectableComponent" },
-        {
-            "dataClass": "NeedsComponentData",
+    "components": {
+        "PhysicsComponent": {},
+        "ElevationComponent": {},
+        "MoveComponent": {},
+        "PathFollowComponent": {},
+        "SelectableComponent": {},
+        "RenderComponent": {
+            "graphicData": {
+                "spritePath": "assets/textures/placeholder.png",
+                "origin": {
+                    "x": 0.5,
+                    "y": 0.7
+                }
+            }
+        },
+        "NeedsComponent": {
             "needs": [
                 "Hunger",
                 "Thirst",
                 "Energy"
             ]
         },
-        { 
-            "dataClass": "BehaviourComponentData",
+        "BehaviourComponent": {
             "behaviourGiverClass": "AnimalBehaviourGiver"
         }
-    ],
+    },
     "tags": [
         "Animal"
     ]

@@ -33,6 +33,8 @@ public class PersonComponentData : ComponentData {
 }
 
 public class PersonComponent : Component {
+    public static Type DataType => typeof(PersonComponentData);
+
     // Static cache TODO: Move this somewhere
     private static bool         loadedIntoCache = false;
 
