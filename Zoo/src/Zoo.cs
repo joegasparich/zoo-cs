@@ -122,6 +122,9 @@ public class Zoo : ISerialisable {
     }
 
     public void Serialise() {
+        Find.SaveManager.ArchiveValue("funds", ref Funds);
+        Find.SaveManager.ArchiveValue("entrance", ref Entrance);
+
         Find.SaveManager.ArchiveDeep("world", World);
     }
     public void PostLoad() {
