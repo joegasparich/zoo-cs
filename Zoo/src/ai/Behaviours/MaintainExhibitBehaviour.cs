@@ -43,6 +43,7 @@ public class MaintainExhibitBehaviour : Behaviour {
 
             yield return Steps_General.Do(() => {
                 Game.RegisterEntity(GenEntity.CreateTileObject(ObjectDefOf.WaterBowl, waterBowlPos.Value));
+                Find.Zoo.DeductFunds(ObjectDefOf.WaterBowl.Cost);
             });
         }
 
@@ -53,6 +54,7 @@ public class MaintainExhibitBehaviour : Behaviour {
 
             yield return Steps_General.Do(() => {
                 Game.RegisterEntity(GenEntity.CreateTileObject(ObjectDefOf.Hay, foodPos.Value));
+                Find.Zoo.DeductFunds(ObjectDefOf.Hay.Cost);
             });
         }
 
