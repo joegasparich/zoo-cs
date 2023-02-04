@@ -9,8 +9,8 @@ namespace Zoo.world;
 
 public class TerrainGrid : ISerialisable {
     // Constants
-    public static readonly int   TerrainScale          = 2;
-    internal const         int   ChunkSize           = 20;
+    public static readonly int   TerrainScale        = 2;
+    internal const         int   ChunkSize           = 10;
     internal const         float SlopeColourStrength = 0.3f;
 
     // Config
@@ -189,17 +189,17 @@ public class TerrainGrid : ISerialisable {
 }
 
 public class TerrainChunk : IDisposable {
-    private Mesh          chunkMesh;
+    private Mesh            chunkMesh;
     private TerrainCell[][] grid;
-    private bool          isSetup          = false;
-    private bool          shouldRegenerate = false;
+    private bool            isSetup          = false;
+    private bool            shouldRegenerate = false;
     
     public int  X                { get; }
     public int  Y                { get; }
     public int  Rows             { get; }
     public int  Cols             { get; }
 
-    public Vector2 ChunkPos => new Vector2(X * TerrainGrid.ChunkSize, Y * TerrainGrid.ChunkSize);
+    public IntVec2 ChunkPos => new(X * TerrainGrid.ChunkSize, Y * TerrainGrid.ChunkSize);
     
     public TerrainChunk(int x, int y, int cols, int rows, string[][][]? data = null) {
         X    = x;
@@ -257,12 +257,12 @@ public class TerrainChunk : IDisposable {
                 var cell = grid[i][j];
                 for (int q = 0; q < 4; q++) {
                     var colour          = cell.Quadrants[q].Colour;
-                    var pos             = ChunkPos + new Vector2(i, j);
-                    var tile            = (pos / TerrainGrid.TerrainScale).Floor();
+                    var pos             = ChunkPos + new IntVec2(i, j);
+                    var tile            = pos / TerrainGrid.TerrainScale;
                     var slopeBrightness = ElevationUtility.GetSlopeVariantColourOffset(Find.World.Elevation.GetTileSlopeVariant(tile), pos, (Side)q);
                     colour = colour.Brighten(slopeBrightness * TerrainGrid.SlopeColourStrength);
                     
-                    var quadrantVertices = TerrainCell.GetQuadrantVertices(new Vector2(i, j), (Side)q);
+                    var quadrantVertices = TerrainCell.GetQuadrantVertices(new IntVec2(i, j), (Side)q);
                     for (int v = 0; v < 3; v++) {
                         var elevation = Find.World.Elevation.GetElevationAtPos((quadrantVertices[v] + ChunkPos) / TerrainGrid.TerrainScale);
                         
@@ -313,12 +313,15 @@ public class TerrainChunk : IDisposable {
         Raylib.UnloadMesh(ref chunkMesh);
     }
 
-    public void SetTerrainInRadius(Vector2 pos, float radius, TerrainDef terrain) {
+    public void SetTerrainInRadius(Vector2 pos, float radius, TerrainDef terrain, bool containToArea = true) {
         bool changed = false;
+        var  area    = ((ChunkPos + pos.Floor()) / TerrainGrid.TerrainScale).GetArea();
         
         for (float i = pos.X - radius; i < pos.X + radius; i++) {
             for (float j = pos.Y - radius; j < pos.Y + radius; j++) {
-                var cellPos = new Vector2(MathF.Floor(i), MathF.Floor(j));
+                var cellPos = new IntVec2(i.FloorToInt(), j.FloorToInt());
+                
+                if (containToArea && ((ChunkPos + cellPos) / TerrainGrid.TerrainScale).GetArea() != area) continue;
                 if (!IsPositionInChunk(cellPos)) continue;
 
                 // Get triangles in circle
@@ -326,10 +329,8 @@ public class TerrainChunk : IDisposable {
                     var side = (Side)q;
                     foreach (var point in TerrainCell.GetQuadrantVertices(cellPos, side)) {
                         if (JMath.PointInCircle(pos, radius, point)) {
-                            var xFloor = cellPos.X.RoundToInt();
-                            var yFloor = cellPos.Y.RoundToInt();
-                            if (grid[xFloor][yFloor].Quadrants[(int)side] != terrain) {
-                                grid[xFloor][yFloor].SetQuadrant(side, terrain);
+                            if (grid[cellPos.X][cellPos.Y].Quadrants[(int)side] != terrain) {
+                                grid[cellPos.X][cellPos.Y].SetQuadrant(side, terrain);
                                 changed = true;
                             }
                         }
@@ -343,7 +344,7 @@ public class TerrainChunk : IDisposable {
         }
     }
 
-    public bool IsPositionInChunk(Vector2 pos) {
+    private bool IsPositionInChunk(Vector2 pos) {
         return pos.X >= 0 && pos.X < Cols && pos.Y >= 0 && pos.Y < Rows;
     }
 
@@ -373,7 +374,7 @@ internal class TerrainCell {
         Quadrants[(int)quadrant] = terrain;
     }
 
-    public static Vector2[] GetQuadrantVertices(Vector2 pos, Side quadrant) {
+    public static Vector2[] GetQuadrantVertices(IntVec2 pos, Side quadrant) {
         switch (quadrant) {
             case Side.North: return new Vector2[] { new(pos.X, pos.Y), new(pos.X + 0.5f, pos.Y + 0.5f), new(pos.X + 1, pos.Y) };
             case Side.West:  return new Vector2[] { new(pos.X, pos.Y), new(pos.X, pos.Y + 1), new(pos.X + 0.5f, pos.Y + 0.5f) };
