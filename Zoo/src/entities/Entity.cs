@@ -29,7 +29,9 @@ public class Entity : ISerialisable {
     // Properties
     public         IEnumerable<Component> Components => components.Values;
     public virtual EntityDef              Def        => def;
+    public virtual string                 Name       => Def?.Name ?? "Unnamed Entity";
     public         IntVec2                TilePos    => Pos.Floor();
+    public         RenderComponent        Renderer   => GetComponent<RenderComponent>();
     public         GraphicData            Graphics   => GetComponent<RenderComponent>().Graphics;
     public         bool                   Selectable => HasComponent<SelectableComponent>();
     public         bool                   Selected   => Find.Zoo.Selection.SelectedEntity == this;
@@ -84,6 +86,12 @@ public class Entity : ISerialisable {
         if (DebugSettings.EntityLocations) {
             Debug.DrawLine(Pos - new Vector2(0.25f, 0.25f), Pos + new Vector2(0.25f, 0.25f), new Color(255, 0, 0, 255), true);
             Debug.DrawLine(Pos - new Vector2(-0.25f, 0.25f), Pos + new Vector2(-0.25f, 0.25f), new Color(255, 0, 0, 255), true);
+        }
+    }
+
+    public virtual void OnGUI() {
+        foreach (var component in components.Values) {
+            component.OnGUI();
         }
     }
 

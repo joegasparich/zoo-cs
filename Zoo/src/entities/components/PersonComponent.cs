@@ -65,9 +65,6 @@ public class PersonComponent : Component {
     public PersonAgeCategory AgeCategory;
     public PersonGender      Gender;
 
-    // References
-    private RenderComponent renderer;
-    
     // State
     private string firstName;
     private string lastName;
@@ -80,16 +77,15 @@ public class PersonComponent : Component {
     private string? pants;
     
     // Properties
-    public PersonComponentData Data => (PersonComponentData)data;
-    protected override Type[] Dependencies => new[] { typeof(RenderComponent) };
-    public string FullName => $"{firstName.Capitalise()} {lastName.Capitalise()}";
+    public             PersonComponentData Data         => (PersonComponentData)data;
+    protected override Type[]              Dependencies => new[] { typeof(RenderComponent) };
+    private            RenderComponent     Renderer     => entity.GetComponent<RenderComponent>();
+    public             string              FullName     => $"{firstName.Capitalise()} {lastName.Capitalise()}";
 
     public PersonComponent(Entity entity, PersonComponentData? data) : base(entity, data) {}
 
     public override void Start() {
         base.Start();
-        
-        renderer = entity.GetComponent<RenderComponent>();
         
         // TODO: Move this somewhere so we aren't hitting the file system after launch
         if (!loadedIntoCache) {
@@ -140,11 +136,11 @@ public class PersonComponent : Component {
         if (body == null)
             PickOutfit(AgeCategory, Gender);
 
-        renderer.BaseGraphic.SetSprite(body);
-        if (pants != null) renderer.AddAttachment(pants);
-        if (shirt != null) renderer.AddAttachment(shirt);
-        if (beard != null) renderer.AddAttachment(beard);
-        if (hair  != null) renderer.AddAttachment(hair);
+        Renderer.BaseGraphic.SetSprite(body);
+        if (pants != null) Renderer.AddAttachment(pants);
+        if (shirt != null) Renderer.AddAttachment(shirt);
+        if (beard != null) Renderer.AddAttachment(beard);
+        if (hair  != null) Renderer.AddAttachment(hair);
     }
 
     private void PickOutfit(PersonAgeCategory age, PersonGender gender) {

@@ -64,6 +64,11 @@ public static class GUI {
             AlignMode.BottomRight => new Vector2(rect.x + (rect.width - textWidth), rect.y + (rect.height - FontSize))
         };
     }
+
+    public static Vector2 MeasureText(string text) {
+        var scaledFontSize = FontSize * UIScale;
+        return Raylib.MeasureTextEx(Find.UI.DefaultFont, text, scaledFontSize, FontSpacing);
+    }
     
     // Draw functions
     public static void DrawRect(Rectangle rect, Color col) {
@@ -141,7 +146,7 @@ public static class GUI {
         var scaledFontSize = FontSize * UIScale;
 
         var absRect   = Find.UI.GetAbsRect(rect);
-        var textWidth = Raylib.MeasureTextEx(Find.UI.DefaultFont, text, scaledFontSize, FontSpacing).X;
+        var textWidth = MeasureText(text).X;
 
         Vector2 drawPos = GetTextAlignPos(absRect, textWidth.FloorToInt());
         

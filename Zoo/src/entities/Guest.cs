@@ -9,8 +9,9 @@ public class Guest : Actor {
     public HashSet<Exhibit> ExhibitsViewed = new ();
     
     // Properties
-    public PersonComponent Person => GetComponent<PersonComponent>();
-    
+    public          PersonComponent Person => GetComponent<PersonComponent>();
+    public override string          Name   => Person.FullName;
+
     public Guest(Vector2 pos, ActorDef? def) : base(pos, def) {}
 
     public override void Setup() {

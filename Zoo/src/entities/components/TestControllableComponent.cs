@@ -5,22 +5,13 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public class TestControllableComponent : Component {
-    // References
-    private PathFollowComponent pathfinder;
-
     protected override Type[] Dependencies => new[] { typeof(PathFollowComponent) };
+    private PathFollowComponent Pathfinder => entity.GetComponent<PathFollowComponent>();
 
     public TestControllableComponent(Entity entity, ComponentData? data) : base(entity, data) {}
 
-    public override void Start() {
-        base.Start();
-        
-        pathfinder = entity.GetComponent<PathFollowComponent>();
-        Debug.Assert(pathfinder != null);
-    }
-
     public override void Render() {
-        var path = pathfinder.GetPath();
+        var path = Pathfinder.GetPath();
         if (!path.NullOrEmpty()) {
             for (var i = 1; i < path.Count; i++) {
                 Debug.DrawLine(
@@ -36,7 +27,7 @@ public class TestControllableComponent : Component {
     public override void OnInput(InputEvent evt) {
         if (evt.mouseDown == MouseButton.MOUSE_BUTTON_LEFT) {
             if (Find.World.IsPositionInMap(evt.mouseWorldPos)) {
-                pathfinder.PathTo(evt.mouseWorldPos);
+                Pathfinder.PathTo(evt.mouseWorldPos);
                 evt.Consume();
             }
         }

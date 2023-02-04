@@ -190,22 +190,25 @@ public class UIManager {
         return openWindowMap.ContainsKey(id);
     }
 
-    public void DoImmediateWindow(string id, Rectangle initialRect, Action<Rectangle> onUI, bool dialog = true) {
+    public void DoImmediateWindow(string id, Rectangle rect, Action<Rectangle> onUI, bool draggable = false, bool dialog = true) {
         if (CurrentEvent == UIEvent.None) {
             Debug.Warn("Immediate windows must be called in OnGUI");
             return;
         }
         
-        var found = windowStack.Any(window => window.Id == id);
+        var found = openWindowMap.ContainsKey(id);
 
         if (!found) {
             Window window;
             if (dialog)
-                window = new Dialog(id, initialRect, onUI);
+                window = new Dialog(id, rect, onUI);
             else
-                window = new Window(id, initialRect, onUI);
+                window = new Window(id, rect, onUI);
             window.Immediate = true;
             PushWindow(window);
+        } else {
+            if (!draggable)
+                openWindowMap[id].AbsRect = rect;
         }
 
         immediateWindows.Add(id);

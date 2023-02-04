@@ -236,6 +236,10 @@ public static class Game {
 
     public static void OnGUI() {
         Find.SceneManager.GetCurrentScene()?.OnGUI();
+
+        foreach (var entity in entities.Values) {
+            entity.OnGUI();
+        }
     }
 
     public static int RegisterEntity(Entity entity) {

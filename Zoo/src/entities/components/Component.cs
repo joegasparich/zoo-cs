@@ -35,6 +35,7 @@ public abstract class Component : ISerialisable {
     public virtual void     Update()                {}
     public virtual void     PostUpdate()            {}
     public virtual void     Render()                {}
+    public virtual void     OnGUI()                 {}
     public virtual void     OnInput(InputEvent evt) {}
     public virtual void     End()                   {}
     public virtual InfoTab? GetInfoTab()            => null;
