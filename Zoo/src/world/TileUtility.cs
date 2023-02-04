@@ -30,6 +30,7 @@ public static class TileUtility {
                 if (Find.World.GetTileObjectAtTile(t) != null) return false;
                 if (Find.World.Elevation.IsTileWater(t)) return false;
                 if (!Find.World.IsPositionInMap(t)) return false;
+                if (Find.World.GetEntitiesAtTile(t).Any()) return false;
                 
                 foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(t)) {
                     if (!wall.Exists) continue;

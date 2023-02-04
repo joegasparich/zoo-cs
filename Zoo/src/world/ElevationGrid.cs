@@ -100,7 +100,7 @@ public class ElevationGrid : ISerialisable {
                 
                 foreach (var entity in Find.World.GetEntitiesAtTile(tile)) {
                     // Check for animals that can't swim
-                    if (entity is Animal animal  && !animal.Def.CanSwim) return false;
+                    if (entity is Actor actor && !actor.Def.CanSwim) return false;
                     // Check for objects that can't be underwater
                     if (entity is TileObject obj && !obj.Def.CanPlaceInWater) return false;
                 }
