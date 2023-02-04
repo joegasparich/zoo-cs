@@ -51,7 +51,7 @@ public class AreaManager {
                 }
                 
                 var area = new Area(Guid.NewGuid().ToString());
-                area.Tiles = FloodFill(tile);
+                area.SetTiles(FloodFill(tile));
                 areas.Add(area.Id, area);
                 foreach (var areaTile in area.Tiles) {
                     tileAreaMap.Add(areaTile.ToString(), area);
@@ -79,7 +79,7 @@ public class AreaManager {
 
     public void FormZooArea(IntVec2 entrance) {
         var zooArea = new Area(ZooArea);
-        zooArea.Tiles = FloodFill(entrance);
+        zooArea.SetTiles(FloodFill(entrance));
         areas.Add(zooArea.Id, zooArea);
         foreach (var tile in zooArea.Tiles) {
             tileAreaMap.Add(tile.ToString(), zooArea);
@@ -120,11 +120,11 @@ public class AreaManager {
         if (newTiles.Contains(Find.Zoo.Entrance))
             (oldTiles, newTiles) = (newTiles, oldTiles);
 
-        oldArea.Tiles = oldTiles;
+        oldArea.SetTiles(oldTiles);
         foreach (var tile in oldTiles) {
             tileAreaMap[tile.ToString()] = oldArea;
         }
-        newArea.Tiles = newTiles;
+        newArea.SetTiles(newTiles);
         foreach (var tile in newTiles) {
             tileAreaMap[tile.ToString()] = newArea;
         }
@@ -150,21 +150,14 @@ public class AreaManager {
         if (areaB.Id == ZooArea) {
             (areaA, areaB) = (areaB, areaA);
         }
-        
+
         areaA.Tiles.AddRange(areaB.Tiles);
         foreach (var tile in areaB.Tiles) {
             tileAreaMap[tile.ToString()] = areaA;
         }
-        foreach (var areaConnection in areaB.ConnectedAreas) {
-            var (area, doors) = areaConnection;
-            if (area == areaA) continue;
-            
-            foreach (var door in doors) {
-                areaA.AddAreaConnection(area, door);
-                area.AddAreaConnection(areaA, door);
-            }
-        }
         areas.Remove(areaB.Id);
+
+        areaA.RecalculateAreaConnections();
         
         Messenger.Fire(EventType.AreaUpdated, areaA);
         Messenger.Fire(EventType.AreaRemoved, areaB);
@@ -263,7 +256,14 @@ public class AreaManager {
                     if (!Find.Renderer.IsWorldPosOnScreen(door.WorldPos)) continue;
                     
                     var tiles = door.GetAdjacentTiles();
-                    Debug.DrawLine(tiles[0] + new Vector2(0.5f, 0.5f), tiles[1] + new Vector2(0.5f, 0.5f), Color.BLACK, true);
+                    var (p1, p2) = door.GetVertices();
+                    if (door.Orientation == Orientation.Horizontal) {
+                        Debug.DrawPolygon(new List<Vector2>{p1, p2, tiles[0].Centre()}, tiles[1].GetArea().Colour, true);
+                        Debug.DrawPolygon(new List<Vector2>{p1, tiles[1].Centre(), p2}, tiles[0].GetArea().Colour, true);
+                    } else {
+                        Debug.DrawPolygon(new List<Vector2>{p1, tiles[0].Centre(), p2}, tiles[1].GetArea().Colour, true);
+                        Debug.DrawPolygon(new List<Vector2>{p1, p2, tiles[1].Centre()},   tiles[0].GetArea().Colour, true);
+                    }
                 }
             }
         }

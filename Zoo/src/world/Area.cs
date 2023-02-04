@@ -11,12 +11,25 @@ public class Area {
     public Color  Colour { get; }
     
     // Cache
-    public List<Wall> Entrances = new();
+    public  HashSet<Wall> Entrances  = new();
+    public  HashSet<Wall> OuterWalls = new();
 
     // State
-    public List<IntVec2>                   Tiles          { get; set; } = new();
-    public Dictionary<Area, HashSet<Wall>> ConnectedAreas { get; }      = new();
+    private List<IntVec2> tiles      = new();
+
+    // Properties
+    public Dictionary<Area, HashSet<Wall>> ConnectedAreas { get; } = new();
     public bool                            IsZooArea      => Id == AreaManager.ZooArea;
+
+    public List<IntVec2> Tiles {
+        get => tiles;
+    }
+
+    public void SetTiles(List<IntVec2> value) {
+        tiles = value;
+        RecalculateOuterWalls();
+        RecalculateAreaConnections();
+    }
 
     public Area(string id) {
         Id     = id;
@@ -31,7 +44,7 @@ public class Area {
         }
         ConnectedAreas[area].Add(door);
 
-        CacheEntranceTiles();
+        RecalculateEntrances();
     }
     
     public void RemoveAreaConnection(Area area, Wall door) {
@@ -43,7 +56,29 @@ public class Area {
             ConnectedAreas.Remove(area);
         }
 
-        CacheEntranceTiles();
+        RecalculateEntrances();
+    }
+
+    public void RecalculateAreaConnections() {
+        // Remove previous connections
+        foreach (var (otherArea, doors) in ConnectedAreas) {
+            foreach (var door in doors) {
+                otherArea.RemoveAreaConnection(this, door);
+                RemoveAreaConnection(otherArea, door);
+            }
+        }
+        ConnectedAreas.Clear();
+
+        RecalculateOuterWalls();
+        foreach (var wall in OuterWalls) {
+            if (!wall.IsDoor) continue;
+            var otherArea = wall.GetAdjacentTiles().First(tile => tile.GetArea() != this).GetArea();
+
+            AddAreaConnection(otherArea, wall);
+            otherArea.AddAreaConnection(this, wall);
+        }
+
+        RecalculateEntrances();
     }
 
     public IEnumerable<Entity> GetContainedEntities(EntityTag tag = EntityTag.All) {
@@ -75,8 +110,18 @@ public class Area {
         
         return Tiles.Where(pred).RandomElement();
     }
+
+    private void RecalculateOuterWalls() {
+        OuterWalls.Clear();
+        foreach (var tile in Tiles) {
+            foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(tile)) {
+                if (wall.GetAdjacentTiles().Any(tile => tile.GetArea() != this))
+                    OuterWalls.Add(wall);
+            }
+        }
+    }
     
-    private void CacheEntranceTiles() {
-        Entrances = ConnectedAreas.Values.SelectMany(doors => doors).ToList();
+    private void RecalculateEntrances() {
+        Entrances = ConnectedAreas.Values.SelectMany(doors => doors).ToHashSet();
     }
 }

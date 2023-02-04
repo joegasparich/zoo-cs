@@ -173,4 +173,18 @@ public static class Draw {
         Rlgl.rlPopMatrix();
         Rlgl.rlSetTexture(0);
     }
+
+    // Get average of list of points
+    public static Vector2 Average(this List<Vector2> points)
+    {
+        Vector2 average = new Vector2(0, 0);
+        for (int i = 0; i < points.Count; i++)
+        {
+            average.X += points[i].X;
+            average.Y += points[i].Y;
+        }
+        average.X /= points.Count;
+        average.Y /= points.Count;
+        return average;
+    }
 }

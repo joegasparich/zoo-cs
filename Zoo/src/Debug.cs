@@ -47,4 +47,11 @@ public static class Debug {
         var scale = worldScale ? World.WorldScale : 1;
         Draw.DrawRectangleV3D(start * scale, dimensions * scale, colour, (int)Depth.Debug);
     }
+
+    public static void DrawPolygon(List<Vector2> points, Color colour, bool worldScale) {
+        var scale      = worldScale ? World.WorldScale : 1;
+        var pointsCopy = new List<Vector2>(points) {points.Average()};
+        pointsCopy.Append(points[1]);
+        Draw.DrawTriangleFan3D(pointsCopy.Select(point => point * scale).ToArray(), colour, (int)Depth.Debug);
+    }
 }

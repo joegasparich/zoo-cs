@@ -1,4 +1,4 @@
-using Zoo.world;
+using System.Numerics;
 
 namespace Zoo.util; 
 
@@ -11,5 +11,8 @@ public static class IntVecExtension {
     }
     public static bool InDistOf(this IntVec2 a, IntVec2 b, float range) {
         return a.DistanceSquared(b) < range * range;
+    }
+    public static Vector2 Centre(this IntVec2 tile) {
+        return new Vector2(tile.X + 0.5f, tile.Y + 0.5f);
     }
 }
