@@ -132,6 +132,8 @@ public class World : ISerialisable {
             var exhibit = Exhibits.GetExhibitByArea(area);
             if (exhibit == null) return;
             Find.UI.PushWindow(new Dialog_ExhibitInfo(exhibit));
+
+            evt.Consume();
         }
     }
     

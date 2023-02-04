@@ -194,11 +194,11 @@ public static class Game {
     public static void OnInput(InputEvent evt) {
         if (!evt.consumed) UI.OnInput(evt);
         
-        if (!evt.consumed) SceneManager.GetCurrentScene()?.OnInput(evt);
-        
         foreach (var entity in entities.Values) {
             if (!evt.consumed) entity.OnInput(evt);
         }
+
+        if (!evt.consumed) SceneManager.GetCurrentScene()?.OnInput(evt);
 
         // Tick rate controls
         if (!evt.consumed) {

@@ -109,8 +109,8 @@ public class Zoo : ISerialisable {
 
     public void OnInput(InputEvent evt) {
         if (!evt.consumed) Tools.OnInput(evt);
-        if (!evt.consumed) World.OnInput(evt);
         if (!evt.consumed) Selection.OnInput(evt);
+        if (!evt.consumed) World.OnInput(evt);
     }
 
     public void DeductFunds(int amount) {

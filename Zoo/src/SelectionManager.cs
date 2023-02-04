@@ -17,7 +17,12 @@ public class SelectionManager {
     private string  infoDialogId;
 
     public void Update() {
+        // Deselect if entity despawns
         if (SelectedEntity is { Despawned: true })
+            Select(null);
+
+        // Deselect if info window is closed
+        if (!Find.UI.IsWindowOpen(infoDialogId) && SelectedEntity != null)
             Select(null);
     }
 
@@ -26,11 +31,12 @@ public class SelectionManager {
             var pickId = Find.Renderer.GetPickIdAtPos(evt.mousePos);
             if (pickId > 0) {
                 Select(Game.GetEntityById(pickId));
+                evt.Consume();
             }
-            else {
+            else if (SelectedEntity != null) {
                 Select(null);
+                evt.Consume();
             }
-            evt.Consume();
         }
     }
 
