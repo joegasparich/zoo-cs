@@ -73,6 +73,7 @@ public class Area {
         foreach (var wall in OuterWalls) {
             if (!wall.IsDoor) continue;
             var otherArea = wall.GetAdjacentTiles().First(tile => tile.GetArea() != this).GetArea();
+            if (otherArea == null) continue; // Door is on outer wall
 
             AddAreaConnection(otherArea, wall);
             otherArea.AddAreaConnection(this, wall);
