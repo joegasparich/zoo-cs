@@ -136,6 +136,7 @@ public class AssetManager {
         while (dataQueue.Count > 0) {
             var data = dataQueue.Dequeue();
             var id = data["id"]!.ToString();
+            if (data["abstract"]!.Value<bool>()) continue;
 
             // Check if already loaded
             if (defMapFlat.ContainsKey(id)) {
@@ -279,7 +280,7 @@ public class AssetManager {
         
         // TODO: Cache this
 
-        return defMap[typeof(T)].Values.Cast<T>().Where(def => !def.Abstract).ToList();
+        return defMap[typeof(T)].Values.Cast<T>().ToList();
     }
 
     public List<T>? GetEntityDefsWithTag<T>(EntityTag tag) where T : Def {
@@ -288,6 +289,6 @@ public class AssetManager {
             return null;
         }
 
-        return defMap[typeof(T)].Values.Cast<T>().Where(def => !def.Abstract && def is EntityDef edef && edef.Tags.Contains(tag)).ToList();
+        return defMap[typeof(T)].Values.Cast<T>().Where(def => def is EntityDef edef && edef.Tags.Contains(tag)).ToList();
     }
 }
