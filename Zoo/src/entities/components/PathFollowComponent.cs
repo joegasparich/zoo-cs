@@ -18,6 +18,7 @@ public class PathFollowComponent : InputComponent {
     protected bool                    pathCompleted;
     protected bool                    failedToFindPath;
     private   bool                    needNewPath;
+    protected PathMode                pathMode;
     
     // Properties
     public         bool  HasPath            => path != null && path.Count > 0;
@@ -56,7 +57,7 @@ public class PathFollowComponent : InputComponent {
     public override void Update() {
         if (needNewPath) {
             needNewPath = false;
-            PathTo(destination!.Value);
+            PathTo(destination!.Value, pathMode);
         }
         if (pathRequest != null) CheckPathRequest();
         if (path == null) return;
@@ -89,7 +90,7 @@ public class PathFollowComponent : InputComponent {
         return true;
     }
 
-    public virtual bool PathTo(Vector2 targetPos) {
+    public virtual bool PathTo(Vector2 targetPos, PathMode mode = PathMode.OnTile) {
         ResetPath();
 
         if (Actor.Pos.Floor() == targetPos.Floor()) {
@@ -110,7 +111,8 @@ public class PathFollowComponent : InputComponent {
             accesibility = AccessibilityType.NoWater;
 
         destination                = targetPos.Floor();
-        (pathRequest, cancelToken) = Find.World.Pathfinder.RequestPath(Actor.Pos.Floor(), destination.Value, accesibility) ?? (null, default);
+        (pathRequest, cancelToken) = Find.World.Pathfinder.RequestPath(Actor.Pos.Floor(), destination.Value, accesibility, mode) ?? (null, default);
+        pathMode                   = mode;
 
         return true;
     }
@@ -180,8 +182,9 @@ public class PathFollowComponent : InputComponent {
         base.Serialise();
         
         Find.SaveManager.ArchiveValue("destination", ref destination);
+        Find.SaveManager.ArchiveValue("pathMode", ref pathMode);
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading && destination.HasValue)
-            PathTo(destination.Value);
+            PathTo(destination.Value, pathMode);
     }
 }

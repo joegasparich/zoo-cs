@@ -1,8 +1,9 @@
+using Newtonsoft.Json;
 using Zoo.entities;
 using Zoo.util;
 using Zoo.world;
 
-namespace Zoo.ai; 
+namespace Zoo.ai;
 
 public class IdleBehaviour : Behaviour {
     // State
@@ -11,6 +12,7 @@ public class IdleBehaviour : Behaviour {
     // Properties
     public PathFollowComponent Pather => actor.GetComponent<PathFollowComponent>();
 
+    [JsonConstructor]
     public IdleBehaviour() {}
     public IdleBehaviour(Actor actor) : base(actor) {}
 

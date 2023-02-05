@@ -91,7 +91,7 @@ public class FootPathGrid : ISerialisable {
                 path.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: (int)Depth.GroundCover,
-                    colour: path.OverrideColour,
+                    overrideColour: path.OverrideColour,
                     index: (int)spriteIndex
                 );
                 

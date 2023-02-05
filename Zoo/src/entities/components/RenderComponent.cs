@@ -15,16 +15,16 @@ public class RenderComponent : Component {
     public static Type DataType => typeof(RenderComponentData);
 
     // State
-    public  Vector2           Offset         = Vector2.Zero;
-    public  Color             OverrideColour = Color.WHITE;
-    public  int               SpriteIndex    = 0; // TODO: move this shit into graphics now that they are per instance
+    public  Vector2           Offset = Vector2.Zero;
+    public  Color?            OverrideColour;
+    public  int               SpriteIndex = 0; // TODO: move this shit into graphics now that they are per instance
     public  GraphicData       BaseGraphic;
     private GraphicData       bakedGraphic;
     private List<GraphicData> attachments = new();
 
     // Properties
     public RenderComponentData Data => (RenderComponentData)data;
-    public GraphicData Graphics => bakedGraphic;
+    public ref GraphicData Graphics => ref bakedGraphic;
     public bool Hovered => entity.Selectable && Find.Renderer.GetPickIdAtPos(Find.Input.GetMousePos()) == entity.Id;
 
     public RenderComponent(Entity entity, RenderComponentData? data) : base(entity, data) {
@@ -44,13 +44,13 @@ public class RenderComponent : Component {
         bakedGraphic.Blit(
             pos: (entity.Pos + Offset) * World.WorldScale,
             depth: Find.Renderer.GetDepth(entity.Pos.Y),
-            colour: OverrideColour,
+            overrideColour: OverrideColour,
             index: SpriteIndex,
             pickId: entity.Selectable ? entity.Id : null,
             fragShader: Hovered ? Renderer.OutlineShader : null
         );
 
-        OverrideColour = Color.WHITE;
+        OverrideColour = null;
     }
 
     public void AddAttachment(string spritePath) {

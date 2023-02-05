@@ -1,4 +1,5 @@
-﻿using Zoo.entities;
+﻿using Newtonsoft.Json;
+using Zoo.entities;
 
 namespace Zoo.ai; 
 
@@ -9,6 +10,7 @@ public class SleepBehaviour : Behaviour {
     
     public NeedsComponent Needs => actor.GetComponent<NeedsComponent>();
 
+    [JsonConstructor]
     public SleepBehaviour() {}
     public SleepBehaviour(Actor actor) : base(actor) {}
 

@@ -23,6 +23,7 @@ public enum AccessibilityType {
     NoSolidIgnorePaths,
     NoWaterIgnorePaths,
     PathsOnly,
+    Any,
 }
 
 public enum TileCost {
@@ -202,6 +203,8 @@ public class World : ISerialisable {
 
     private TileCost CalculateTileCost(IntVec2 tile, AccessibilityType type) {
         Debug.Assert(IsPositionInMap(tile));
+
+        if (type == AccessibilityType.Any) return TileCost.Normal;
 
         // Solid
         if (tileObjectMap.ContainsKey(tile.ToString()) && tileObjectMap[tile.ToString()].Def.Solid) {

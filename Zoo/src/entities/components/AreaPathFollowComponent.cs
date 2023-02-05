@@ -41,7 +41,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
             }
             var doorTiles  = currentDoor.GetAdjacentTiles();
             var targetTile = doorTiles.First(tile => Find.World.Areas.GetAreaAtTile(tile) == currentArea);
-            base.PathTo(targetTile);
+            base.PathTo(targetTile, pathMode);
         }
 
         if (currentDoor != null & !enterDoorPos.HasValue) {
@@ -66,7 +66,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
                 currentDoor  = null;
 
                 if (deferredTargetPos.HasValue) {
-                    PathTo(deferredTargetPos.Value);
+                    PathTo(deferredTargetPos.Value, pathMode);
                     deferredTargetPos = null;
                     return;
                 }
@@ -75,14 +75,14 @@ public class AreaPathFollowComponent : PathFollowComponent {
 
                 if (!areaPath.Any()) {
                     // We're in the final area, path to final destination
-                    base.PathTo(destination.Value);
+                    base.PathTo(destination.Value, pathMode);
                     areaPathCompleted = pathCompleted;
                 }
             }
         }
     }
 
-    public override bool PathTo(Vector2 target) {
+    public override bool PathTo(Vector2 target, PathMode mode = PathMode.OnTile) {
         if (enterDoorPos.HasValue) {
             deferredTargetPos = target;
             return true;
@@ -108,7 +108,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
             return false;
         }
         
-        return base.PathTo(target);
+        return base.PathTo(target, mode);
     }
 
     private void ResetAreaPath() {
@@ -124,6 +124,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
     }
 
     public override void Serialise() {
+        // It's gonna path twice when loading
         base.Serialise();
 
         Find.SaveManager.ArchiveValue("areaDestination", ref destination);
@@ -133,7 +134,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
             if (enterDoorPos.HasValue) {
                 deferredTargetPos = destination;
             } else if (destination.HasValue)
-                PathTo(destination.Value);
+                PathTo(destination.Value, pathMode);
         }
     }
 }

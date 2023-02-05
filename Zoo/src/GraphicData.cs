@@ -9,7 +9,7 @@ namespace Zoo;
 public struct GraphicData {
     // Config
     public  Vector2   Origin = Vector2.Zero;
-    public  Vector2   Scale  = Vector2.One;
+    public  Color     Colour = Color.WHITE;
     private Texture2D texture;
 
     [JsonProperty] private string spritePath = "";
@@ -19,8 +19,7 @@ public struct GraphicData {
     // Properties
     public Texture2D Texture
     {
-        get
-        {
+        get {
             if (texture.Empty())
                 texture = Find.AssetManager.GetTexture(spritePath);
 
@@ -32,6 +31,7 @@ public struct GraphicData {
     public int CellWidth  => cellWidth  == 0 ? Texture.width : cellWidth;
     public int CellHeight => cellHeight == 0 ? Texture.height : cellHeight;
 
+    [JsonConstructor]
     public GraphicData() {}
 
     public void SetSprite(string path)
@@ -40,17 +40,17 @@ public struct GraphicData {
         Texture = Find.AssetManager.GetTexture(spritePath);
     }
 
-    public void Blit(Vector2 pos, float depth, Color colour, int scale = 1, int index = 0, int? pickId = null, Shader? fragShader = null) {
+    public void Blit(Vector2 pos, float depth, Color? overrideColour, int index = 0, int? pickId = null, Shader? fragShader = null) {
         var source = GetCellBounds(index);
         
         Find.Renderer.Blit(
             texture: Texture,
             pos: pos,
             depth: depth,
-            scale: new Vector2(Texture.width * source.width, Texture.height * source.height) * scale,
+            scale: new Vector2(Texture.width * source.width, Texture.height * source.height),
             origin: Origin,
             source: source,
-            color: colour,
+            color: overrideColour ?? Colour,
             fragShader: fragShader,
             pickId: pickId
         );

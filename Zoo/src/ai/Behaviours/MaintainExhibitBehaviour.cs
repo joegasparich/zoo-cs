@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Zoo.entities;
 using Zoo.util;
 using Zoo.world;
@@ -13,6 +14,7 @@ public class MaintainExhibitBehaviour : Behaviour {
     private IntVec2? waterBowlPos;
     private IntVec2? foodPos; // TODO: Array based on different required food types
 
+    [JsonConstructor]
     public MaintainExhibitBehaviour() {}
     public MaintainExhibitBehaviour(Actor actor, Exhibit exhibit) : base(actor) {
         this.exhibit = exhibit;

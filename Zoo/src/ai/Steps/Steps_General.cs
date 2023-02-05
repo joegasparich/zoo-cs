@@ -1,4 +1,5 @@
 using System.Numerics;
+using Zoo.world;
 
 namespace Zoo.ai; 
 
@@ -17,9 +18,9 @@ public static class Steps_General {
         return step;
     }
     
-    public static Step GoTo(Vector2 pos) {
+    public static Step GoTo(Vector2 pos, PathMode mode = PathMode.OnTile) {
         var step = new Step();
-        step.Setup = () => step.Actor.Pather.PathTo(pos);
+        step.Setup = () => step.Actor.Pather.PathTo(pos, mode);
         step.SuccessConditions.Add(() => step.Actor.Pather.ReachedDestination);
         step.FailConditions.Add(() => step.Actor.Pather.NoPathFound);
 

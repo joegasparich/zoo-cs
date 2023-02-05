@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Zoo.entities;
 using Zoo.util;
 
@@ -24,6 +25,7 @@ public class Exhibit : ISerialisable {
     public bool MissingWater     => ContainedAnimals.Any(animal => animal.MissingWaterSource);
     public bool NeedsMaintenance => (MissingFood || MissingWater) && LastMaintainedTick + MaintenanceCooldown < Game.Ticks;
 
+    [JsonConstructor]
     public Exhibit() {}
     public Exhibit(string id, string name, Area area) {
         Id   = id;

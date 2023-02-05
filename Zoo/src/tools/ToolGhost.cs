@@ -156,11 +156,11 @@ public class ToolGhost {
         var pos = (Pos + Offset) * World.WorldScale;
         if (Elevate)
             pos.Y -= Find.World.Elevation.GetElevationAtPos(Pos + Offset) * World.WorldScale;
-        
+
         Graphics.Value.Blit(
             pos: pos,
             depth: (int)Depth.UI,
-            colour: CanPlace ? GhostColour : BlockedColour,
+            overrideColour: CanPlace ? GhostColour : BlockedColour,
             index: SpriteIndex
         );
     }

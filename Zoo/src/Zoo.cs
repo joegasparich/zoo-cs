@@ -1,4 +1,3 @@
-using System.Numerics;
 using Zoo.entities;
 using Zoo.tools;
 using Zoo.ui;
@@ -37,9 +36,10 @@ public class Zoo : ISerialisable {
     public int Funds = 1000;
     
     // Caches
-    public readonly HashSet<Animal> Animals = new();
-    public readonly HashSet<Guest>  Guests  = new();
-    public readonly HashSet<Staff>  Staff   = new();
+    public readonly HashSet<Animal>     Animals       = new();
+    public readonly HashSet<Guest>      Guests        = new();
+    public readonly HashSet<Staff>      Staff         = new();
+    public readonly HashSet<TileObject> ObjBlueprints = new();
     
     public Zoo() {
         Tools = new ToolManager();

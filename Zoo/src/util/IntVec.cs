@@ -45,6 +45,7 @@ public struct IntVec2 : IEquatable<IntVec2> {
     }
 
     public static implicit operator Vector2(IntVec2 v) => new(v.X, v.Y);
+    public Vector2 ToVector2() => new(X, Y);
 
     public bool Equals(IntVec2 other) {
         return X == other.X && Y == other.Y;

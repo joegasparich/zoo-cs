@@ -24,11 +24,11 @@ public enum WallSpriteIndex {
 
 public class Wall : ISerialisable {
     // Config
-    public WallDef?   Data           = null;
-    public IntVec2     GridPos        = default;
-    public bool        Indestructable = false;
-    public bool        IsDoor         = false;
-    public Color       OverrideColour = Color.WHITE;
+    public WallDef? Data           = null;
+    public IntVec2  GridPos        = default;
+    public bool     Indestructable = false;
+    public bool     IsDoor         = false;
+    public Color?   OverrideColour;
     
     // Properties
     public Orientation Orientation => (Orientation)(GridPos.X % 2);
@@ -118,11 +118,11 @@ public class WallGrid : ISerialisable {
                 wall.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
-                    colour: wall.OverrideColour,
+                    overrideColour: wall.OverrideColour,
                     index: (int)spriteIndex
                 );
                 
-                wall.OverrideColour = Color.WHITE;
+                wall.OverrideColour = null;
             }
         }
     }

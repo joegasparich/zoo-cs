@@ -5,6 +5,11 @@ using Zoo.util;
 
 namespace Zoo.world;
 
+public enum PathMode {
+    OnTile,
+    Adjacent
+}
+
 internal struct Tile {
     public bool[] connections = { true, true, true, true, true, true, true, true };
     public Tile() {}
@@ -55,14 +60,14 @@ public class Pathfinder {
         isSetup  = false;
     }
     
-    public (Task<List<IntVec2>?>, CancellationTokenSource)? RequestPath(IntVec2 start, IntVec2 end, AccessibilityType accessibility) {
+    public (Task<List<IntVec2>?>, CancellationTokenSource)? RequestPath(IntVec2 start, IntVec2 end, AccessibilityType accessibility, PathMode mode = PathMode.OnTile) {
         if (!isSetup) return null;
 
         var cancel = new CancellationTokenSource();
         var token  = cancel.Token;
         var task = Task.Run(() => {
             if (!isSetup) return null;
-            var path = GetPath(start, end, accessibility);
+            var path = GetPath(start, end, accessibility, mode);
             pathRequests.TryRemove(cancel, out _);
             return path;
         }, token);
@@ -71,10 +76,10 @@ public class Pathfinder {
     }
     
     // https://www.geeksforgeeks.org/a-search-algorithm/
-    private List<IntVec2>? GetPath(IntVec2 from, IntVec2 to, AccessibilityType accessibility) {
+    private List<IntVec2>? GetPath(IntVec2 from, IntVec2 to, AccessibilityType accessibility, PathMode mode) {
         if (!isSetup) return null;
-        if (!Find.World.IsPositionInMap(from) || !Find.World.IsPositionInMap(to)) return null;
-        if (!IsAccessible(from, accessibility) || !IsAccessible(to, accessibility)) return null;
+        if (!Find.World.IsPositionInMap(from)  || !Find.World.IsPositionInMap(to)) return null;
+        if (!IsAccessible(from, accessibility) || (mode == PathMode.OnTile && !IsAccessible(to, accessibility))) return null;
         if (from == to) return null;
 
         var closedList  = new bool[cols, rows];
@@ -103,7 +108,13 @@ public class Pathfinder {
             foreach(var neighbour in GetNeighbours(new IntVec2(x, y), accessibility)) {
                 var (nx, ny) = neighbour;
 
-                if (neighbour == to) {
+                if (mode == PathMode.Adjacent && GetNeighbours(neighbour, AccessibilityType.Any).Contains(to)) {
+                    // Destination found!
+                    cellDetails[nx, ny].parent = new IntVec2(x, y);
+                    return ReconstructPath(cellDetails, neighbour);
+                }
+
+                if (mode == PathMode.OnTile && neighbour == to) {
                     // Destination found!
                     cellDetails[nx, ny].parent = new IntVec2(x, y);
                     return ReconstructPath(cellDetails, to);

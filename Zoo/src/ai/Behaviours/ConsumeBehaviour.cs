@@ -1,4 +1,5 @@
-﻿using Zoo.defs;
+﻿using Newtonsoft.Json;
+using Zoo.defs;
 using Zoo.entities;
 using Zoo.util;
 
@@ -18,7 +19,8 @@ public class ConsumeBehaviour : Behaviour {
     public  NeedsComponent       Needs      => actor.GetComponent<NeedsComponent>();
     private bool                 CanConsume => consumable != null && !consumable.Despawned && actor.Pos.InDistOf(consumable.Pos, 1);
     private ConsumableComponent? Consumable => consumable != null ? consumable.GetComponent<ConsumableComponent>() : null;
-    
+
+    [JsonConstructor]
     public ConsumeBehaviour() {}
     public ConsumeBehaviour(Actor actor, NeedDef need) : base(actor) {
         Debug.Assert(Needs != null, "Consume behaviour requires the actor to have a needs component");

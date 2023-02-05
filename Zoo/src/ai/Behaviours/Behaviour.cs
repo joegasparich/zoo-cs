@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Zoo.entities;
 using Zoo.util;
 
@@ -24,6 +25,7 @@ public abstract class Behaviour : ISerialisable {
     // Properties
     public PathFollowComponent Pather  => actor.GetComponent<PathFollowComponent>();
 
+    [JsonConstructor]
     public Behaviour() {}
     public Behaviour(Actor actor) {
         this.actor = actor;

@@ -1,9 +1,10 @@
-﻿using Zoo.entities;
+﻿using Newtonsoft.Json;
+using Zoo.entities;
 
 namespace Zoo.ai; 
 
 public class LeaveBehaviour : Behaviour {
-    
+    [JsonConstructor]
     public LeaveBehaviour() {}
     public LeaveBehaviour(Actor actor) : base(actor) {}
 

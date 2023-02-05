@@ -17,6 +17,7 @@ public class ObjectDef : EntityDef {
     public bool       CanPlaceOnSlopes = false;
     public bool       CanPlaceInWater  = false;
     public bool       CanRotate        = false;
+    public bool       NeedsBlueprint   = false;
 
     public ObjectDef() {
         IsStatic = true;

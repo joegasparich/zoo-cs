@@ -1,4 +1,5 @@
-﻿using Zoo.entities;
+﻿using Newtonsoft.Json;
+using Zoo.entities;
 using Zoo.util;
 using Zoo.world;
 
@@ -20,6 +21,7 @@ public class ViewExhibitBehaviour : Behaviour {
     // Properties
     private Guest Guest => actor as Guest;
 
+    [JsonConstructor]
     public ViewExhibitBehaviour() {}
     public ViewExhibitBehaviour(Actor actor, Exhibit exhibit) : base(actor) {
         this.exhibit = exhibit;
