@@ -26,11 +26,7 @@ public class Tool_Door : Tool {
             if (Ghost.CanPlace) {
                 var wall = Find.World.Walls.GetWallAtTile(evt.mouseWorldPos.Floor(), mouseQuadrant);
 
-                // TODO: Door blueprint if wall exists
-                if (!wall.isBlueprint)
-                    Find.World.Walls.OnDoorBuilt(wall!);
-                else
-                    wall.IsDoor = true;
+                wall.PlaceDoor();
                 
                 toolManager.PushAction(new ToolAction() {
                     Name = "Place door",

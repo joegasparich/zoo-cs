@@ -30,26 +30,44 @@ public class Wall : ISerialisable, IBlueprintable {
     public   bool     Indestructable = false;
     public   bool     IsDoor         = false;
     public   Color?   OverrideColour;
-    internal bool     isBlueprint = false;
+    internal bool     isWallBlueprint     = false;
+    internal bool     isDoorBlueprint = false; // If the wall exists but the door is a blueprint
 
     // Properties
     public Orientation Orientation => (Orientation)(GridPos.X % 2);
     public Vector2     WorldPos    => WallUtility.WallToWorldPosition(GridPos, Orientation);
     public bool        Empty       => Data == null;
-    public bool        IsBlueprint => isBlueprint;
-    public bool        Exists      => !Empty && !isBlueprint;
+    public bool        IsBlueprint => isWallBlueprint || isDoorBlueprint;
+    public bool        Exists      => !Empty && !isWallBlueprint;
     public string      BlueprintId => $"blueprint-wall{GridPos.ToString()}";
 
     public void BuildBlueprint() {
-        if (!isBlueprint) return;
+        if (isDoorBlueprint) {
+            isDoorBlueprint = false;
+            IsDoor          = true;
+            Find.World.Walls.OnDoorBuilt(this);
+            return;
+        }
+        
+        if (!isWallBlueprint) return;
 
-        isBlueprint = false;
+        isWallBlueprint = false;
         Find.World.Blueprints.UnregisterBlueprint(this);
         Find.World.Walls.OnWallBuilt(this);
     }
 
     public List<IntVec2> GetBuildTiles() {
         return GetAdjacentTiles();
+    }
+
+    public void PlaceDoor() {
+        if (!isWallBlueprint) {
+            isDoorBlueprint = true;
+            Find.World.Blueprints.RegisterBlueprint(this);
+        } else {
+            // Is blueprint so we can instantly set it to be a door
+            IsDoor = true;
+        }
     }
 
     private static List<IntVec2> adjacentTiles = new ();
@@ -74,10 +92,11 @@ public class Wall : ISerialisable, IBlueprintable {
         Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
-        Find.SaveManager.ArchiveValue("isBlueprint", ref isBlueprint);
+        Find.SaveManager.ArchiveValue("isBlueprint", ref isWallBlueprint);
+        Find.SaveManager.ArchiveValue("isDoorBlueprint", ref isDoorBlueprint);
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            if (isBlueprint)
+            if (IsBlueprint)
                 Find.World.Blueprints.RegisterBlueprint(this);
         }
     }
@@ -162,6 +181,16 @@ public class WallGrid : ISerialisable {
                     index: (int)spriteIndex
                 );
                 
+                // Draw door blueprint on top of wall
+                if (!wall.isWallBlueprint && wall.isDoorBlueprint) {
+                    wall.Data.GraphicData.Blit(
+                        pos: pos * World.WorldScale,
+                        depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
+                        overrideColour: Colour.Blueprint,
+                        index: (int)spriteIndex + 2
+                    );
+                }
+                
                 wall.OverrideColour = null;
             }
         }
@@ -177,7 +206,7 @@ public class WallGrid : ISerialisable {
             Data           = data,
             GridPos        = new IntVec2(x, y),
             Indestructable = indestructable,
-            isBlueprint    = isBlueprint
+            isWallBlueprint    = isBlueprint
         };
 
         var wall = grid[x][y];
@@ -301,7 +330,7 @@ public class WallGrid : ISerialisable {
             var orientation = i % 2;
             for (var j = 0; j < rows + orientation; j++) {
                 var wall = grid[i][j];
-                if (wall.Exists || includeBlueprints && wall.isBlueprint)
+                if (wall.Exists || includeBlueprints && wall.isWallBlueprint)
                     yield return wall;
             }
         }
