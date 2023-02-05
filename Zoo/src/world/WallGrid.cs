@@ -46,6 +46,10 @@ public class Wall : ISerialisable, IBlueprintable {
         Find.Zoo.UnregisterBlueprint(this);
     }
 
+    public List<IntVec2> GetBuildTiles() {
+        return GetAdjacentTiles();
+    }
+
     private static List<IntVec2> adjacentTiles = new ();
     public List<IntVec2> GetAdjacentTiles() {
         adjacentTiles.Clear();
@@ -69,12 +73,11 @@ public class Wall : ISerialisable, IBlueprintable {
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
         Find.SaveManager.ArchiveValue("isBlueprint", ref isBlueprint);
-    }
 
-    [OnDeserialized]
-    public void PostLoad() {
-        if (isBlueprint)
-            Find.Zoo.RegisterBlueprint(this);
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
+            if (isBlueprint)
+                Find.Zoo.RegisterBlueprint(this);
+        }
     }
 }
 
@@ -153,7 +156,7 @@ public class WallGrid : ISerialisable {
                 wall.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
-                    overrideColour: wall.OverrideColour ?? (wall.IsBlueprint ? Color.WHITE.WithAlpha(0.5f) : Color.WHITE),
+                    overrideColour: wall.OverrideColour ?? (wall.IsBlueprint ? Colour.Blueprint : Color.WHITE),
                     index: (int)spriteIndex
                 );
                 
@@ -447,13 +450,6 @@ public class WallGrid : ISerialisable {
             walls => walls.Select(wallData => GetWallByGridPos(wallData["gridPos"].ToObject<IntVec2>()))
         );
 
-        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            foreach (var wall in GetAllWalls()) {
-                if (wall.isBlueprint)
-                    Find.Zoo.RegisterBlueprint(wall);
-            }
-        }
-        
         UpdatePathfinding();
     }
 }

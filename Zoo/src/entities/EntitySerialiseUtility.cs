@@ -34,7 +34,7 @@ public static class EntitySerialiseUtility {
             var entity = GenEntity.CreateEntity(type, def, pos);
             Game.RegisterEntityNow(entity, entityData["id"].Value<int>());
             entity.Serialise();
-            entity.Setup();
+            entity.Setup(true);
         }
         
         Find.SaveManager.CurrentSaveNode = parent;

@@ -7,5 +7,5 @@ public interface IBlueprintable {
     public string BlueprintId { get; }
 
     public void BuildBlueprint();
-    public List<IntVec2> GetAdjacentTiles();
+    public List<IntVec2> GetBuildTiles();
 }

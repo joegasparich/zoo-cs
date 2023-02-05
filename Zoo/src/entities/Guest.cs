@@ -14,8 +14,8 @@ public class Guest : Actor {
 
     public Guest(Vector2 pos, ActorDef? def) : base(pos, def) {}
 
-    public override void Setup() {
-        base.Setup();
+    public override void Setup(bool fromSave) {
+        base.Setup(fromSave);
         
         Find.Zoo.Guests.Add(this);
     }

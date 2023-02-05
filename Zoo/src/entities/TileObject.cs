@@ -16,19 +16,22 @@ public class TileObject : Entity, IBlueprintable {
     // Properties
     public override ObjectDef       Def         => (ObjectDef)base.Def;
     private         RenderComponent Renderer    => GetComponent<RenderComponent>()!;
-    public          bool            IsBlueprint => isBlueprint;
     public          string          BlueprintId => $"blueprint-object{Id}";
+    public bool IsBlueprint {
+        get => isBlueprint;
+        set => isBlueprint = value;
+    }
 
     public TileObject(Vector2 pos, ObjectDef def) : base(pos, def) {}
 
-    public override void Setup() {
-        base.Setup();
+    public override void Setup(bool fromSave) {
+        base.Setup(fromSave);
         
         Find.World.RegisterTileObject(this);
 
-        if (Def.NeedsBlueprint) {
-            isBlueprint              = true;
-            Renderer.Graphics.Colour = Color.WHITE.WithAlpha(0.5f);
+        if (isBlueprint) {
+            Renderer.Graphics.Colour = Colour.Blueprint;
+
             Find.Zoo.RegisterBlueprint(this);
         }
 
@@ -78,7 +81,7 @@ public class TileObject : Entity, IBlueprintable {
     }
 
     private HashSet<IntVec2> adjacentTiles = new();
-    public List<IntVec2> GetAdjacentTiles() {
+    public List<IntVec2> GetBuildTiles() {
         adjacentTiles.Clear();
 
         foreach (IntVec2 tile in GetOccupiedTiles()) {
@@ -99,7 +102,7 @@ public class TileObject : Entity, IBlueprintable {
     }
 
     [OnDeserialized]
-    public override void PostLoad() {
+    public void OnDeserialized(StreamingContext context) {
         Renderer.SpriteIndex = (int)rotation;
 
         if (isBlueprint)

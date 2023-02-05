@@ -4,6 +4,8 @@ using Raylib_cs;
 namespace Zoo.util; 
 
 public static class Colour {
+    public static readonly Color Blueprint = Color.WHITE.WithAlpha(0.5f);
+
     public static Color IntToColour(int number) {
         return new Color(
             (number >>  0) & 255,

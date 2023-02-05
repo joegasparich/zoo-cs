@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
@@ -14,20 +15,40 @@ public enum FootPathSpriteIndex {
     HillSouth = 4
 }
 
-public class FootPath : ISerialisable {
+public class FootPath : ISerialisable, IBlueprintable {
     // Config
-    public FootPathDef? Data           = null;
-    public IntVec2       Pos            = default;
-    public bool          Indestructable = false;
-    public Color         OverrideColour = Color.WHITE;
+    public   FootPathDef? Data           = null;
+    public   IntVec2      Pos            = default;
+    public   bool         Indestructable = false;
+    public   Color?       OverrideColour;
+    internal bool         isBlueprint = false;
 
     // Properties
-    public bool Exists => Data != null;
+    public bool   Exists      => Data != null;
+    public bool   IsBlueprint => isBlueprint;
+    public string BlueprintId => $"blueprint-path{Pos.ToString()}";
+
+    public void BuildBlueprint() {
+        if (!isBlueprint) return;
+
+        isBlueprint = false;
+        Find.Zoo.UnregisterBlueprint(this);
+    }
+
+    public List<IntVec2> GetBuildTiles() {
+        return new List<IntVec2> { Pos };
+    }
 
     public void Serialise() {
         Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
         Find.SaveManager.ArchiveValue("pos",            ref Pos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
+        Find.SaveManager.ArchiveValue("isBlueprint",    ref isBlueprint);
+
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
+            if (isBlueprint)
+                Find.Zoo.RegisterBlueprint(this);
+        }
     }
 }
 
@@ -91,23 +112,29 @@ public class FootPathGrid : ISerialisable {
                 path.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: (int)Depth.GroundCover,
-                    overrideColour: path.OverrideColour,
+                    overrideColour: path.OverrideColour ?? (path.IsBlueprint ? Colour.Blueprint : Color.WHITE),
                     index: (int)spriteIndex
                 );
                 
-                path.OverrideColour = Color.WHITE;
+                path.OverrideColour = null;
             }
         }
     }
 
-    public FootPath? PlacePathAtTile(FootPathDef data, IntVec2 tile) {
+    public FootPath? PlacePathAtTile(FootPathDef data, IntVec2 tile, bool isBlueprint = false) {
         if (!Find.World.IsPositionInMap(tile)) return null;
         if (GetFootPathAtTile(tile)!.Exists) return null;
         
         grid[tile.X][tile.Y] = new FootPath() {
             Data = data,
             Pos = tile,
+            isBlueprint = isBlueprint
         };
+
+        var path = grid[tile.X][tile.Y];
+
+        if (isBlueprint)
+            Find.Zoo.RegisterBlueprint(path);
         
         Find.World.UpdateAccessibilityGrids(tile);
         

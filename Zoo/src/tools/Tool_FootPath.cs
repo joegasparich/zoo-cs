@@ -71,7 +71,7 @@ public class Tool_FootPath : Tool {
         while (ghosts.Any()) {
             var ghost = ghosts.Pop();
             if (ghost.CanPlace) {
-                Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor());
+                Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor(), isBlueprint: true);
                 undoData.Add(ghost.Pos.Floor());
                 placed++;
             }

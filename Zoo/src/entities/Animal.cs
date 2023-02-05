@@ -17,8 +17,8 @@ public class Animal : Actor {
 
     public Animal(Vector2 pos, AnimalDef def) : base(pos, def) {}
 
-    public override void Setup() {
-        base.Setup();
+    public override void Setup(bool fromSave) {
+        base.Setup(fromSave);
 
         Find.Zoo.Animals.Add(this);
         Messenger.Fire(EventType.AnimalPlaced, this);

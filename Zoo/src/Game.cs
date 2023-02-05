@@ -279,7 +279,7 @@ public static class Game {
         foreach (var entity in entitiesToAdd) {
             try {
                 RegisterEntityNow(entity, entity.Id);
-                entity.Setup();
+                entity.Setup(false);
             }
             catch (Exception e) {
                 Debug.Error($"Failed to set up entity {entity.Id}:", e);

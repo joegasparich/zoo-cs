@@ -21,7 +21,7 @@ public class BuildBlueprintBehaviour : Behaviour {
         base.Start();
 
         blueprint   = Find.Zoo.Blueprints.Values.RandomElement();
-        closestTile = blueprint.GetAdjacentTiles().Closest(actor.Pos);
+        closestTile = blueprint.GetBuildTiles().Closest(actor.Pos);
     }
 
     public override IEnumerable<Step> GetSteps() {

@@ -45,7 +45,7 @@ public class Entity : ISerialisable {
         }
     }
 
-    public virtual void Setup() {
+    public virtual void Setup(bool fromSave) {
         if (def.IsStatic)
             Find.World.OccupyTileStatic(this);
         else
@@ -202,8 +202,6 @@ public class Entity : ISerialisable {
         
         Find.SaveManager.ArchiveDef("def", ref def);
     }
-
-    public virtual void PostLoad() {}
 
     public virtual List<InfoTab> GetInfoTabs() {
         return Components.Select(comp => comp.GetInfoTab()).Where(tab => tab != null).ToList();

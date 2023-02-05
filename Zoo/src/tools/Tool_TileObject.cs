@@ -42,9 +42,12 @@ public class Tool_TileObject : Tool {
 
             var obj = GenEntity.CreateTileObject(currentObject.Id, Ghost.Pos);
             if (obj == null) return;
-            Game.RegisterEntity(obj);
-            
+
             obj.SetRotation(rotation);
+            if (currentObject.NeedsBlueprint)
+                obj.IsBlueprint = true;
+
+            Game.RegisterEntity(obj);
 
             Find.Zoo.DeductFunds(currentObject.Cost);
 
