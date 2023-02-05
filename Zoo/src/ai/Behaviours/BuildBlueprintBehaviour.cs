@@ -20,7 +20,9 @@ public class BuildBlueprintBehaviour : Behaviour {
     public override void Start() {
         base.Start();
 
-        blueprint = Find.World.Blueprints.Blueprints.Values.Where(bp => !bp.Reserved).RandomElement();
+        // TODO: Store blueprints in regions and look for nearby blueprints and otherwise pick a random one
+        var blueprints = Find.World.Blueprints.Blueprints.Values.Where(bp => !bp.Reserved);
+        blueprint = blueprints.OrderBy(bp => bp.Pos.DistanceSquared(actor.Pos)).FirstOrDefault();
 
         if (!Find.World.Blueprints.TryReserveBlueprint(blueprint, actor)) {
             State = CompleteState.Failed;
@@ -54,7 +56,7 @@ public class BuildBlueprintBehaviour : Behaviour {
     public override void Serialise() {
         base.Serialise();
 
-        Find.SaveManager.ArchiveValue("blueprint",   () => blueprint.BlueprintId, id => blueprint = Find.World.Blueprints.Blueprints[id]);
+        Find.SaveManager.ArchiveValue("blueprint",   () => blueprint.UniqueId, id => blueprint = Find.World.Blueprints.Blueprints[id]);
         Find.SaveManager.ArchiveValue("closestTile", ref closestTile);
     }
 }

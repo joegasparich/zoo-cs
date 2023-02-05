@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.util;
@@ -35,11 +33,11 @@ public class Wall : ISerialisable, IBlueprintable {
 
     // Properties
     public Orientation Orientation => (Orientation)(GridPos.X % 2);
-    public Vector2     WorldPos    => WallUtility.WallToWorldPosition(GridPos, Orientation);
+    public Vector2     Pos         => WallUtility.WallToWorldPosition(GridPos, Orientation);
     public bool        Empty       => Data == null;
     public bool        IsBlueprint => isWallBlueprint || isDoorBlueprint;
     public bool        Exists      => !Empty && !isWallBlueprint;
-    public string      BlueprintId => $"blueprint-wall{GridPos.ToString()}";
+    public string      UniqueId    => $"wall{GridPos.ToString()}";
 
     public void BuildBlueprint() {
         if (isDoorBlueprint) {
@@ -74,7 +72,7 @@ public class Wall : ISerialisable, IBlueprintable {
     public List<IntVec2> GetAdjacentTiles() {
         adjacentTiles.Clear();
 
-        var (x, y) = WorldPos;
+        var (x, y) = Pos;
 
         if (Orientation == Orientation.Horizontal) {
             if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y - 1.0f))) adjacentTiles.Add(new Vector2(x - 0.5f, y - 1.0f).Floor());
@@ -176,7 +174,7 @@ public class WallGrid : ISerialisable {
                 
                 wall.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
-                    depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
+                    depth: Find.Renderer.GetDepth(wall.Pos.Y),
                     overrideColour: wall.OverrideColour ?? (wall.IsBlueprint ? Colour.Blueprint : Color.WHITE),
                     index: (int)spriteIndex
                 );
@@ -185,7 +183,7 @@ public class WallGrid : ISerialisable {
                 if (!wall.isWallBlueprint && wall.isDoorBlueprint) {
                     wall.Data.GraphicData.Blit(
                         pos: pos * World.WorldScale,
-                        depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
+                        depth: Find.Renderer.GetDepth(wall.Pos.Y),
                         overrideColour: Colour.Blueprint,
                         index: (int)spriteIndex + 2
                     );
@@ -220,7 +218,7 @@ public class WallGrid : ISerialisable {
     }
 
     public void RemoveWall(Wall wall) {
-        RemoveWallAtTile(wall.WorldPos.Floor(), wall.Orientation == Orientation.Horizontal ? Side.North : Side.West);
+        RemoveWallAtTile(wall.Pos.Floor(), wall.Orientation == Orientation.Horizontal ? Side.North : Side.West);
     }
 
     public void RemoveWallAtTile(IntVec2 tile, Side side) {
@@ -274,7 +272,7 @@ public class WallGrid : ISerialisable {
     }
 
     internal void UpdatePathfindingAtWall(Wall wall) {
-        var (x, y) = wall.WorldPos;
+        var (x, y) = wall.Pos;
 
         if (wall.Orientation == Orientation.Horizontal) {
             if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y - 1))) {
@@ -437,11 +435,11 @@ public class WallGrid : ISerialisable {
         if (adjacent.Length < 2) return false;
 
         if (wall.Orientation == Orientation.Horizontal) {
-            if (adjacent.Any(w => w.WorldPos.X > wall.WorldPos.X) && adjacent.Any(w => w.WorldPos.X < wall.WorldPos.X)) {
+            if (adjacent.Any(w => w.Pos.X > wall.Pos.X) && adjacent.Any(w => w.Pos.X < wall.Pos.X)) {
                 return true;
             }
         } else {
-            if (adjacent.Any(w => w.WorldPos.Y > wall.WorldPos.Y) && adjacent.Any(w => w.WorldPos.Y < wall.WorldPos.Y)) {
+            if (adjacent.Any(w => w.Pos.Y > wall.Pos.Y) && adjacent.Any(w => w.Pos.Y < wall.Pos.Y)) {
                 return true;
             }
         }

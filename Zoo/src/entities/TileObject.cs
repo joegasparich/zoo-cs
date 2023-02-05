@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Runtime.Serialization;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.ui;
@@ -11,16 +10,13 @@ namespace Zoo.entities;
 public class TileObject : Entity, IBlueprintable {
     // State
     private Side rotation;
-    private bool isBlueprint;
-    
+
     // Properties
     public override ObjectDef       Def         => (ObjectDef)base.Def;
     private         RenderComponent Renderer    => GetComponent<RenderComponent>()!;
-    public          string          BlueprintId => $"blueprint-object{Id}";
-    public bool IsBlueprint {
-        get => isBlueprint;
-        set => isBlueprint = value;
-    }
+    public new      Vector2         Pos         => base.Pos;
+    public          string          UniqueId    => $"object{Id}";
+    public          bool            IsBlueprint { get; set; }
 
     public TileObject(Vector2 pos, ObjectDef def) : base(pos, def) {}
 
@@ -29,7 +25,7 @@ public class TileObject : Entity, IBlueprintable {
         
         Find.World.RegisterTileObject(this);
 
-        if (isBlueprint) {
+        if (IsBlueprint) {
             Renderer.Graphics.Colour = Colour.Blueprint;
 
             Find.World.Blueprints.RegisterBlueprint(this);
@@ -66,7 +62,7 @@ public class TileObject : Entity, IBlueprintable {
     }
 
     public void BuildBlueprint() {
-        isBlueprint              = false;
+        IsBlueprint              = false;
         Renderer.Graphics.Colour = Color.WHITE;
         Find.World.Blueprints.UnregisterBlueprint(this);
     }
@@ -98,15 +94,7 @@ public class TileObject : Entity, IBlueprintable {
         base.Serialise();
         
         Find.SaveManager.ArchiveValue("rotation",    ref rotation);
-        Find.SaveManager.ArchiveValue("isBlueprint", ref isBlueprint);
-    }
-
-    [OnDeserialized]
-    public void OnDeserialized(StreamingContext context) {
-        Renderer.SpriteIndex = (int)rotation;
-
-        if (isBlueprint)
-            Find.World.Blueprints.RegisterBlueprint(this);
+        Find.SaveManager.ArchiveValue("isBlueprint", () => IsBlueprint, b => IsBlueprint = b);
     }
 
     public override List<InfoTab> GetInfoTabs() {

@@ -256,7 +256,7 @@ public class AreaManager {
 
             foreach (var (_, doors) in area.ConnectedAreas) {
                 foreach (var door in doors) {
-                    if (!Find.Renderer.IsWorldPosOnScreen(door.WorldPos)) continue;
+                    if (!Find.Renderer.IsWorldPosOnScreen(door.Pos)) continue;
                     
                     var tiles = door.GetAdjacentTiles();
                     var (p1, p2) = door.GetVertices();

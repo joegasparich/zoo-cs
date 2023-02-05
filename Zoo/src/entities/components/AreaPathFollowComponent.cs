@@ -33,7 +33,7 @@ public class AreaPathFollowComponent : PathFollowComponent {
             var nextArea = areaPath!.First();
             var minDistSquared = float.MaxValue;
             foreach (var door in currentArea.ConnectedAreas[nextArea]) {
-                var distSquared = Actor.Pos.DistanceSquared(door.WorldPos);
+                var distSquared = Actor.Pos.DistanceSquared(door.Pos);
                 if (distSquared < minDistSquared) {
                     currentDoor    = door;
                     minDistSquared = distSquared;

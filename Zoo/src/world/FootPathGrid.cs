@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.util;
@@ -18,35 +16,35 @@ public enum FootPathSpriteIndex {
 public class FootPath : ISerialisable, IBlueprintable {
     // Config
     public   FootPathDef? Data           = null;
-    public   IntVec2      Pos            = default;
+    public   IntVec2      Tile            = default;
     public   bool         Indestructable = false;
     public   Color?       OverrideColour;
-    internal bool         isBlueprint = false;
 
     // Properties
-    public bool   Exists      => Data != null;
-    public bool   IsBlueprint => isBlueprint;
-    public string BlueprintId => $"blueprint-path{Pos.ToString()}";
+    public bool    Exists      => Data != null;
+    public bool    IsBlueprint { get; internal set; } = false;
+    public Vector2 Pos         => Tile;
+    public string  UniqueId    => $"path{Tile.ToString()}";
 
     public void BuildBlueprint() {
-        if (!isBlueprint) return;
+        if (!IsBlueprint) return;
 
-        isBlueprint = false;
+        IsBlueprint = false;
         Find.World.Blueprints.UnregisterBlueprint(this);
     }
 
     public List<IntVec2> GetBuildTiles() {
-        return new List<IntVec2> { Pos };
+        return new List<IntVec2> { Tile };
     }
 
     public void Serialise() {
         Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
-        Find.SaveManager.ArchiveValue("pos",            ref Pos);
+        Find.SaveManager.ArchiveValue("tile",           ref Tile);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
-        Find.SaveManager.ArchiveValue("isBlueprint",    ref isBlueprint);
+        Find.SaveManager.ArchiveValue("isBlueprint",    () => IsBlueprint, b => IsBlueprint = b);
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            if (isBlueprint)
+            if (IsBlueprint)
                 Find.World.Blueprints.RegisterBlueprint(this);
         }
     }
@@ -54,8 +52,8 @@ public class FootPath : ISerialisable, IBlueprintable {
 
 public class FootPathGrid : ISerialisable {
     // Config
-    private int          cols;
-    private int          rows;
+    private int cols;
+    private int rows;
     
     // State
     private bool         isSetup = false;
@@ -77,7 +75,7 @@ public class FootPathGrid : ISerialisable {
                 var pathData = data?[i][j] != null ? Find.AssetManager.GetDef<FootPathDef>(data[i][j]) : null;
                 grid[i][j] = new FootPath() {
                     Data = pathData,
-                    Pos = new IntVec2(i, j),
+                    Tile = new IntVec2(i, j),
                 };
             }
         }
@@ -106,7 +104,7 @@ public class FootPathGrid : ISerialisable {
                 if (path.Data == null) continue;
 
                 var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
-                Vector2 pos = path.Pos;
+                Vector2 pos = path.Tile;
                 pos -= new Vector2(0, 1 + elevation);
                 
                 path.Data.GraphicData.Blit(
@@ -127,8 +125,8 @@ public class FootPathGrid : ISerialisable {
         
         grid[tile.X][tile.Y] = new FootPath() {
             Data = data,
-            Pos = tile,
-            isBlueprint = isBlueprint
+            Tile = tile,
+            IsBlueprint = isBlueprint
         };
 
         var path = grid[tile.X][tile.Y];
@@ -146,7 +144,7 @@ public class FootPathGrid : ISerialisable {
         if (!GetFootPathAtTile(tile)!.Exists) return;
         
         grid[tile.X][tile.Y] = new FootPath() {
-            Pos = tile
+            Tile = tile
         };
 
         Find.World.UpdateAccessibilityGrids(tile);

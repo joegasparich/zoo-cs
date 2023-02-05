@@ -39,7 +39,7 @@ public static class TileUtility {
                 foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(t)) {
                     if (wall.Empty) continue;
                     var placementBounds = new Rectangle(tile.X, tile.Y, obj.Size.X, obj.Size.Y);
-                    if (placementBounds.ContractedBy(0.1f).Contains(wall.WorldPos)) return false;
+                    if (placementBounds.ContractedBy(0.1f).Contains(wall.Pos)) return false;
                 }
             }
         }

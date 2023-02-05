@@ -21,16 +21,16 @@ public static class WallUtility {
 
     public static (WallSpriteIndex, float) GetSpriteInfo(Wall wall, bool isDoor = false) {
         if (wall.Orientation == Orientation.Horizontal) {
-            var left      = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.WorldPos.X - 0.5f, wall.WorldPos.Y));
-            var right     = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.WorldPos.X + 0.5f, wall.WorldPos.Y));
+            var left      = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.Pos.X - 0.5f, wall.Pos.Y));
+            var right     = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.Pos.X + 0.5f, wall.Pos.Y));
             var elevation = MathF.Min(left, right);
 
             if (left.NearlyEquals(right)) return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, elevation );
             if (left > right)                    return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillWest, elevation );
             if (left < right)                    return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillEast, elevation );
         } else {
-            var up        = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.WorldPos.X, wall.WorldPos.Y - 0.5f));
-            var down      = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.WorldPos.X, wall.WorldPos.Y + 0.5f));
+            var up        = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.Pos.X, wall.Pos.Y - 0.5f));
+            var down      = Find.World.Elevation.GetElevationAtPos(new Vector2(wall.Pos.X, wall.Pos.Y + 0.5f));
             var elevation = MathF.Min(up, down);
 
             if (up.NearlyEquals(down)) return ( isDoor || wall.IsDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, elevation );
@@ -44,12 +44,12 @@ public static class WallUtility {
     public static (IntVec2, IntVec2) GetVertices(this Wall wall) {
         return wall.Orientation switch {
             Orientation.Horizontal => (
-                new Vector2(wall.WorldPos.X - 0.5f, wall.WorldPos.Y).Floor(), 
-                new Vector2(wall.WorldPos.X + 0.5f, wall.WorldPos.Y).Floor()
+                new Vector2(wall.Pos.X - 0.5f, wall.Pos.Y).Floor(), 
+                new Vector2(wall.Pos.X + 0.5f, wall.Pos.Y).Floor()
             ),
             Orientation.Vertical => (
-                new Vector2(wall.WorldPos.X, wall.WorldPos.Y - 0.5f).Floor(), 
-                new Vector2(wall.WorldPos.X, wall.WorldPos.Y + 0.5f).Floor()
+                new Vector2(wall.Pos.X, wall.Pos.Y - 0.5f).Floor(), 
+                new Vector2(wall.Pos.X, wall.Pos.Y + 0.5f).Floor()
             )
         };
     }

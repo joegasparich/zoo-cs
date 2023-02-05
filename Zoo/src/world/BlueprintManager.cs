@@ -7,26 +7,26 @@ public class BlueprintManager : ISerialisable {
     private Dictionary<string, int>            reservedBlueprints = new();
 
     public void RegisterBlueprint(IBlueprintable blueprint) {
-        Blueprints.Add(blueprint.BlueprintId, blueprint);
+        Blueprints.Add(blueprint.UniqueId, blueprint);
     }
     public void UnregisterBlueprint(IBlueprintable blueprint) {
-        Blueprints.Remove(blueprint.BlueprintId);
+        Blueprints.Remove(blueprint.UniqueId);
     }
 
     public bool TryReserveBlueprint(IBlueprintable blueprint, Actor actor) {
-        if (reservedBlueprints.ContainsKey(blueprint.BlueprintId))
+        if (reservedBlueprints.ContainsKey(blueprint.UniqueId))
             return false;
 
-        reservedBlueprints.Add(blueprint.BlueprintId, actor.Id);
+        reservedBlueprints.Add(blueprint.UniqueId, actor.Id);
         return true;
     }
     public void UnreserveBlueprint(IBlueprintable blueprint) {
-        if (!reservedBlueprints.ContainsKey(blueprint.BlueprintId)) return;
+        if (!reservedBlueprints.ContainsKey(blueprint.UniqueId)) return;
 
-        reservedBlueprints.Remove(blueprint.BlueprintId);
+        reservedBlueprints.Remove(blueprint.UniqueId);
     }
     public bool IsBlueprintReserved(IBlueprintable blueprint) {
-        return reservedBlueprints.ContainsKey(blueprint.BlueprintId);
+        return reservedBlueprints.ContainsKey(blueprint.UniqueId);
     }
 
     public void Serialise() {

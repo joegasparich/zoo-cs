@@ -52,7 +52,7 @@ public class Tool_Delete : Tool {
             }
             // Delete paths
             foreach(var p in paths) {
-                Find.World.FootPaths.RemovePathAtTile(p.Pos);
+                Find.World.FootPaths.RemovePathAtTile(p.Tile);
             }
             // Delete walls
             foreach(var w in walls) {
