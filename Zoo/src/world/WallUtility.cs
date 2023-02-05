@@ -54,6 +54,7 @@ public static class WallUtility {
         };
     }
 
+    // Doesn't include blueprint walls currently
     private static List<Wall> adjacentWalls = new ();
     public static Wall[] GetAdjacentWalls(this Wall wall) {
         adjacentWalls.Clear();

@@ -35,8 +35,9 @@ public class Wall : ISerialisable, IBlueprintable {
     // Properties
     public Orientation Orientation => (Orientation)(GridPos.X % 2);
     public Vector2     WorldPos    => WallUtility.WallToWorldPosition(GridPos, Orientation);
-    public bool        Exists      => Data != null;
+    public bool        Empty       => Data == null;
     public bool        IsBlueprint => isBlueprint;
+    public bool        Exists      => !Empty && !isBlueprint;
     public string      BlueprintId => $"blueprint-wall{GridPos.ToString()}";
 
     public void BuildBlueprint() {
@@ -44,6 +45,7 @@ public class Wall : ISerialisable, IBlueprintable {
 
         isBlueprint = false;
         Find.World.Blueprints.UnregisterBlueprint(this);
+        Find.World.Walls.OnWallBuilt(this);
     }
 
     public List<IntVec2> GetBuildTiles() {
@@ -146,7 +148,7 @@ public class WallGrid : ISerialisable {
             var orientation = (Orientation)(i % 2);
             for (var j = 0; j < rows + (int)orientation; j++) {
                 var wall = grid[i][j];
-                if (!wall.Exists) continue;
+                if (wall.Empty) continue;
                 if (wall.Data == null) continue;
                 
                 var (spriteIndex, elevation) = WallUtility.GetSpriteInfo(wall);
@@ -167,7 +169,7 @@ public class WallGrid : ISerialisable {
 
     public Wall? PlaceWallAtTile(WallDef data, IntVec2 tile, Side side, bool indestructable = false, bool isBlueprint = false) {
         if (!IsWallPosInMap(tile, side)) return null;
-        if (GetWallAtTile(tile, side)!.Exists) return null;
+        if (!GetWallAtTile(tile, side)!.Empty) return null;
         
         var (x, y, _) = WallUtility.GetGridPosition(tile, side);
 
@@ -184,10 +186,6 @@ public class WallGrid : ISerialisable {
             Find.World.Blueprints.RegisterBlueprint(wall);
 
         UpdatePathfindingAtWall(wall);
-        
-        if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
-            Find.World.Areas.FormAreasAtWall(wall);
-        }
 
         return wall;
     }
@@ -201,7 +199,7 @@ public class WallGrid : ISerialisable {
         
         // Get grid pos
         var (x, y, orientation) = WallUtility.GetGridPosition(tile, side);
-        if (!grid[x][y].Exists || grid[x][y].Indestructable) return;
+        if (grid[x][y].Empty || grid[x][y].Indestructable) return;
         
         // Set to empty wall
         grid[x][y] = new Wall() {
@@ -216,8 +214,8 @@ public class WallGrid : ISerialisable {
         Find.World.Areas.JoinAreasAtWall(wall);
     }
 
-    public void PlaceDoor(Wall wall) {
-        if (!wall.Exists) return;
+    public void OnDoorBuilt(Wall wall) {
+        if (wall.Empty) return;
         
         wall.IsDoor = true;
         
@@ -232,7 +230,7 @@ public class WallGrid : ISerialisable {
     }
 
     public void RemoveDoor(Wall wall) {
-        if (!wall.Exists) return;
+        if (wall.Empty) return;
         
         wall.IsDoor = false;
         
@@ -246,7 +244,7 @@ public class WallGrid : ISerialisable {
         areaB.RemoveAreaConnection(areaA, wall);
     }
 
-    private void UpdatePathfindingAtWall(Wall wall) {
+    internal void UpdatePathfindingAtWall(Wall wall) {
         var (x, y) = wall.WorldPos;
 
         if (wall.Orientation == Orientation.Horizontal) {
@@ -298,12 +296,12 @@ public class WallGrid : ISerialisable {
         }
     }
 
-    public IEnumerable<Wall> GetAllWalls() {
+    public IEnumerable<Wall> GetAllWalls(bool includeBlueprints) {
         for (var i = 0; i < cols * 2 + 1; i++) {
             var orientation = i % 2;
             for (var j = 0; j < rows + orientation; j++) {
                 var wall = grid[i][j];
-                if (wall.Exists)
+                if (wall.Exists || includeBlueprints && wall.isBlueprint)
                     yield return wall;
             }
         }
@@ -393,6 +391,17 @@ public class WallGrid : ISerialisable {
         return !Find.World.Elevation.GetElevationAtPos(v1).NearlyEquals(Find.World.Elevation.GetElevationAtPos(v2));     
     }
 
+    public void OnWallBuilt(Wall wall) {
+        UpdatePathfindingAtWall(wall);
+
+        if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
+            Find.World.Areas.FormAreasAtWall(wall);
+        }
+
+        if (wall.IsDoor)
+            OnDoorBuilt(wall);
+    }
+
     // TODO (optimisation): See if we can optimise these two functions
     private bool ShouldCheckForLoop(Wall wall) {
         var adjacent = wall.GetAdjacentWalls();
@@ -446,7 +455,7 @@ public class WallGrid : ISerialisable {
             Setup();
 
         Find.SaveManager.ArchiveCollection("walls",
-            GetAllWalls(),
+            GetAllWalls(true),
             walls => walls.Select(wallData => GetWallByGridPos(wallData["gridPos"].ToObject<IntVec2>()))
         );
 

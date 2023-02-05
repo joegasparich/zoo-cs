@@ -37,7 +37,7 @@ public static class TileUtility {
                 if (Find.World.GetEntitiesAtTile(t).Any()) return false;
                 
                 foreach (var wall in Find.World.Walls.GetWallsSurroundingTile(t)) {
-                    if (!wall.Exists) continue;
+                    if (wall.Empty) continue;
                     var placementBounds = new Rectangle(tile.X, tile.Y, obj.Size.X, obj.Size.Y);
                     if (placementBounds.ContractedBy(0.1f).Contains(wall.WorldPos)) return false;
                 }

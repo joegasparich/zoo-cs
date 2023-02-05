@@ -6,13 +6,16 @@ namespace Zoo.world;
 
 public class AreaManager {
     // Constants
-    public const string ZooArea = "Zoo;";
+    public const string ZooAreaId = "Zoo;";
     
     // State
     private Dictionary<string, Area> areas = new();
     private Dictionary<string, Area> tileAreaMap = new();
     
     private bool isSetup = false;
+
+    // Properties
+    public Area ZooArea => areas[ZooAreaId];
 
     public void Setup(IntVec2 startTile) {
         Debug.Log("Setting up areas");
@@ -60,7 +63,7 @@ public class AreaManager {
         }
 
         // Form connections
-        foreach (var wall in Find.World.Walls.GetAllWalls()) {
+        foreach (var wall in Find.World.Walls.GetAllWalls(false)) {
             if (!wall.IsDoor) continue;
             var adjacentTiles = wall.GetAdjacentTiles();
             if (adjacentTiles.Count < 2) continue;
@@ -78,7 +81,7 @@ public class AreaManager {
     }
 
     public void FormZooArea(IntVec2 entrance) {
-        var zooArea = new Area(ZooArea);
+        var zooArea = new Area(ZooAreaId);
         zooArea.SetTiles(FloodFill(entrance));
         areas.Add(zooArea.Id, zooArea);
         foreach (var tile in zooArea.Tiles) {
@@ -147,7 +150,7 @@ public class AreaManager {
         if (areaA == areaB) return;
         
         // If one of the areas is the main zoo area then ensure we keep it
-        if (areaB.Id == ZooArea) {
+        if (areaB.Id == ZooAreaId) {
             (areaA, areaB) = (areaB, areaA);
         }
 

@@ -92,7 +92,7 @@ public class ElevationGrid : ISerialisable {
         if (elevation == Elevation.Water) {
             // Check 4 surrounding wall slots for walls
             foreach(var wall in Find.World.Walls.GetWallsSurroundingPoint(gridPos)) {
-                if (wall.Exists) return false;
+                if (!wall.Empty) return false;
             }
             // Check 4 surrounding tiles
             foreach(var tile in GetSurroundingTiles(gridPos)) {

@@ -205,7 +205,7 @@ public class Tool_Wall : Tool {
         // Invalid wall position
         if (wall == null) return false;
         // Wall already exists
-        if (wall.Exists) return false;
+        if (!wall.Empty) return false;
 
         // Water
         var (v1, v2) = wall.GetVertices();

@@ -19,7 +19,7 @@ public class Area {
 
     // Properties
     public Dictionary<Area, HashSet<Wall>> ConnectedAreas { get; } = new();
-    public bool                            IsZooArea      => Id == AreaManager.ZooArea;
+    public bool                            IsZooArea      => Id == AreaManager.ZooAreaId;
 
     public List<IntVec2> Tiles {
         get => tiles;

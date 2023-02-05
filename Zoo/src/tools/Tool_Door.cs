@@ -25,7 +25,12 @@ public class Tool_Door : Tool {
 
             if (Ghost.CanPlace) {
                 var wall = Find.World.Walls.GetWallAtTile(evt.mouseWorldPos.Floor(), mouseQuadrant);
-                Find.World.Walls.PlaceDoor(wall!);
+
+                // TODO: Door blueprint if wall exists
+                if (!wall.isBlueprint)
+                    Find.World.Walls.OnDoorBuilt(wall!);
+                else
+                    wall.IsDoor = true;
                 
                 toolManager.PushAction(new ToolAction() {
                     Name = "Place door",
@@ -41,7 +46,7 @@ public class Tool_Door : Tool {
     public override void RenderLate() {
         var wall = Find.World.Walls.GetWallAtTile(Ghost.Pos.Floor(), Ghost.Side);
         
-        Ghost.Visible = wall is { Exists: true };
+        Ghost.Visible = wall is { Empty: false };
 
         if (!Ghost.Visible) return;
 
@@ -63,7 +68,7 @@ public class Tool_Door : Tool {
         
         var wall = Find.World.Walls.GetWallAtTile(tile, quadrant);
 
-        if (wall is not { Exists: true }) return false;
+        if (wall is { Empty: true }) return false;
         if (Find.World.Walls.IsWallSloped(wall)) return false;
 
         return true;
