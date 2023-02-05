@@ -20,8 +20,18 @@ public class BuildBlueprintBehaviour : Behaviour {
     public override void Start() {
         base.Start();
 
-        blueprint   = Find.Zoo.Blueprints.Values.RandomElement();
+        blueprint = Find.World.Blueprints.Blueprints.Values.Where(bp => !bp.Reserved).RandomElement();
+
+        if (!Find.World.Blueprints.TryReserveBlueprint(blueprint, actor)) {
+            State = CompleteState.Failed;
+            return;
+        }
+
         closestTile = blueprint.GetBuildTiles().Closest(actor.Pos);
+    }
+
+    public override void End() {
+        Find.World.Blueprints.UnreserveBlueprint(blueprint);
     }
 
     public override IEnumerable<Step> GetSteps() {
@@ -44,7 +54,7 @@ public class BuildBlueprintBehaviour : Behaviour {
     public override void Serialise() {
         base.Serialise();
 
-        Find.SaveManager.ArchiveValue("blueprint", () => blueprint.BlueprintId, id => blueprint = Find.Zoo.Blueprints[id]);
+        Find.SaveManager.ArchiveValue("blueprint",   () => blueprint.BlueprintId, id => blueprint = Find.World.Blueprints.Blueprints[id]);
         Find.SaveManager.ArchiveValue("closestTile", ref closestTile);
     }
 }

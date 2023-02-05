@@ -39,7 +39,6 @@ public class Zoo : ISerialisable {
     public readonly HashSet<Animal>                    Animals = new();
     public readonly HashSet<Guest>                     Guests  = new();
     public readonly HashSet<Staff>                     Staff   = new();
-    public          Dictionary<string, IBlueprintable> Blueprints { get; } = new();
     
     public Zoo() {
         Tools = new ToolManager();
@@ -122,13 +121,6 @@ public class Zoo : ISerialisable {
 
     public void AddFunds(int amount) {
         Funds += amount;
-    }
-
-    public void RegisterBlueprint(IBlueprintable blueprint) {
-        Blueprints.Add(blueprint.BlueprintId, blueprint);
-    }
-    public void UnregisterBlueprint(IBlueprintable blueprint) {
-        Blueprints.Remove(blueprint.BlueprintId);
     }
 
     public void Serialise() {

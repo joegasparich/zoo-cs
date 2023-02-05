@@ -3,8 +3,10 @@
 namespace Zoo.world;
 
 public interface IBlueprintable {
-    public bool IsBlueprint { get; }
+    // Properties
+    public bool   IsBlueprint { get; }
     public string BlueprintId { get; }
+    public bool   Reserved    => Find.World.Blueprints.IsBlueprintReserved(this);
 
     public void BuildBlueprint();
     public List<IntVec2> GetBuildTiles();

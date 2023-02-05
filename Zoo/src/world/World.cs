@@ -52,9 +52,12 @@ public class World : ISerialisable {
     public TerrainGrid    Terrain    { get; }
     public WallGrid       Walls      { get; }
     public FootPathGrid   FootPaths  { get; }
-    public AreaManager    Areas      { get; }
-    public ExhibitManager Exhibits   { get; }
     public Pathfinder     Pathfinder { get; private set; }
+
+    // Managers
+    public AreaManager      Areas      { get; }
+    public ExhibitManager   Exhibits   { get; }
+    public BlueprintManager Blueprints { get; }
 
     private bool isSetup = false;
 
@@ -68,6 +71,7 @@ public class World : ISerialisable {
         FootPaths = new FootPathGrid(Width, Height);
         Areas     = new AreaManager();
         Exhibits  = new ExhibitManager();
+        Blueprints = new BlueprintManager();
     }
 
     public void Setup() {
@@ -377,6 +381,7 @@ public class World : ISerialisable {
         }
         
         Find.SaveManager.ArchiveDeep("exhibits", Exhibits);
+        Find.SaveManager.ArchiveDeep("blueprints", Blueprints);
     }
 
     public void PostLoad() {

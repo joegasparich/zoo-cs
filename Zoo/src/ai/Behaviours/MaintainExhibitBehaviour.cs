@@ -21,6 +21,8 @@ public class MaintainExhibitBehaviour : Behaviour {
     }
 
     public override void Start() {
+        base.Start();
+
         if (!Find.World.Exhibits.TryReserveExhibit(exhibit, actor)) {
             State = CompleteState.Failed;
             return;

@@ -43,7 +43,7 @@ public class Wall : ISerialisable, IBlueprintable {
         if (!isBlueprint) return;
 
         isBlueprint = false;
-        Find.Zoo.UnregisterBlueprint(this);
+        Find.World.Blueprints.UnregisterBlueprint(this);
     }
 
     public List<IntVec2> GetBuildTiles() {
@@ -76,7 +76,7 @@ public class Wall : ISerialisable, IBlueprintable {
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             if (isBlueprint)
-                Find.Zoo.RegisterBlueprint(this);
+                Find.World.Blueprints.RegisterBlueprint(this);
         }
     }
 }
@@ -181,7 +181,7 @@ public class WallGrid : ISerialisable {
         var wall = grid[x][y];
 
         if (isBlueprint)
-            Find.Zoo.RegisterBlueprint(wall);
+            Find.World.Blueprints.RegisterBlueprint(wall);
 
         UpdatePathfindingAtWall(wall);
         

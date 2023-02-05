@@ -32,7 +32,7 @@ public class TileObject : Entity, IBlueprintable {
         if (isBlueprint) {
             Renderer.Graphics.Colour = Colour.Blueprint;
 
-            Find.Zoo.RegisterBlueprint(this);
+            Find.World.Blueprints.RegisterBlueprint(this);
         }
 
         // Currently this means that blueprints are solid and can't be walked through
@@ -68,7 +68,7 @@ public class TileObject : Entity, IBlueprintable {
     public void BuildBlueprint() {
         isBlueprint              = false;
         Renderer.Graphics.Colour = Color.WHITE;
-        Find.Zoo.UnregisterBlueprint(this);
+        Find.World.Blueprints.UnregisterBlueprint(this);
     }
     
     public override IEnumerable<IntVec2> GetOccupiedTiles() {
@@ -106,7 +106,7 @@ public class TileObject : Entity, IBlueprintable {
         Renderer.SpriteIndex = (int)rotation;
 
         if (isBlueprint)
-            Find.Zoo.RegisterBlueprint(this);
+            Find.World.Blueprints.RegisterBlueprint(this);
     }
 
     public override List<InfoTab> GetInfoTabs() {

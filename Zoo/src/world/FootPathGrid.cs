@@ -32,7 +32,7 @@ public class FootPath : ISerialisable, IBlueprintable {
         if (!isBlueprint) return;
 
         isBlueprint = false;
-        Find.Zoo.UnregisterBlueprint(this);
+        Find.World.Blueprints.UnregisterBlueprint(this);
     }
 
     public List<IntVec2> GetBuildTiles() {
@@ -47,7 +47,7 @@ public class FootPath : ISerialisable, IBlueprintable {
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
             if (isBlueprint)
-                Find.Zoo.RegisterBlueprint(this);
+                Find.World.Blueprints.RegisterBlueprint(this);
         }
     }
 }
@@ -134,7 +134,7 @@ public class FootPathGrid : ISerialisable {
         var path = grid[tile.X][tile.Y];
 
         if (isBlueprint)
-            Find.Zoo.RegisterBlueprint(path);
+            Find.World.Blueprints.RegisterBlueprint(path);
         
         Find.World.UpdateAccessibilityGrids(tile);
         
