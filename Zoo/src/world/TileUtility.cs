@@ -22,6 +22,10 @@ public static class TileUtility {
         return Find.World.FootPaths.GetFootPathAtTile(tile);
     }
 
+    public static IEnumerable<IntVec2> AdjacentTiles(this IntVec2 tile) {
+        return Find.World.GetAdjacentTiles(tile);
+    }
+
     public static bool CanPlace(ObjectDef obj, IntVec2 tile) {
         for (int i = 0; i < obj.Size.X; i++) {
             for (int j = 0; j < obj.Size.Y; j++) {

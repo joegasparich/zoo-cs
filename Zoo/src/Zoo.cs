@@ -28,18 +28,18 @@ public class Zoo : ISerialisable {
     public IntVec2 Entrance;
     
     // State
-    public  World            World;
-    public  ToolManager      Tools;
-    public  SelectionManager Selection;
-    private string           infoWidgetHandle;
-    
+    public  World                              World;
+    public  ToolManager                        Tools;
+    public  SelectionManager                   Selection;
+    private string                             infoWidgetHandle;
+
     public int Funds = 1000;
     
     // Caches
-    public readonly HashSet<Animal>     Animals       = new();
-    public readonly HashSet<Guest>      Guests        = new();
-    public readonly HashSet<Staff>      Staff         = new();
-    public readonly HashSet<TileObject> ObjBlueprints = new();
+    public readonly HashSet<Animal>                    Animals = new();
+    public readonly HashSet<Guest>                     Guests  = new();
+    public readonly HashSet<Staff>                     Staff   = new();
+    public          Dictionary<string, IBlueprintable> Blueprints { get; } = new();
     
     public Zoo() {
         Tools = new ToolManager();
@@ -122,6 +122,13 @@ public class Zoo : ISerialisable {
 
     public void AddFunds(int amount) {
         Funds += amount;
+    }
+
+    public void RegisterBlueprint(IBlueprintable blueprint) {
+        Blueprints.Add(blueprint.BlueprintId, blueprint);
+    }
+    public void UnregisterBlueprint(IBlueprintable blueprint) {
+        Blueprints.Remove(blueprint.BlueprintId);
     }
 
     public void Serialise() {

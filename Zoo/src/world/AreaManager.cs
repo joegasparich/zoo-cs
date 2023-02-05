@@ -63,7 +63,7 @@ public class AreaManager {
         foreach (var wall in Find.World.Walls.GetAllWalls()) {
             if (!wall.IsDoor) continue;
             var adjacentTiles = wall.GetAdjacentTiles();
-            if (adjacentTiles.Length < 2) continue;
+            if (adjacentTiles.Count < 2) continue;
 
             var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
             var areaB = Find.World.Areas.GetAreaAtTile(adjacentTiles[1]);
@@ -97,7 +97,7 @@ public class AreaManager {
         
         // ! Does not handle situations where final wall is placed on the edge of the map
         // Current solution is to ensure that the map is already surrounded by walls
-        if (startTiles.Length < 2) return;
+        if (startTiles.Count < 2) return;
         
         areaATiles = FloodFill(startTiles[0]);
         areaBTiles = FloodFill(startTiles[1]);
@@ -139,7 +139,7 @@ public class AreaManager {
 
     public void JoinAreasAtWall(Wall removedWall) {
         var tiles = removedWall.GetAdjacentTiles();
-        if (tiles.Length < 2) return;
+        if (tiles.Count < 2) return;
 
         var areaA = GetAreaAtTile(tiles[0]);
         var areaB = GetAreaAtTile(tiles[1]);

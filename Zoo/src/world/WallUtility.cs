@@ -53,24 +53,7 @@ public static class WallUtility {
             )
         };
     }
-    
-    private static List<IntVec2> adjacentTiles = new ();
-    public static IntVec2[] GetAdjacentTiles(this Wall wall) {
-        adjacentTiles.Clear();
 
-        var (x, y) = wall.WorldPos;
-        
-        if (wall.Orientation == Orientation.Horizontal) {
-            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y - 1.0f))) adjacentTiles.Add(new Vector2(x - 0.5f, y - 1.0f).Floor());
-            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y))) adjacentTiles.Add(new Vector2(x - 0.5f, y).Floor());
-        } else {
-            if (Find.World.IsPositionInMap(new Vector2(x - 1.0f, y - 0.5f))) adjacentTiles.Add(new Vector2(x - 1.0f, y - 0.5f).Floor());
-            if (Find.World.IsPositionInMap(new Vector2(x, y - 0.5f))) adjacentTiles.Add(new Vector2(x, y - 0.5f).Floor());
-        }
-
-        return adjacentTiles.ToArray();
-    }
-    
     private static List<Wall> adjacentWalls = new ();
     public static Wall[] GetAdjacentWalls(this Wall wall) {
         adjacentWalls.Clear();

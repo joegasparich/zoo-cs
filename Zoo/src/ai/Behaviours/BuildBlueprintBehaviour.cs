@@ -10,8 +10,8 @@ public class BuildBlueprintBehaviour : Behaviour {
     private int BuildTicks = 60; // 1 second
 
     // State
-    private TileObject blueprint;
-    private IntVec2    closestTile;
+    private IBlueprintable blueprint;
+    private IntVec2        closestTile;
 
     [JsonConstructor]
     public BuildBlueprintBehaviour() {}
@@ -20,19 +20,19 @@ public class BuildBlueprintBehaviour : Behaviour {
     public override void Start() {
         base.Start();
 
-        blueprint   = Find.Zoo.ObjBlueprints.RandomElement();
-        closestTile = blueprint.GetOccupiedTiles().Closest(actor.Pos);
+        blueprint   = Find.Zoo.Blueprints.Values.RandomElement();
+        closestTile = blueprint.GetAdjacentTiles().Closest(actor.Pos);
     }
 
     public override IEnumerable<Step> GetSteps() {
         // Go to blueprint
-        yield return Steps_General.GoTo(closestTile, PathMode.Adjacent)
-            .FailOn(() => blueprint.Despawned)
+        yield return Steps_General.GoTo(closestTile)
+            .FailOn(() => blueprint is Entity e && e.Despawned)
             .FailOn(() => !blueprint.IsBlueprint);
 
         // Build for a while
         yield return Steps_General.Wait(BuildTicks)
-            .FailOn(() => blueprint.Despawned)
+            .FailOn(() => blueprint is Entity e && e.Despawned)
             .FailOn(() => !blueprint.IsBlueprint);
 
         // Build blueprint
@@ -44,7 +44,7 @@ public class BuildBlueprintBehaviour : Behaviour {
     public override void Serialise() {
         base.Serialise();
 
-        Find.SaveManager.ArchiveValue("blueprint", () => blueprint.Id, id => blueprint = Game.GetEntityById(id) as TileObject);
+        Find.SaveManager.ArchiveValue("blueprint", () => blueprint.BlueprintId, id => blueprint = Find.Zoo.Blueprints[id]);
         Find.SaveManager.ArchiveValue("closestTile", ref closestTile);
     }
 }

@@ -203,6 +203,8 @@ public class Entity : ISerialisable {
         Find.SaveManager.ArchiveDef("def", ref def);
     }
 
+    public virtual void PostLoad() {}
+
     public virtual List<InfoTab> GetInfoTabs() {
         return Components.Select(comp => comp.GetInfoTab()).Where(tab => tab != null).ToList();
     }

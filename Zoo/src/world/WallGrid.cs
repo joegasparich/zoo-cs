@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
@@ -22,24 +23,58 @@ public enum WallSpriteIndex {
     HillSouth = 7,
 };
 
-public class Wall : ISerialisable {
+public class Wall : ISerialisable, IBlueprintable {
     // Config
-    public WallDef? Data           = null;
-    public IntVec2  GridPos        = default;
-    public bool     Indestructable = false;
-    public bool     IsDoor         = false;
-    public Color?   OverrideColour;
-    
+    public   WallDef? Data           = null;
+    public   IntVec2  GridPos        = default;
+    public   bool     Indestructable = false;
+    public   bool     IsDoor         = false;
+    public   Color?   OverrideColour;
+    internal bool     isBlueprint = false;
+
     // Properties
     public Orientation Orientation => (Orientation)(GridPos.X % 2);
     public Vector2     WorldPos    => WallUtility.WallToWorldPosition(GridPos, Orientation);
     public bool        Exists      => Data != null;
+    public bool        IsBlueprint => isBlueprint;
+    public string      BlueprintId => $"blueprint-wall{GridPos.ToString()}";
+
+    public void BuildBlueprint() {
+        if (!isBlueprint) return;
+
+        isBlueprint = false;
+        Find.Zoo.UnregisterBlueprint(this);
+    }
+
+    private static List<IntVec2> adjacentTiles = new ();
+    public List<IntVec2> GetAdjacentTiles() {
+        adjacentTiles.Clear();
+
+        var (x, y) = WorldPos;
+
+        if (Orientation == Orientation.Horizontal) {
+            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y - 1.0f))) adjacentTiles.Add(new Vector2(x - 0.5f, y - 1.0f).Floor());
+            if (Find.World.IsPositionInMap(new Vector2(x - 0.5f, y))) adjacentTiles.Add(new Vector2(x        - 0.5f, y).Floor());
+        } else {
+            if (Find.World.IsPositionInMap(new Vector2(x - 1.0f, y - 0.5f))) adjacentTiles.Add(new Vector2(x - 1.0f, y - 0.5f).Floor());
+            if (Find.World.IsPositionInMap(new Vector2(x,        y - 0.5f))) adjacentTiles.Add(new Vector2(x,        y - 0.5f).Floor());
+        }
+
+        return adjacentTiles;
+    }
 
     public void Serialise() {
         Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.AssetManager.GetDef<WallDef>(id));
         Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
         Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
+        Find.SaveManager.ArchiveValue("isBlueprint", ref isBlueprint);
+    }
+
+    [OnDeserialized]
+    public void PostLoad() {
+        if (isBlueprint)
+            Find.Zoo.RegisterBlueprint(this);
     }
 }
 
@@ -51,9 +86,9 @@ public class WallGrid : ISerialisable {
     private int rows;
     
     // State
-    private bool     isSetup = false;
-    private Wall[][] grid;
-    
+    private bool          isSetup = false;
+    private Wall[][]      grid;
+
     public WallGrid(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
@@ -118,7 +153,7 @@ public class WallGrid : ISerialisable {
                 wall.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: Find.Renderer.GetDepth(wall.WorldPos.Y),
-                    overrideColour: wall.OverrideColour,
+                    overrideColour: wall.OverrideColour ?? (wall.IsBlueprint ? Color.WHITE.WithAlpha(0.5f) : Color.WHITE),
                     index: (int)spriteIndex
                 );
                 
@@ -127,20 +162,24 @@ public class WallGrid : ISerialisable {
         }
     }
 
-    public Wall? PlaceWallAtTile(WallDef data, IntVec2 tile, Side side, bool indestructable = false) {
+    public Wall? PlaceWallAtTile(WallDef data, IntVec2 tile, Side side, bool indestructable = false, bool isBlueprint = false) {
         if (!IsWallPosInMap(tile, side)) return null;
         if (GetWallAtTile(tile, side)!.Exists) return null;
         
-        var (x, y, orientation) = WallUtility.GetGridPosition(tile, side);
+        var (x, y, _) = WallUtility.GetGridPosition(tile, side);
 
-        grid[x][y] = new Wall() {
+        grid[x][y] = new Wall {
             Data           = data,
             GridPos        = new IntVec2(x, y),
             Indestructable = indestructable,
+            isBlueprint    = isBlueprint
         };
-        
+
         var wall = grid[x][y];
-        
+
+        if (isBlueprint)
+            Find.Zoo.RegisterBlueprint(wall);
+
         UpdatePathfindingAtWall(wall);
         
         if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
@@ -180,7 +219,7 @@ public class WallGrid : ISerialisable {
         wall.IsDoor = true;
         
         var adjacentTiles = wall.GetAdjacentTiles();
-        if (adjacentTiles.Length < 2) return;
+        if (adjacentTiles.Count < 2) return;
         
         var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
         var areaB = Find.World.Areas.GetAreaAtTile(adjacentTiles[1]);
@@ -195,7 +234,7 @@ public class WallGrid : ISerialisable {
         wall.IsDoor = false;
         
         var adjacentTiles = wall.GetAdjacentTiles();
-        if (adjacentTiles.Length < 2) return;
+        if (adjacentTiles.Count < 2) return;
         
         var areaA = Find.World.Areas.GetAreaAtTile(adjacentTiles[0]);
         var areaB = Find.World.Areas.GetAreaAtTile(adjacentTiles[1]);
@@ -407,6 +446,13 @@ public class WallGrid : ISerialisable {
             GetAllWalls(),
             walls => walls.Select(wallData => GetWallByGridPos(wallData["gridPos"].ToObject<IntVec2>()))
         );
+
+        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
+            foreach (var wall in GetAllWalls()) {
+                if (wall.isBlueprint)
+                    Find.Zoo.RegisterBlueprint(wall);
+            }
+        }
         
         UpdatePathfinding();
     }

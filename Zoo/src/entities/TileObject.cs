@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.Serialization;
 using Raylib_cs;
 using Zoo.defs;
 using Zoo.ui;
@@ -7,7 +8,7 @@ using Zoo.world;
 
 namespace Zoo.entities; 
 
-public class TileObject : Entity {
+public class TileObject : Entity, IBlueprintable {
     // State
     private Side rotation;
     private bool isBlueprint;
@@ -16,6 +17,7 @@ public class TileObject : Entity {
     public override ObjectDef       Def         => (ObjectDef)base.Def;
     private         RenderComponent Renderer    => GetComponent<RenderComponent>()!;
     public          bool            IsBlueprint => isBlueprint;
+    public          string          BlueprintId => $"blueprint-object{Id}";
 
     public TileObject(Vector2 pos, ObjectDef def) : base(pos, def) {}
 
@@ -27,7 +29,7 @@ public class TileObject : Entity {
         if (Def.NeedsBlueprint) {
             isBlueprint              = true;
             Renderer.Graphics.Colour = Color.WHITE.WithAlpha(0.5f);
-            Find.Zoo.ObjBlueprints.Add(this);
+            Find.Zoo.RegisterBlueprint(this);
         }
 
         // Currently this means that blueprints are solid and can't be walked through
@@ -63,7 +65,7 @@ public class TileObject : Entity {
     public void BuildBlueprint() {
         isBlueprint              = false;
         Renderer.Graphics.Colour = Color.WHITE;
-        Find.Zoo.ObjBlueprints.Remove(this);
+        Find.Zoo.UnregisterBlueprint(this);
     }
     
     public override IEnumerable<IntVec2> GetOccupiedTiles() {
@@ -75,15 +77,33 @@ public class TileObject : Entity {
         }
     }
 
+    private HashSet<IntVec2> adjacentTiles = new();
+    public List<IntVec2> GetAdjacentTiles() {
+        adjacentTiles.Clear();
+
+        foreach (IntVec2 tile in GetOccupiedTiles()) {
+            foreach (IntVec2 adjacentTile in tile.AdjacentTiles()) {
+                if (!GetOccupiedTiles().Contains(adjacentTile))
+                    adjacentTiles.Add(adjacentTile);
+            }
+        }
+
+        return adjacentTiles.ToList();
+    }
+
     public override void Serialise() {
         base.Serialise();
         
         Find.SaveManager.ArchiveValue("rotation",    ref rotation);
         Find.SaveManager.ArchiveValue("isBlueprint", ref isBlueprint);
+    }
 
-        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            Renderer.SpriteIndex   = (int)rotation;
-        }
+    [OnDeserialized]
+    public override void PostLoad() {
+        Renderer.SpriteIndex = (int)rotation;
+
+        if (isBlueprint)
+            Find.Zoo.RegisterBlueprint(this);
     }
 
     public override List<InfoTab> GetInfoTabs() {

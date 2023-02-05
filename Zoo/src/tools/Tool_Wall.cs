@@ -81,7 +81,7 @@ public class Tool_Wall : Tool {
         while (ghosts.Any()) {
             var ghost = ghosts.Pop();
             if (ghost.CanPlace) {
-                var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
+                var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant, isBlueprint: true);
                 foreach (var tile in wall.GetAdjacentTiles())
                     affectedTiles.Add(tile);
 
