@@ -59,7 +59,7 @@ public class BehaviourComponent : Component {
     }
     
     public void SetBehaviour(Behaviour? behaviour) {
-        currentBehaviour?.OnComplete();
+        currentBehaviour?.End();
         currentBehaviour = behaviour;
         currentBehaviour?.Start();
     }

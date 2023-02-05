@@ -40,6 +40,7 @@ public abstract class Behaviour : ISerialisable {
     public virtual void OnExpire() {
         Pather.ResetPath();
     }
+    public virtual void End() {}
     
     /// <summary>
     /// This method returns a list of steps to be executed in order.

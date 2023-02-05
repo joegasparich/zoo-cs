@@ -21,6 +21,11 @@ public class MaintainExhibitBehaviour : Behaviour {
     }
 
     public override void Start() {
+        if (!Find.World.Exhibits.TryReserveExhibit(exhibit, actor)) {
+            State = CompleteState.Failed;
+            return;
+        }
+
         exhibitEntrance = exhibit.Area.Entrances.RandomElement();
 
         if (exhibit.MissingWater)
@@ -28,6 +33,10 @@ public class MaintainExhibitBehaviour : Behaviour {
 
         if (exhibit.MissingFood)
             foodPos = exhibit.Area.RandomTileWhere(tile => tile != waterBowlPos && TileUtility.CanPlace(ObjectDefOf.Hay, tile)); // TODO: Ensure reachable from entrancePos
+    }
+
+    public override void End() {
+        Find.World.Exhibits.UnreserveExhibit(exhibit);
     }
 
     public override IEnumerable<Step> GetSteps() {
@@ -73,8 +82,8 @@ public class MaintainExhibitBehaviour : Behaviour {
         
         // TODO: ArchiveRef
         Find.SaveManager.ArchiveValue("exhibit", () => exhibit.Id, id => exhibit = Find.World.Exhibits.GetExhibitById(id));
-        Find.SaveManager.ArchiveValue("consumablePos", ref waterBowlPos);
-        Find.SaveManager.ArchiveValue("consumablePos", ref foodPos);
+        Find.SaveManager.ArchiveValue("waterBowlPos", ref waterBowlPos);
+        Find.SaveManager.ArchiveValue("foodPos", ref foodPos);
         Find.SaveManager.ArchiveValue("exhibitEntrance", () => exhibitEntrance.GridPos, gridPos => exhibitEntrance = Find.World.Walls.GetWallByGridPos(gridPos));
     }
 }

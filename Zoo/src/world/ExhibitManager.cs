@@ -6,8 +6,9 @@ namespace Zoo.world;
 
 public class ExhibitManager : ISerialisable {
     // Collections
-    private Dictionary<string, Exhibit> exhibits = new();
-    private Dictionary<string, Exhibit> exhibitsByArea = new();
+    private Dictionary<string, Exhibit> exhibits         = new();
+    private Dictionary<string, Exhibit> exhibitsByArea   = new();
+    private Dictionary<string, int>     reservedExhibits = new();
 
     // Listeners
     private string areaCreatedListener;
@@ -82,6 +83,22 @@ public class ExhibitManager : ISerialisable {
         }
     }
 
+    public bool TryReserveExhibit(Exhibit exhibit, Actor actor) {
+        if (reservedExhibits.ContainsKey(exhibit.Id))
+            return false;
+
+        reservedExhibits.Add(exhibit.Id, actor.Id);
+        return true;
+    }
+    public void UnreserveExhibit(Exhibit exhibit) {
+        if (!reservedExhibits.ContainsKey(exhibit.Id)) return;
+
+        reservedExhibits.Remove(exhibit.Id);
+    }
+    public bool IsExhibitReserved(Exhibit exhibit) {
+        return reservedExhibits.ContainsKey(exhibit.Id);
+    }
+
     private void OnAreaCreated(object obj) {
         var area = obj as Area;
         
@@ -147,6 +164,12 @@ public class ExhibitManager : ISerialisable {
                 exhibits.Add(node["id"].Value<string>(), new Exhibit());
             }
             return exhibits.Values;
+        });
+
+        Find.SaveManager.ArchiveValue("reservedExhibits", () => reservedExhibits.Select(kv => (kv.Key, kv.Value)), t => {
+            foreach (var (exhibitId, actorId) in t) {
+                reservedExhibits.Add(exhibitId, actorId);
+            }
         });
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {

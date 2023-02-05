@@ -21,9 +21,10 @@ public class Exhibit : ISerialisable {
     public List<Animal>     ContainedAnimals = new();
     
     // Properties
+    public bool Reserved         => Find.World.Exhibits.IsExhibitReserved(this);
+    public bool NeedsMaintenance => (MissingFood || MissingWater) && LastMaintainedTick + MaintenanceCooldown < Game.Ticks;
     public bool MissingFood      => ContainedAnimals.Any(animal => animal.MissingFoodSource);
     public bool MissingWater     => ContainedAnimals.Any(animal => animal.MissingWaterSource);
-    public bool NeedsMaintenance => (MissingFood || MissingWater) && LastMaintainedTick + MaintenanceCooldown < Game.Ticks;
 
     [JsonConstructor]
     public Exhibit() {}
