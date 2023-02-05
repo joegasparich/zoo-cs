@@ -5,7 +5,7 @@
     "inherits": "BaseStaff",
     "components": {
         "BehaviourComponent": {
-            "behaviourGiverClass": "KeeperBehaviourGiver"
+            "behaviourGiverClass": "BuilderBehaviourGiver"
         },
         "PersonComponent": {
             "age": "Adult",

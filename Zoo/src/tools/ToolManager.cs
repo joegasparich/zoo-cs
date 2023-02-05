@@ -96,6 +96,9 @@ public class ToolManager {
             case ToolType.Animal:
                 activeTool = new Tool_Animal(this);
                 break;
+            case ToolType.Staff:
+                activeTool = new Tool_Staff(this);
+                break;
             case ToolType.TileObject:
                 activeTool = new Tool_TileObject(this);
                 break;

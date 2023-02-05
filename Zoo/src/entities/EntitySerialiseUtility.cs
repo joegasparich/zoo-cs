@@ -31,7 +31,7 @@ public static class EntitySerialiseUtility {
             var def  = Find.AssetManager.GetDef(entityData["def"].Value<string>()) as EntityDef;
             var pos  = entityData["pos"].ToObject<Vector2>();
 
-            var entity = GenEntity.CreateEntity(type, pos, def);
+            var entity = GenEntity.CreateEntity(type, def, pos);
             Game.RegisterEntityNow(entity, entityData["id"].Value<int>());
             entity.Serialise();
             entity.Setup();

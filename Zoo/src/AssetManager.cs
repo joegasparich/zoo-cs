@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using Zoo.defs;
+using Zoo.entities;
 using Zoo.util;
 
 namespace Zoo;
@@ -31,6 +32,9 @@ public class AssetManager {
         DeserializeDefs(resolvedQueue);
 
         DefUtility.LoadDefOfs();
+
+        // People cache
+        LoadPeople();
     }
 
     private void LoadTextures() {
@@ -171,6 +175,41 @@ public class AssetManager {
         }
     }
 
+    public void LoadPeople() {
+        Debug.Log("Loading people textures");
+
+        LoadPeopleTextures(PersonComponent.AdultBodies,     "assets/textures/people/body");
+        LoadPeopleTextures(PersonComponent.ElderBodies,     "assets/textures/people/body/old");
+        LoadPeopleTextures(PersonComponent.ChildBodies,     "assets/textures/people/body/child");
+        LoadPeopleTextures(PersonComponent.AllHats,         "assets/textures/people/hats");
+        LoadPeopleTextures(PersonComponent.MaleHair,        "assets/textures/people/hair/male");
+        LoadPeopleTextures(PersonComponent.FemaleHair,      "assets/textures/people/hair/female");
+        LoadPeopleTextures(PersonComponent.MaleElderHair,   "assets/textures/people/hair/old/male");
+        LoadPeopleTextures(PersonComponent.FemaleElderHair, "assets/textures/people/hair/old/female");
+        LoadPeopleTextures(PersonComponent.Beards,          "assets/textures/people/beards");
+        LoadPeopleTextures(PersonComponent.ElderBeards,     "assets/textures/people/beards/old");
+        LoadPeopleTextures(PersonComponent.AdultShirts,     "assets/textures/people/shirts");
+        LoadPeopleTextures(PersonComponent.ChildShirts,     "assets/textures/people/shirts/child");
+        LoadPeopleTextures(PersonComponent.AdultPants,      "assets/textures/people/pants");
+        LoadPeopleTextures(PersonComponent.ChildPants,      "assets/textures/people/pants/child");
+
+        var json = File.ReadAllText("assets/lang/names.json");
+        var data = JsonConvert.DeserializeObject<JObject>(json)!;
+        PersonComponent.MaleNames   = data["maleFirstNames"].ToObject<List<String>>();
+        PersonComponent.FemaleNames = data["femaleFirstNames"].ToObject<List<String>>();
+        PersonComponent.LastNames   = data["lastNames"].ToObject<List<String>>();
+    }
+
+    private void LoadPeopleTextures(List<string> list, string path) {
+        try {
+            foreach (var file in FileUtility.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly)) {
+                list.Add(file);
+            }
+        } catch (Exception e) {
+            Debug.Error("Failed to load textures from " + path + ": " + e.Message);
+        }
+    }
+
     public Texture2D GetTexture(string path) {
         if (!textureMap.ContainsKey(path)) {
             var texture = Raylib.LoadTexture(path);
@@ -241,5 +280,14 @@ public class AssetManager {
         // TODO: Cache this
 
         return defMap[typeof(T)].Values.Cast<T>().Where(def => !def.Abstract).ToList();
+    }
+
+    public List<T>? GetEntityDefsWithTag<T>(EntityTag tag) where T : Def {
+        if (!defMap.ContainsKey(typeof(T))) {
+            Debug.Error($"Failed to get defs of type {typeof(T)}, no defs of that type have been loaded");
+            return null;
+        }
+
+        return defMap[typeof(T)].Values.Cast<T>().Where(def => !def.Abstract && def is EntityDef edef && edef.Tags.Contains(tag)).ToList();
     }
 }

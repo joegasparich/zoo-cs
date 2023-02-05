@@ -6,9 +6,9 @@ public class Def {
     public bool    Abstract = false;
     public string? Inherits;
     
-    public string  Id;
-    public string? Name;
-    
+    public string       Id;
+    public string?      Name;
+
     // Properties
     public Type DefType => Type.GetType("Zoo.defs." + Class);
 }

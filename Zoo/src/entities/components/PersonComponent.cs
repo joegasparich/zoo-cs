@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
+using Zoo.defs;
 using Zoo.ui;
 using Zoo.util;
 
@@ -35,27 +36,24 @@ public class PersonComponentData : ComponentData {
 public class PersonComponent : Component {
     public static Type DataType => typeof(PersonComponentData);
 
-    // Static cache TODO: Move this somewhere
-    private static bool         loadedIntoCache = false;
+    public static List<string> AdultBodies     = new();
+    public static List<string> ElderBodies     = new();
+    public static List<string> ChildBodies     = new();
+    public static List<string> AllHats         = new();
+    public static List<string> MaleHair        = new();
+    public static List<string> FemaleHair      = new();
+    public static List<string> MaleElderHair   = new();
+    public static List<string> FemaleElderHair = new();
+    public static List<string> Beards          = new();
+    public static List<string> ElderBeards     = new();
+    public static List<string> AdultShirts     = new();
+    public static List<string> AdultPants      = new();
+    public static List<string> ChildShirts     = new();
+    public static List<string> ChildPants      = new();
 
-    private static List<string> AdultBodies     = new();
-    private static List<string> ElderBodies     = new();
-    private static List<string> ChildBodies     = new();
-    private static List<string> AllHats         = new();
-    private static List<string> MaleHair        = new();
-    private static List<string> FemaleHair      = new();
-    private static List<string> MaleElderHair   = new();
-    private static List<string> FemaleElderHair = new();
-    private static List<string> Beards          = new();
-    private static List<string> ElderBeards     = new();
-    private static List<string> AdultShirts     = new();
-    private static List<string> AdultPants      = new();
-    private static List<string> ChildShirts     = new();
-    private static List<string> ChildPants      = new();
-
-    private static List<string> MaleNames = new();
-    private static List<string> FemaleNames = new();
-    private static List<string> LastNames  = new();
+    public static List<string> MaleNames = new();
+    public static List<string> FemaleNames = new();
+    public static List<string> LastNames  = new();
     
     // Constants
     // This is to prevent skin and hair colour being identical because of the colour palette, please don't cancel me!
@@ -88,32 +86,6 @@ public class PersonComponent : Component {
 
     public override void Start() {
         base.Start();
-        
-        // TODO: Move this somewhere so we aren't hitting the file system after launch
-        if (!loadedIntoCache) {
-            LoadTextures(AdultBodies,     "assets/textures/people/body");
-            LoadTextures(ElderBodies,     "assets/textures/people/body/old");
-            LoadTextures(ChildBodies,     "assets/textures/people/body/child");
-            LoadTextures(AllHats,         "assets/textures/people/hats");
-            LoadTextures(MaleHair,        "assets/textures/people/hair/male");
-            LoadTextures(FemaleHair,      "assets/textures/people/hair/female");
-            LoadTextures(MaleElderHair,   "assets/textures/people/hair/old/male");
-            LoadTextures(FemaleElderHair, "assets/textures/people/hair/old/female");
-            LoadTextures(Beards,          "assets/textures/people/beards");
-            LoadTextures(ElderBeards,     "assets/textures/people/beards/old");
-            LoadTextures(AdultShirts,     "assets/textures/people/shirts");
-            LoadTextures(ChildShirts,     "assets/textures/people/shirts/child");
-            LoadTextures(AdultPants,      "assets/textures/people/pants");
-            LoadTextures(ChildPants,      "assets/textures/people/pants/child");
-
-            var json = File.ReadAllText("assets/lang/names.json");
-            var data = JsonConvert.DeserializeObject<JObject>(json)!;
-            MaleNames   = data["maleFirstNames"].ToObject<List<String>>();
-            FemaleNames = data["femaleFirstNames"].ToObject<List<String>>();
-            LastNames   = data["lastNames"].ToObject<List<String>>();
-
-            loadedIntoCache = true;
-        }
         
         // Age
         AgeCategory = Data.Age ?? Rand.EnumValue<PersonAgeCategory>();
@@ -154,7 +126,7 @@ public class PersonComponent : Component {
                 if (gender == PersonGender.Male || gender == PersonGender.NonBinary)
                     if (Rand.Chance(0.3f)) beard = Beards.RandomElement();
                 if (gender == PersonGender.Male)
-                    if (Rand.Chance(0.9f)) MaleHair.RandomElement();
+                    if (Rand.Chance(0.9f)) hair = MaleHair.RandomElement();
                 if (gender == PersonGender.Female)
                     hair = FemaleHair.RandomElement();
                 if (gender == PersonGender.NonBinary)
@@ -208,16 +180,6 @@ public class PersonComponent : Component {
         if (Data.Shirt != null) shirt = Data.Shirt;
         if (Data.Pants != null) pants = Data.Pants;
         if (Data.Hat   != null) hat   = Data.Hat;
-    } 
-
-    private void LoadTextures(List<string> list, string path) {
-        try {
-            foreach (var file in FileUtility.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly)) {
-                list.Add(file);
-            }
-        } catch (Exception e) {
-            Debug.Error("Failed to load textures from " + path + ": " + e.Message);
-        }
     }
 
     public override InfoTab? GetInfoTab() {
@@ -236,5 +198,22 @@ public class PersonComponent : Component {
         Find.SaveManager.ArchiveValue("hat", ref hat);
         Find.SaveManager.ArchiveValue("shirt", ref shirt);
         Find.SaveManager.ArchiveValue("pants", ref pants);
+    }
+
+    public static Texture2D GetPersonTexture(ActorDef def) {
+        var renderData = def.Components.Find(comp => comp is RenderComponentData) as RenderComponentData;
+        var personData = def.Components.Find(comp => comp is PersonComponentData) as PersonComponentData;
+
+        var iconPerson = new PersonComponent(null, personData);
+        iconPerson.PickOutfit(personData.Age ?? PersonAgeCategory.Adult, personData.Gender ?? Rand.EnumValue<PersonGender>());
+
+        var renderer = new RenderComponent(null, renderData);
+        renderer.BaseGraphic.SetSprite(iconPerson.body);
+        if (iconPerson.pants != null) renderer.AddAttachment(iconPerson.pants);
+        if (iconPerson.shirt != null) renderer.AddAttachment(iconPerson.shirt);
+        if (iconPerson.beard != null) renderer.AddAttachment(iconPerson.beard);
+        if (iconPerson.hair  != null) renderer.AddAttachment(iconPerson.hair);
+
+        return renderer.Graphics.Texture;
     }
 }

@@ -5,7 +5,25 @@ using Zoo.util;
 namespace Zoo.entities; 
 
 public static class GenEntity {
-    public static T? CreateEntity<T>(Vector2 pos, EntityDef def) where T : Entity {
+    public static Entity CreateEntity(EntityDef def, Vector2 pos) {
+        if (!Find.World.IsPositionInMap(pos)) return null;
+
+        try {
+            var entity = Activator.CreateInstance(typeof(Entity), pos, def) as Entity;
+
+            foreach (var compData in def.Components) {
+                entity.AddComponent(compData.CompClass, compData);
+            }
+
+            return entity;
+        } catch (Exception e) {
+            Debug.Error($"Failed to create entity at {pos} with def {def.Id}: ", e);
+            return null;
+        }
+
+    }
+
+    public static T? CreateEntity<T>(EntityDef def, Vector2 pos) where T : Entity {
         if (!Find.World.IsPositionInMap(pos)) return null;
 
         try {
@@ -22,7 +40,7 @@ public static class GenEntity {
         }
     }
     
-    public static Entity CreateEntity(Type type, Vector2 pos, EntityDef def) {
+    public static Entity CreateEntity(Type type, EntityDef def, Vector2 pos) {
         if (!Find.World.IsPositionInMap(pos)) return null;
         
         try {
@@ -46,7 +64,7 @@ public static class GenEntity {
     }
     
     public static TileObject? CreateTileObject(ObjectDef def, Vector2 pos) {
-        return CreateEntity<TileObject>(pos + def.Size / 2f, def);
+        return CreateEntity<TileObject>(def, pos + def.Size / 2f);
     }
     
     public static Animal? CreateAnimal(string animalId, Vector2 pos) {
@@ -56,10 +74,10 @@ public static class GenEntity {
     }
     
     public static Animal? CreateAnimal(AnimalDef def, Vector2 pos) {
-        return CreateEntity<Animal>(pos, def);
+        return CreateEntity<Animal>(def, pos);
     }
 
     public static Guest? CreateGuest(Vector2 pos) {
-        return CreateEntity<Guest>(pos, ActorDefOf.Guest);
+        return CreateEntity<Guest>(ActorDefOf.Guest, pos);
     }
 }
