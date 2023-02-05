@@ -25,8 +25,7 @@ public class Tool_Door : Tool {
 
             if (Ghost.CanPlace) {
                 var wall = Find.World.Walls.GetWallAtTile(evt.mouseWorldPos.Floor(), mouseQuadrant);
-
-                wall.PlaceDoor();
+                Find.World.Walls.PlaceDoorOnWall(wall);
                 
                 toolManager.PushAction(new ToolAction() {
                     Name = "Place door",

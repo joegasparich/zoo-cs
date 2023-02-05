@@ -107,7 +107,7 @@ public class PathFollowComponent : InputComponent {
         var accesibility = Actor.Accessibility;
 
         // Get back onto footpath
-        if (accesibility == AccessibilityType.PathsOnly && !Actor.Pos.Floor().GetFootPath().Exists)
+        if (accesibility == AccessibilityType.PathsOnly && Actor.Pos.Floor().GetFootPath().Empty)
             accesibility = AccessibilityType.NoWater;
 
         destination                = targetPos.Floor();

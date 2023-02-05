@@ -135,7 +135,7 @@ public class Tool_Delete : Tool {
                 if (!Find.World.IsPositionInMap(tile)) continue;
 
                 var footpath = Find.World.FootPaths.GetFootPathAtTile(tile);
-                if (footpath is not { Exists: true }) continue;
+                if (footpath is { Empty: true }) continue;
                 highlightedFootPaths.Add(footpath);
             }
         }

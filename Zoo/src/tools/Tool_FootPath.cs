@@ -181,7 +181,7 @@ public class Tool_FootPath : Tool {
         // Path location invalid
         if (path == null) return false;
         // Path already exists
-        if (path.Exists) return false;
+        if (!path.Empty) return false;
         // Can't place on slope corner
         if (Find.World.Elevation.IsPositionSlopeCorner(path.Tile)) return false;
         // Can't place on water

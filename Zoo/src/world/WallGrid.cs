@@ -25,7 +25,7 @@ public class Wall : ISerialisable, IBlueprintable {
     // Config
     public   WallDef? Data           = null;
     public   IntVec2  GridPos        = default;
-    public   bool     Indestructable = false;
+    public   bool     Indestructible = false;
     public   bool     IsDoor         = false;
     public   Color?   OverrideColour;
     internal bool     isWallBlueprint     = false;
@@ -58,16 +58,6 @@ public class Wall : ISerialisable, IBlueprintable {
         return GetAdjacentTiles();
     }
 
-    public void PlaceDoor() {
-        if (!isWallBlueprint) {
-            isDoorBlueprint = true;
-            Find.World.Blueprints.RegisterBlueprint(this);
-        } else {
-            // Is blueprint so we can instantly set it to be a door
-            IsDoor = true;
-        }
-    }
-
     private static List<IntVec2> adjacentTiles = new ();
     public List<IntVec2> GetAdjacentTiles() {
         adjacentTiles.Clear();
@@ -88,7 +78,7 @@ public class Wall : ISerialisable, IBlueprintable {
     public void Serialise() {
         Find.SaveManager.ArchiveValue("wallId", () => Data.Id, id => Data = Find.AssetManager.GetDef<WallDef>(id));
         Find.SaveManager.ArchiveValue("gridPos", ref GridPos);
-        Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
+        Find.SaveManager.ArchiveValue("indestructible", ref Indestructible);
         Find.SaveManager.ArchiveValue("isDoor", ref IsDoor);
         Find.SaveManager.ArchiveValue("isBlueprint", ref isWallBlueprint);
         Find.SaveManager.ArchiveValue("isDoorBlueprint", ref isDoorBlueprint);
@@ -137,7 +127,7 @@ public class WallGrid : ISerialisable {
                     Data           = wallData,
                     GridPos        = new IntVec2(i, j),
                     IsDoor         = data?[i][j]?.isDoor ?? false,
-                    Indestructable = data?[i][j]?.indestructable ?? false
+                    Indestructible = data?[i][j]?.indestructable ?? false
                 };
             }
         }
@@ -203,7 +193,7 @@ public class WallGrid : ISerialisable {
         grid[x][y] = new Wall {
             Data           = data,
             GridPos        = new IntVec2(x, y),
-            Indestructable = indestructable,
+            Indestructible = indestructable,
             isWallBlueprint    = isBlueprint
         };
 
@@ -226,19 +216,40 @@ public class WallGrid : ISerialisable {
         
         // Get grid pos
         var (x, y, orientation) = WallUtility.GetGridPosition(tile, side);
-        if (grid[x][y].Empty || grid[x][y].Indestructable) return;
+        if (grid[x][y].Empty || grid[x][y].Indestructible) return;
         
         // Set to empty wall
         grid[x][y] = new Wall() {
             Data           = null,
             GridPos        = new IntVec2(x, y),
-            Indestructable = false,
+            Indestructible = false,
         };
         
         var wall = grid[x][y];
         
         UpdatePathfindingAtWall(wall);
         Find.World.Areas.JoinAreasAtWall(wall);
+    }
+    
+    public void OnWallBuilt(Wall wall) {
+        UpdatePathfindingAtWall(wall);
+
+        if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
+            Find.World.Areas.FormAreasAtWall(wall);
+        }
+
+        if (wall.IsDoor)
+            OnDoorBuilt(wall);
+    }
+    
+    public void PlaceDoorOnWall(Wall wall) {
+        if (!wall.isWallBlueprint) {
+            wall.isDoorBlueprint = true;
+            Find.World.Blueprints.RegisterBlueprint(wall);
+        } else {
+            // Is blueprint so we can instantly set it to be a door
+            wall.IsDoor = true;
+        }
     }
 
     public void OnDoorBuilt(Wall wall) {
@@ -416,17 +427,6 @@ public class WallGrid : ISerialisable {
     public bool IsWallSloped(Wall wall) {
         var (v1, v2) = wall.GetVertices();
         return !Find.World.Elevation.GetElevationAtPos(v1).NearlyEquals(Find.World.Elevation.GetElevationAtPos(v2));     
-    }
-
-    public void OnWallBuilt(Wall wall) {
-        UpdatePathfindingAtWall(wall);
-
-        if (ShouldCheckForLoop(wall) && CheckForLoop(wall)) {
-            Find.World.Areas.FormAreasAtWall(wall);
-        }
-
-        if (wall.IsDoor)
-            OnDoorBuilt(wall);
     }
 
     // TODO (optimisation): See if we can optimise these two functions

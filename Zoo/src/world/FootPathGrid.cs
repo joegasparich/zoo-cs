@@ -15,14 +15,15 @@ public enum FootPathSpriteIndex {
 
 public class FootPath : ISerialisable, IBlueprintable {
     // Config
-    public   FootPathDef? Data           = null;
-    public   IntVec2      Tile            = default;
-    public   bool         Indestructable = false;
-    public   Color?       OverrideColour;
+    public FootPathDef? Data;
+    public IntVec2      Tile;
+    public bool         Indestructible;
+    public Color?       OverrideColour;
 
     // Properties
-    public bool    Exists      => Data != null;
-    public bool    IsBlueprint { get; internal set; } = false;
+    public bool    Empty       => Data == null;
+    public bool    IsBlueprint { get; internal set; }
+    public bool    Exists      => !Empty && !IsBlueprint;
     public Vector2 Pos         => Tile;
     public string  UniqueId    => $"path{Tile.ToString()}";
 
@@ -31,6 +32,7 @@ public class FootPath : ISerialisable, IBlueprintable {
 
         IsBlueprint = false;
         Find.World.Blueprints.UnregisterBlueprint(this);
+        Find.World.FootPaths.OnPathBuilt(this);
     }
 
     public List<IntVec2> GetBuildTiles() {
@@ -40,7 +42,7 @@ public class FootPath : ISerialisable, IBlueprintable {
     public void Serialise() {
         Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
         Find.SaveManager.ArchiveValue("tile",           ref Tile);
-        Find.SaveManager.ArchiveValue("indestructable", ref Indestructable);
+        Find.SaveManager.ArchiveValue("indestructible", ref Indestructible);
         Find.SaveManager.ArchiveValue("isBlueprint",    () => IsBlueprint, b => IsBlueprint = b);
 
         if (Find.SaveManager.Mode == SerialiseMode.Loading) {
@@ -100,7 +102,7 @@ public class FootPathGrid : ISerialisable {
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
                 var path = grid[i][j];
-                if (!path.Exists) continue;
+                if (path.Empty) continue;
                 if (path.Data == null) continue;
 
                 var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
@@ -134,8 +136,6 @@ public class FootPathGrid : ISerialisable {
         if (isBlueprint)
             Find.World.Blueprints.RegisterBlueprint(path);
         
-        Find.World.UpdateAccessibilityGrids(tile);
-        
         return grid[tile.X][tile.Y];
     }
 
@@ -150,11 +150,15 @@ public class FootPathGrid : ISerialisable {
         Find.World.UpdateAccessibilityGrids(tile);
     }
     
-    public IEnumerable<FootPath> GetAllFootPaths() {
+    public void OnPathBuilt(FootPath path) {
+        Find.World.UpdateAccessibilityGrids(path.Tile);
+    }
+    
+    public IEnumerable<FootPath> GetAllFootPaths(bool includeBlueprints) {
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
                 var path = grid[i][j];
-                if (path.Exists)
+                if (path.Exists || includeBlueprints && path.IsBlueprint)
                     yield return path;
             }
         }
@@ -176,7 +180,7 @@ public class FootPathGrid : ISerialisable {
             Setup();
         
         Find.SaveManager.ArchiveCollection("paths",
-            GetAllFootPaths(),
+            GetAllFootPaths(true),
             paths => paths.Select(pathData => GetFootPathAtTile(pathData["pos"].ToObject<IntVec2>()))
         );
     }
