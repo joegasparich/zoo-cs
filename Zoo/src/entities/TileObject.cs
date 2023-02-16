@@ -7,7 +7,7 @@ using Zoo.world;
 
 namespace Zoo.entities; 
 
-public class TileObject : Entity, IBlueprintable {
+public class TileObject : Entity {
     // State
     private Side rotation;
 
@@ -15,8 +15,6 @@ public class TileObject : Entity, IBlueprintable {
     public override ObjectDef       Def         => (ObjectDef)base.Def;
     private         RenderComponent Renderer    => GetComponent<RenderComponent>()!;
     public new      Vector2         Pos         => base.Pos;
-    public          string          UniqueId    => $"object{Id}";
-    public          bool            IsBlueprint { get; set; }
 
     public TileObject(Vector2 pos, ObjectDef def) : base(pos, def) {}
 
@@ -25,14 +23,6 @@ public class TileObject : Entity, IBlueprintable {
         
         Find.World.RegisterTileObject(this);
 
-        if (IsBlueprint) {
-            Renderer.Graphics.Colour = Colour.Blueprint;
-
-            Find.World.Blueprints.RegisterBlueprint(this);
-        }
-
-        // Currently this means that blueprints are solid and can't be walked through
-        // Probably a good idea in case they get built while an actor is pathing through it
         if (Def.Solid) {
             foreach (var tile in GetOccupiedTiles()) {
                 Find.World.UpdateAccessibilityGrids(tile);
@@ -61,12 +51,6 @@ public class TileObject : Entity, IBlueprintable {
         Renderer.SpriteIndex = (int)rotation;
     }
 
-    public void BuildBlueprint() {
-        IsBlueprint              = false;
-        Renderer.Graphics.Colour = Color.WHITE;
-        Find.World.Blueprints.UnregisterBlueprint(this);
-    }
-    
     public override IEnumerable<IntVec2> GetOccupiedTiles() {
         var baseTile = (Pos - Def.Size / 2).Floor();
         for (var i = 0; i < Def.Size.X; i++) {
@@ -76,25 +60,10 @@ public class TileObject : Entity, IBlueprintable {
         }
     }
 
-    private HashSet<IntVec2> adjacentTiles = new();
-    public List<IntVec2> GetBuildTiles() {
-        adjacentTiles.Clear();
-
-        foreach (IntVec2 tile in GetOccupiedTiles()) {
-            foreach (IntVec2 adjacentTile in tile.AdjacentTiles()) {
-                if (!GetOccupiedTiles().Contains(adjacentTile))
-                    adjacentTiles.Add(adjacentTile);
-            }
-        }
-
-        return adjacentTiles.ToList();
-    }
-
     public override void Serialise() {
         base.Serialise();
         
         Find.SaveManager.ArchiveValue("rotation",    ref rotation);
-        Find.SaveManager.ArchiveValue("isBlueprint", () => IsBlueprint, b => IsBlueprint = b);
     }
 
     public override List<InfoTab> GetInfoTabs() {

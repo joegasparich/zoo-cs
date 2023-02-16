@@ -92,7 +92,7 @@ public class ElevationGrid : ISerialisable {
         if (elevation == Elevation.Water) {
             // Check 4 surrounding wall slots for walls
             foreach(var wall in Find.World.Walls.GetWallsSurroundingPoint(gridPos)) {
-                if (!wall.Empty) return false;
+                if (wall.Exists) return false;
             }
             // Check 4 surrounding tiles
             foreach(var tile in GetSurroundingTiles(gridPos)) {
@@ -106,7 +106,7 @@ public class ElevationGrid : ISerialisable {
                 }
                 
                 // Check for paths
-                if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Empty: false }) return false;
+                if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;
             }
         }
 
@@ -120,7 +120,7 @@ public class ElevationGrid : ISerialisable {
                 if (tileObject is { Def.CanPlaceOnSlopes: false }) return false;
                 // Check for paths
                 // TODO (fix): Figure out if points are being elevated in a way where this is valid
-                if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Empty: false }) return false;
+                if (Find.World.FootPaths.GetFootPathAtTile(tile) is { Exists: true }) return false;
             }
         }
 

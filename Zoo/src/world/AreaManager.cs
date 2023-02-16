@@ -63,7 +63,7 @@ public class AreaManager {
         }
 
         // Form connections
-        foreach (var wall in Find.World.Walls.GetAllWalls(false)) {
+        foreach (var wall in Find.World.Walls.GetAllWalls()) {
             if (!wall.IsDoor) continue;
             var adjacentTiles = wall.GetAdjacentTiles();
             if (adjacentTiles.Count < 2) continue;

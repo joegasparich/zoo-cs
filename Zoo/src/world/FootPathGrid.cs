@@ -13,7 +13,7 @@ public enum FootPathSpriteIndex {
     HillSouth = 4
 }
 
-public class FootPath : ISerialisable, IBlueprintable {
+public class FootPath : ISerialisable {
     // Config
     public FootPathDef? Data;
     public IntVec2      Tile;
@@ -21,34 +21,13 @@ public class FootPath : ISerialisable, IBlueprintable {
     public Color?       OverrideColour;
 
     // Properties
-    public bool    Empty       => Data == null;
-    public bool    IsBlueprint { get; internal set; }
-    public bool    Exists      => !Empty && !IsBlueprint;
-    public Vector2 Pos         => Tile;
-    public string  UniqueId    => $"path{Tile.ToString()}";
-
-    public void BuildBlueprint() {
-        if (!IsBlueprint) return;
-
-        IsBlueprint = false;
-        Find.World.Blueprints.UnregisterBlueprint(this);
-        Find.World.FootPaths.OnPathBuilt(this);
-    }
-
-    public List<IntVec2> GetBuildTiles() {
-        return new List<IntVec2> { Tile };
-    }
+    public bool    Exists => Data != null;
+    public Vector2 Pos    => Tile;
 
     public void Serialise() {
         Find.SaveManager.ArchiveValue("pathId",         () => Data.Id, id => Data = Find.AssetManager.GetDef<FootPathDef>(id));
         Find.SaveManager.ArchiveValue("tile",           ref Tile);
         Find.SaveManager.ArchiveValue("indestructible", ref Indestructible);
-        Find.SaveManager.ArchiveValue("isBlueprint",    () => IsBlueprint, b => IsBlueprint = b);
-
-        if (Find.SaveManager.Mode == SerialiseMode.Loading) {
-            if (IsBlueprint)
-                Find.World.Blueprints.RegisterBlueprint(this);
-        }
     }
 }
 
@@ -102,7 +81,7 @@ public class FootPathGrid : ISerialisable {
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
                 var path = grid[i][j];
-                if (path.Empty) continue;
+                if (!path.Exists) continue;
                 if (path.Data == null) continue;
 
                 var (spriteIndex, elevation) = FootPathUtility.GetSpriteInfo(path);
@@ -112,7 +91,7 @@ public class FootPathGrid : ISerialisable {
                 path.Data.GraphicData.Blit(
                     pos: pos * World.WorldScale,
                     depth: (int)Depth.GroundCover,
-                    overrideColour: path.OverrideColour ?? (path.IsBlueprint ? Colour.Blueprint : Color.WHITE),
+                    overrideColour: path.OverrideColour,
                     index: (int)spriteIndex
                 );
                 
@@ -121,20 +100,18 @@ public class FootPathGrid : ISerialisable {
         }
     }
 
-    public FootPath? PlacePathAtTile(FootPathDef data, IntVec2 tile, bool isBlueprint = false) {
+    public FootPath? PlacePathAtTile(FootPathDef data, IntVec2 tile) {
         if (!Find.World.IsPositionInMap(tile)) return null;
         if (GetFootPathAtTile(tile)!.Exists) return null;
         
         grid[tile.X][tile.Y] = new FootPath() {
             Data = data,
             Tile = tile,
-            IsBlueprint = isBlueprint
         };
 
         var path = grid[tile.X][tile.Y];
-
-        if (isBlueprint)
-            Find.World.Blueprints.RegisterBlueprint(path);
+        
+        Find.World.UpdateAccessibilityGrids(path.Tile);
         
         return grid[tile.X][tile.Y];
     }
@@ -150,15 +127,11 @@ public class FootPathGrid : ISerialisable {
         Find.World.UpdateAccessibilityGrids(tile);
     }
     
-    public void OnPathBuilt(FootPath path) {
-        Find.World.UpdateAccessibilityGrids(path.Tile);
-    }
-    
-    public IEnumerable<FootPath> GetAllFootPaths(bool includeBlueprints) {
+    public IEnumerable<FootPath> GetAllFootPaths() {
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
                 var path = grid[i][j];
-                if (path.Exists || includeBlueprints && path.IsBlueprint)
+                if (path.Exists)
                     yield return path;
             }
         }
@@ -180,7 +153,7 @@ public class FootPathGrid : ISerialisable {
             Setup();
         
         Find.SaveManager.ArchiveCollection("paths",
-            GetAllFootPaths(true),
+            GetAllFootPaths(),
             paths => paths.Select(pathData => GetFootPathAtTile(pathData["pos"].ToObject<IntVec2>()))
         );
     }

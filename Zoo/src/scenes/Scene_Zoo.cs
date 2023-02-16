@@ -70,7 +70,7 @@ public class Scene_Zoo : Scene {
         }
         
         // Entrance
-        Zoo.World.Walls.OnDoorBuilt(Zoo.World.Walls.GetWallAtTile(Zoo.Entrance, Side.South));
+        Zoo.World.Walls.PlaceDoorOnWall(Zoo.World.Walls.GetWallAtTile(Zoo.Entrance, Side.South));
     }
     
     public override void Serialise() {

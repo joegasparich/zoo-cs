@@ -71,7 +71,7 @@ public class Tool_FootPath : Tool {
         while (ghosts.Any()) {
             var ghost = ghosts.Pop();
             if (ghost.CanPlace) {
-                Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor(), isBlueprint: true);
+                Find.World.FootPaths.PlacePathAtTile(currentFootPath, ghost.Pos.Floor());
                 undoData.Add(ghost.Pos.Floor());
                 placed++;
             }
@@ -181,7 +181,7 @@ public class Tool_FootPath : Tool {
         // Path location invalid
         if (path == null) return false;
         // Path already exists
-        if (!path.Empty) return false;
+        if (path.Exists) return false;
         // Can't place on slope corner
         if (Find.World.Elevation.IsPositionSlopeCorner(path.Tile)) return false;
         // Can't place on water

@@ -81,7 +81,7 @@ public class Tool_Wall : Tool {
         while (ghosts.Any()) {
             var ghost = ghosts.Pop();
             if (ghost.CanPlace) {
-                var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant, isBlueprint: true);
+                var wall = Find.World.Walls.PlaceWallAtTile(currentWall, ghost.Pos.Floor(), dragQuadrant);
                 foreach (var tile in wall.GetAdjacentTiles())
                     affectedTiles.Add(tile);
 
@@ -205,7 +205,7 @@ public class Tool_Wall : Tool {
         // Invalid wall position
         if (wall == null) return false;
         // Wall already exists
-        if (!wall.Empty) return false;
+        if (wall.Exists) return false;
 
         // Water
         var (v1, v2) = wall.GetVertices();

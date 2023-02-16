@@ -41,7 +41,7 @@ public class Tool_Door : Tool {
     public override void RenderLate() {
         var wall = Find.World.Walls.GetWallAtTile(Ghost.Pos.Floor(), Ghost.Side);
         
-        Ghost.Visible = wall is { Empty: false };
+        Ghost.Visible = wall is { Exists: true };
 
         if (!Ghost.Visible) return;
 
@@ -63,7 +63,7 @@ public class Tool_Door : Tool {
         
         var wall = Find.World.Walls.GetWallAtTile(tile, quadrant);
 
-        if (wall is { Empty: true }) return false;
+        if (wall is { Exists: false }) return false;
         if (Find.World.Walls.IsWallSloped(wall)) return false;
 
         return true;

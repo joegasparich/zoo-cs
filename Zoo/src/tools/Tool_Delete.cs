@@ -135,7 +135,7 @@ public class Tool_Delete : Tool {
                 if (!Find.World.IsPositionInMap(tile)) continue;
 
                 var footpath = Find.World.FootPaths.GetFootPathAtTile(tile);
-                if (footpath is { Empty: true }) continue;
+                if (footpath is { Exists: false }) continue;
                 highlightedFootPaths.Add(footpath);
             }
         }
@@ -155,7 +155,7 @@ public class Tool_Delete : Tool {
                 if (!Find.World.IsPositionInMap(tile)) continue;
 
                 foreach(var wall in Find.World.Walls.GetWallsSurroundingTile(tile)) {
-                    if (wall.Empty) continue;
+                    if (!wall.Exists) continue;
 
                     var opposite = Find.World.Walls.GetOppositeTile(wall, tile);
                     if (opposite.HasValue && dragRect.Contains(opposite.Value + new Vector2(0.5f, 0.5f))) {

@@ -44,8 +44,6 @@ public class Tool_TileObject : Tool {
             if (obj == null) return;
 
             obj.SetRotation(rotation);
-            if (currentObject.NeedsBlueprint)
-                obj.IsBlueprint = true;
 
             Game.RegisterEntity(obj);
 
